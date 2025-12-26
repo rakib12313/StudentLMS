@@ -1,0 +1,22 @@
+/* style.css */
+.hidden { display: none !important; }
+body { user-select: none; -webkit-user-select: none; }
+
+/* Tabs */
+.active-tab { color: #2563eb; border-bottom: 2px solid #2563eb; background: #eff6ff; }
+.inactive-tab { color: #6b7280; background: white; }
+
+/* Watermark */
+.watermark-text {
+    font-size: 1.25rem; font-weight: bold; color: rgba(0,0,0,0.08);
+    transform: rotate(-45deg); pointer-events: none; margin: 3rem;
+}
+
+/* User Status Badges */
+.badge-pending { background-color: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 999px; font-size: 0.70rem; }
+.badge-approved { background-color: #d1fae5; color: #065f46; padding: 2px 8px; border-radius: 999px; font-size: 0.70rem; }
+.badge-admin { background-color: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 999px; font-size: 0.70rem; font-weight: bold; }
+
+/* Table Styling */
+.table-row { border-bottom: 1px solid #f3f4f6; padding: 10px; }
+.table-row:last-child { border-bottom: none; }

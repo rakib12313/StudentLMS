@@ -23,8 +23,9 @@
                 <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <i class="fas fa-graduation-cap text-2xl text-white"></i>
                 </div>
-                <h1 class="text-2xl font-bold text-slate-800">Student Portal</h1>
-                <p class="text-slate-500 text-xs mt-1">Secure Access</p>
+                <!-- Dynamic Title -->
+                <h1 id="page-title" class="text-2xl font-bold text-slate-800">Student Login</h1>
+                <p id="page-subtitle" class="text-slate-500 text-xs mt-1">Enter your credentials</p>
             </div>
 
             <!-- INPUT FORM -->
@@ -38,24 +39,25 @@
                     <input type="password" id="password" placeholder="••••••••" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:border-blue-500 transition">
                 </div>
 
-                <button id="login-btn" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold text-sm shadow-lg hover:bg-blue-700 active:scale-95 transition">
+                <!-- Main Action Button -->
+                <button id="main-action-btn" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold text-sm shadow-lg hover:bg-blue-700 active:scale-95 transition">
                     Login
                 </button>
 
-                <!-- Toggle Register -->
+                <!-- Toggle Link -->
                 <div class="text-center pt-2">
-                    <p class="text-xs text-slate-400">First time here?</p>
-                    <button id="setup-btn" class="text-sm font-bold text-blue-600 hover:underline">
+                    <p id="toggle-text" class="text-xs text-slate-400">First time here?</p>
+                    <button id="toggle-mode-btn" class="text-sm font-bold text-blue-600 hover:underline">
                         Create Account (Setup)
                     </button>
                 </div>
             </div>
 
-            <p id="status-msg" class="text-xs text-center mt-4 text-red-500 font-medium h-5"></p>
+            <p id="status-msg" class="text-xs text-center mt-4 text-red-500 font-medium min-h-[20px]"></p>
         </div>
     </div>
 
-    <!-- DASHBOARD (Same as before) -->
+    <!-- DASHBOARD (Hidden initially) -->
     <div id="dashboard-section" class="hidden min-h-screen pb-20">
         <nav class="bg-white p-4 shadow-sm flex justify-between items-center sticky top-0 z-50">
             <span class="font-bold text-blue-600 tracking-wide">Smart LMS</span>
@@ -106,7 +108,7 @@
         </div>
     </div>
 
-    <!-- MODALS (Exam Taker & Viewer) - Kept same as previous version -->
+    <!-- MODALS -->
     <div id="exam-taker-modal" class="hidden fixed inset-0 z-50 bg-white flex flex-col">
         <div class="p-4 bg-slate-900 text-white flex justify-between items-center shadow-lg">
             <h2 id="taking-exam-title" class="font-bold text-sm truncate w-40">Exam</h2>
@@ -125,6 +127,7 @@
         <img id="image-frame" class="max-w-full max-h-full hidden object-contain z-20">
     </div>
 
-    <script type="module" src="app.js"></script>
+    <!-- FORCE NEW VERSION -->
+    <script type="module" src="app.js?v=13"></script>
 </body>
 </html>

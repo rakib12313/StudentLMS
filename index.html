@@ -13,103 +13,108 @@
     <div id="toast-container"></div>
 
     <!-- LOGIN SECTION -->
-    <div id="login-section" class="login-bg flex flex-col items-center justify-center px-4">
+    <div id="login-section" class="login-bg flex flex-col items-center justify-center min-h-screen px-4">
         <div class="blob blob-1 animate-float"></div>
         <div class="blob blob-2 animate-float" style="animation-delay: 2s"></div>
 
-        <div class="login-card w-full max-w-sm p-8 rounded-3xl relative z-10 text-center animate-fade-in">
-            <div class="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-200">
-                <i class="fas fa-graduation-cap text-3xl text-white"></i>
+        <div class="login-card w-full max-w-sm p-8 rounded-3xl relative z-10 animate-fade-in shadow-xl bg-white/90 backdrop-blur">
+            
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i class="fas fa-graduation-cap text-2xl text-white"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-slate-800">Student Portal</h1>
+                <p class="text-slate-500 text-xs mt-1">Secure Access</p>
             </div>
-            <h1 class="text-2xl font-bold text-slate-800">Student Portal</h1>
-            <p class="text-slate-500 text-sm mb-8 mt-1">Access your study materials</p>
 
-            <button id="google-login-btn" class="w-full bg-white border border-slate-200 text-slate-700 font-bold py-4 rounded-xl flex items-center justify-center gap-3 shadow-sm hover:bg-slate-50 active:scale-95 transition cursor-pointer">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5">
-                <span class="text-sm">Login with Gmail</span>
-            </button>
+            <!-- INPUT FORM -->
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-slate-600 ml-1">Email</label>
+                    <input type="email" id="email" placeholder="student@gmail.com" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:border-blue-500 transition">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 ml-1">Password</label>
+                    <input type="password" id="password" placeholder="••••••••" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:border-blue-500 transition">
+                </div>
 
-            <p id="login-status" class="mt-4 text-xs text-blue-600 font-mono h-5"></p>
+                <button id="login-btn" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold text-sm shadow-lg hover:bg-blue-700 active:scale-95 transition">
+                    Login
+                </button>
 
-            <div class="mt-6 p-3 bg-red-50 rounded-lg text-left border border-red-100">
-                <p class="text-[10px] text-red-500 font-bold uppercase mb-1"><i class="fas fa-lock"></i> Security</p>
-                <p class="text-xs text-slate-500">Only emails registered by the Admin can log in.</p>
+                <!-- Toggle Register -->
+                <div class="text-center pt-2">
+                    <p class="text-xs text-slate-400">First time here?</p>
+                    <button id="setup-btn" class="text-sm font-bold text-blue-600 hover:underline">
+                        Create Account (Setup)
+                    </button>
+                </div>
             </div>
+
+            <p id="status-msg" class="text-xs text-center mt-4 text-red-500 font-medium h-5"></p>
         </div>
     </div>
 
-    <!-- DASHBOARD -->
+    <!-- DASHBOARD (Same as before) -->
     <div id="dashboard-section" class="hidden min-h-screen pb-20">
         <nav class="bg-white p-4 shadow-sm flex justify-between items-center sticky top-0 z-50">
             <span class="font-bold text-blue-600 tracking-wide">Smart LMS</span>
             <div class="flex gap-2">
-                <!-- Hidden Admin Link -->
-                <a id="admin-link-btn" href="admin.html" class="hidden text-xs bg-slate-900 text-white px-3 py-1 rounded font-bold flex items-center shadow-lg hover:bg-slate-700">Admin Panel</a>
+                <a id="admin-link-btn" href="admin.html" class="hidden text-xs bg-slate-900 text-white px-3 py-1 rounded font-bold flex items-center">Admin</a>
                 <button id="logout-btn" class="text-xs text-red-500 font-bold px-2">Logout</button>
             </div>
         </nav>
 
         <div class="max-w-3xl mx-auto p-4">
-            <!-- Profile Info -->
             <div class="bg-white p-4 rounded-xl border border-slate-100 mb-6 flex items-center gap-4 shadow-sm">
-                <img id="profile-photo" src="" class="w-12 h-12 rounded-full border">
+                <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xl" id="profile-initial">U</div>
                 <div>
                     <h2 id="profile-name" class="font-bold text-slate-800">Student</h2>
                     <p id="profile-email" class="text-xs text-slate-400">...</p>
                 </div>
             </div>
 
-            <!-- Announcement Banner -->
-            <div id="announcement-area" class="hidden mb-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-5 text-white shadow-lg relative overflow-hidden">
-                <i class="fas fa-bullhorn absolute right-[-10px] bottom-[-10px] text-6xl opacity-20"></i>
-                <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded uppercase font-bold tracking-wider">Notice</span>
-                <p id="announcement-text" class="text-sm mt-2 font-medium leading-relaxed">...</p>
+            <div id="announcement-area" class="hidden mb-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-5 text-white shadow-lg">
+                <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded uppercase font-bold">Notice</span>
+                <p id="announcement-text" class="text-sm mt-2 font-medium">...</p>
             </div>
 
-            <!-- Navigation Tabs -->
             <div class="flex bg-white p-1 rounded-xl border border-slate-200 mb-6 shadow-sm">
                 <button onclick="switchTab('notes')" id="tab-notes" class="flex-1 py-2.5 text-xs font-bold rounded-lg active-tab">Notes</button>
                 <button onclick="switchTab('exams')" id="tab-exams" class="flex-1 py-2.5 text-xs font-medium rounded-lg inactive-tab">Exams</button>
                 <button onclick="switchTab('leaderboard')" id="tab-leaderboard" class="flex-1 py-2.5 text-xs font-medium rounded-lg inactive-tab">Rank</button>
             </div>
 
-            <!-- TAB: Notes -->
-            <div id="view-notes" class="animate-fade-in">
-                <div class="mb-4 relative">
-                    <i class="fas fa-search absolute left-3 top-3 text-slate-400 text-xs"></i>
-                    <input id="global-search" placeholder="Search notes..." class="w-full pl-8 p-2.5 border rounded-lg text-sm focus:outline-none focus:border-blue-500">
-                </div>
+            <div id="view-notes">
+                <div class="mb-4"><input id="global-search" placeholder="Search..." class="w-full pl-4 p-2.5 border rounded-lg text-sm bg-white"></div>
                 <div id="notes-list" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
             </div>
 
-            <!-- TAB: Exams -->
-            <div id="view-exams" class="hidden animate-fade-in">
-                <div id="student-score-card" class="bg-white p-4 rounded-xl border border-slate-100 mb-4 hidden">
-                    <h3 class="font-bold text-xs text-slate-400 uppercase mb-2">Your Results</h3>
+            <div id="view-exams" class="hidden">
+                <div id="student-score-card" class="bg-white p-4 rounded-xl border mb-4 hidden">
+                    <h3 class="font-bold text-xs text-slate-400 uppercase mb-2">Results</h3>
                     <div id="my-results-list" class="grid gap-2"></div>
                 </div>
                 <div id="exams-list" class="grid gap-3"></div>
             </div>
 
-            <!-- TAB: Leaderboard -->
-            <div id="view-leaderboard" class="hidden animate-fade-in">
-                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-                    <div class="p-3 bg-slate-50 border-b font-bold text-xs text-slate-500 uppercase">Top Performers</div>
+            <div id="view-leaderboard" class="hidden">
+                <div class="bg-white rounded-xl border overflow-hidden shadow-sm">
                     <div id="leaderboard-list" class="divide-y divide-slate-50"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODALS -->
+    <!-- MODALS (Exam Taker & Viewer) - Kept same as previous version -->
     <div id="exam-taker-modal" class="hidden fixed inset-0 z-50 bg-white flex flex-col">
         <div class="p-4 bg-slate-900 text-white flex justify-between items-center shadow-lg">
             <h2 id="taking-exam-title" class="font-bold text-sm truncate w-40">Exam</h2>
-            <div id="timer-display" class="bg-slate-800 px-3 py-1 rounded font-mono text-yellow-400 font-bold text-sm border border-slate-700">00:00</div>
+            <div id="timer-display" class="bg-slate-800 px-3 py-1 rounded font-mono text-yellow-400 font-bold text-sm">00:00</div>
         </div>
         <div id="exam-questions-area" class="flex-grow overflow-y-auto p-5 bg-slate-50"></div>
         <div class="p-4 bg-white border-t sticky bottom-0">
-            <button onclick="submitExam()" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold text-sm shadow-lg hover:bg-blue-700 active:scale-95 transition">Submit Answers</button>
+            <button onclick="submitExam()" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold text-sm shadow-lg">Submit Answers</button>
         </div>
     </div>
 

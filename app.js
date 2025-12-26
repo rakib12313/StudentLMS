@@ -153,9 +153,9 @@ async function handleUser(user) {
             }
         }
     } catch (e) {
-        console.error(e);
-        alert("System Error. Check Console.");
-    }
+    console.error(e);
+    // This will show the REAL error on your phone screen
+    alert("Database Error: " + e.message); 
 }
 
 function showLoginScreen() {

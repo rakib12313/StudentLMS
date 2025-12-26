@@ -5,47 +5,95 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LMS Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-slate-50">
     <div id="toast-container"></div>
-    <nav class="bg-slate-900 text-white p-4 flex justify-between items-center sticky top-0 z-50 shadow-lg">
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center font-bold">A</div>
-            <span class="font-bold">Admin Console</span>
-        </div>
-        <div class="flex gap-3">
-            <a href="index.html" class="text-xs bg-slate-700 hover:bg-slate-600 px-3 py-2 rounded font-bold">Student View</a>
-            <button id="logout-btn" class="text-xs bg-red-600 px-3 py-2 rounded font-bold">Logout</button>
-        </div>
+    <nav class="bg-slate-900 text-white p-4 sticky top-0 z-50 flex justify-between items-center shadow-lg">
+        <div class="flex items-center gap-3"><div class="w-8 h-8 bg-indigo-600 rounded flex items-center justify-center font-bold">A</div><span class="font-bold">Admin Console</span></div>
+        <div class="flex gap-3"><a href="index.html" class="text-xs bg-slate-700 px-3 py-2 rounded font-bold">Student View</a><button id="logout-btn" class="text-xs bg-red-600 px-3 py-2 rounded font-bold">Logout</button></div>
     </nav>
-    <div class="max-w-6xl mx-auto p-4 md:p-8">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><p class="text-xs text-slate-400 font-bold uppercase">Total Users</p><h2 id="stat-users" class="text-3xl font-bold text-slate-800">0</h2></div>
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><p class="text-xs text-slate-400 font-bold uppercase">Notes</p><h2 id="stat-notes" class="text-3xl font-bold text-blue-500">0</h2></div>
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><p class="text-xs text-slate-400 font-bold uppercase">Exams</p><h2 id="stat-exams" class="text-3xl font-bold text-indigo-500">0</h2></div>
+
+    <div class="max-w-7xl mx-auto p-4 md:p-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 flex justify-between items-center">
+                <span class="font-bold text-slate-700">Maintenance Mode</span>
+                <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="maint-toggle" class="sr-only peer" onchange="toggleMaint()"><div class="w-9 h-5 bg-gray-200 rounded-full peer peer-checked:bg-red-600 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all"></div></label>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200">
+                <div class="flex gap-2"><input id="live-topic" placeholder="Live Topic" class="border rounded p-1 text-xs w-1/3"><input id="live-url" placeholder="Meet Link" class="border rounded p-1 text-xs flex-grow"><button onclick="setLive()" class="bg-red-600 text-white px-2 rounded text-xs">GO LIVE</button></div>
+            </div>
         </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-5 rounded-xl border shadow-sm"><p class="text-xs text-slate-400 font-bold">Users</p><h2 id="stat-users" class="text-3xl font-bold text-slate-800">0</h2></div>
+            <div class="bg-white p-5 rounded-xl border shadow-sm"><p class="text-xs text-slate-400 font-bold">Pending</p><h2 id="stat-pending" class="text-3xl font-bold text-orange-500">0</h2></div>
+            <div class="bg-white p-5 rounded-xl border shadow-sm"><div class="h-20"><canvas id="contentChart"></canvas></div></div>
+            <div class="bg-white p-5 rounded-xl border shadow-sm"><button onclick="exportCSV()" class="w-full h-full bg-green-50 text-green-700 font-bold rounded-lg border border-green-200">Export CSV</button></div>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="lg:col-span-2 space-y-6">
-                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="bg-slate-50 p-4 border-b flex justify-between"><h3 class="font-bold text-slate-700"><i class="fas fa-users mr-2"></i> Users</h3><button onclick="loadUsers()" class="text-xs text-blue-600 font-bold">Refresh</button></div>
-                    <div class="p-4 border-b bg-blue-50/50 flex gap-2"><input id="new-email" type="email" placeholder="student@gmail.com" class="flex-grow p-2 rounded border text-sm"><button onclick="registerStudent()" class="bg-blue-600 text-white px-4 py-2 rounded text-sm font-bold">Add</button></div>
+                <!-- User Manager -->
+                <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
+                    <div class="bg-slate-50 p-4 border-b flex justify-between"><h3 class="font-bold text-slate-700">Users</h3><button onclick="loadUsers()" class="text-xs text-blue-600 font-bold">Refresh</button></div>
+                    <div class="p-4 border-b bg-blue-50/50 flex gap-2">
+                        <input id="new-email" type="email" placeholder="Email" class="flex-grow p-2 rounded border text-sm">
+                        <select id="new-batch" class="p-2 rounded border text-sm"><option value="all">All</option><option value="10">Class 10</option><option value="12">Class 12</option></select>
+                        <button onclick="registerStudent()" class="bg-blue-600 text-white px-4 rounded text-sm font-bold">Add</button>
+                    </div>
                     <div id="user-list" class="max-h-80 overflow-y-auto divide-y divide-slate-100 p-2"></div>
                 </div>
-                <div class="bg-white rounded-xl border border-slate-200 shadow-sm">
-                    <div class="bg-slate-50 p-4 border-b"><h3 class="font-bold text-slate-700"><i class="fas fa-trash-alt mr-2"></i> Delete Content</h3></div>
-                    <div class="grid grid-cols-2 gap-4 p-4"><div class="border rounded p-2 h-60 overflow-y-auto"><div class="text-xs font-bold text-slate-400 mb-2">NOTES</div><div id="del-notes-list" class="space-y-1"></div></div><div class="border rounded p-2 h-60 overflow-y-auto"><div class="text-xs font-bold text-slate-400 mb-2">EXAMS</div><div id="del-exams-list" class="space-y-1"></div></div></div>
+                
+                <!-- Homework Review -->
+                <div class="bg-white rounded-xl border shadow-sm p-4">
+                    <h3 class="font-bold text-slate-700 mb-2">Homework Submissions</h3>
+                    <div id="submission-list" class="max-h-60 overflow-y-auto space-y-2"></div>
                 </div>
             </div>
+
             <div class="space-y-6">
-                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm"><h3 class="font-bold text-slate-700 mb-2">Announcement</h3><textarea id="announce-text" class="w-full border rounded p-2 text-sm h-20 mb-2"></textarea><button onclick="updateAnnouncement()" class="w-full bg-slate-800 text-white py-2 rounded text-sm font-bold">Update</button></div>
-                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm"><h3 class="font-bold text-slate-700 mb-2">Upload Note</h3><input id="note-title" placeholder="Title" class="w-full border rounded p-2 text-sm mb-2"><input id="note-file" type="file" class="w-full text-xs mb-3"><button id="upload-btn" class="w-full bg-green-600 text-white py-2 rounded text-sm font-bold">Upload</button><p id="upload-status" class="text-xs text-center mt-2 text-slate-400"></p></div>
-                <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 text-white text-center shadow-lg"><i class="fas fa-file-signature text-4xl mb-3 opacity-80"></i><h3 class="font-bold">Exam Creator</h3><button onclick="document.getElementById('exam-modal').classList.remove('hidden')" class="bg-white text-indigo-600 w-full py-2 rounded-lg font-bold mt-4">Open Creator</button></div>
+                <div class="bg-white rounded-xl border p-4 shadow-sm"><h3 class="font-bold text-slate-700 mb-2">Announcement</h3><textarea id="announce-text" class="w-full border rounded p-2 text-sm h-20 mb-2"></textarea><button onclick="updateAnnouncement()" class="w-full bg-slate-800 text-white py-2 rounded text-sm font-bold">Update</button></div>
+                
+                <!-- Uploads -->
+                <div class="bg-white rounded-xl border p-4 shadow-sm">
+                    <h3 class="font-bold text-slate-700 mb-2">Upload Content</h3>
+                    <select id="note-batch" class="w-full border rounded p-2 text-xs mb-2"><option value="all">All Batches</option><option value="10">Class 10</option><option value="12">Class 12</option></select>
+                    <input id="note-title" placeholder="Title" class="w-full border rounded p-2 text-sm mb-2">
+                    <input id="note-file" type="file" class="w-full text-xs mb-3">
+                    <button id="upload-btn" class="w-full bg-green-600 text-white py-2 rounded text-sm font-bold">Upload Note</button>
+                </div>
+                
+                <button onclick="document.getElementById('pdf-exam-modal').classList.remove('hidden')" class="w-full border-2 border-dashed border-pink-300 text-pink-600 py-3 rounded-xl font-bold">Upload PDF Exam</button>
+                
+                <div class="bg-white rounded-xl border p-4 shadow-sm">
+                    <h3 class="font-bold text-slate-700 mb-2">Post Homework</h3>
+                    <input id="hw-title" placeholder="Task Title" class="w-full border rounded p-2 text-sm mb-2">
+                    <input id="hw-date" type="date" class="w-full border rounded p-2 text-sm mb-2">
+                    <button onclick="postHW()" class="w-full bg-indigo-600 text-white py-2 rounded text-sm font-bold">Post Task</button>
+                </div>
             </div>
         </div>
     </div>
-    <div id="exam-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"><div class="bg-white w-full max-w-2xl rounded-xl h-[90vh] flex flex-col"><div class="p-4 border-b flex justify-between items-center bg-slate-50 rounded-t-xl"><h3 class="font-bold text-slate-800">Create Exam</h3><button onclick="document.getElementById('exam-modal').classList.add('hidden')" class="text-2xl text-slate-400">&times;</button></div><div class="flex-grow overflow-y-auto p-6"><input id="exam-title" placeholder="Title" class="w-full border p-3 rounded-lg font-bold mb-3"><input id="exam-duration" type="number" placeholder="Minutes" class="w-full border p-3 rounded-lg mb-6"><div id="questions-list" class="space-y-4"></div><button onclick="addQuestion()" class="w-full py-3 border-2 border-dashed border-slate-300 text-slate-400 font-bold rounded-lg mt-4 hover:bg-slate-50">+ Add Question</button></div><div class="p-4 border-t"><button onclick="publishExam()" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold">Publish Exam</button></div></div></div>
+
+    <!-- PDF EXAM MODAL -->
+    <div id="pdf-exam-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-xl h-[80vh] flex flex-col p-4">
+            <div class="flex justify-between mb-4"><h3 class="font-bold">PDF Exam</h3><button onclick="document.getElementById('pdf-exam-modal').classList.add('hidden')">&times;</button></div>
+            <div class="space-y-2 flex-grow overflow-y-auto">
+                <input id="pe-title" placeholder="Title" class="w-full border p-2 rounded">
+                <input id="pe-dur" type="number" placeholder="Mins" class="w-full border p-2 rounded">
+                <input id="pe-file" type="file" class="text-xs">
+                <input id="pe-count" type="number" placeholder="Num Qs" class="w-full border p-2 rounded">
+                <button onclick="genKeys()" class="bg-slate-800 text-white px-3 py-1 text-xs rounded">Gen Keys</button>
+                <div id="pe-keys" class="grid grid-cols-4 gap-1"></div>
+            </div>
+            <button onclick="pubPDF()" class="w-full bg-pink-600 text-white py-2 rounded font-bold mt-4">Publish</button>
+        </div>
+    </div>
+
     <script type="module" src="admin.js"></script>
 </body>
 </html>

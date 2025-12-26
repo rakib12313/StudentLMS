@@ -1,119 +1,139 @@
-import { auth, db, provider } from './firebase-config.js';
-import { signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, getDoc, setDoc, collection, addDoc, getDocs, query, orderBy, serverTimestamp, where, limit, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { auth, db } from './firebase-config.js';
+import { 
+    signInWithEmailAndPassword, 
+    createUserWithEmailAndPassword, 
+    signOut, 
+    onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { 
+    doc, getDoc, setDoc, collection, getDocs, query, orderBy, serverTimestamp, where, limit, deleteDoc 
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 let currentUser = null;
 let currentExam = null;
 let examTimer = null;
 let allNotes = [];
 
-// --- UTILS ---
-function showToast(msg, type = 'neutral') {
-    const box = document.getElementById('toast-container');
-    const el = document.createElement('div');
-    const icon = type === 'success' ? 'check-circle text-green-400' : (type === 'error' ? 'exclamation-circle text-red-400' : 'info-circle text-blue-400');
-    el.className = "toast";
-    el.innerHTML = `<i class="fas fa-${icon}"></i> <span>${msg}</span>`;
-    box.appendChild(el);
-    setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 3000);
-}
+// --- LOGIN & REGISTER LOGIC ---
+const emailInput = document.getElementById('email');
+const passInput = document.getElementById('password');
+const loginBtn = document.getElementById('login-btn');
+const setupBtn = document.getElementById('setup-btn');
+const statusMsg = document.getElementById('status-msg');
 
-// --- LOGIN (REDIRECT METHOD) ---
-async function checkRedirect() {
-    try {
-        const result = await getRedirectResult(auth);
-        if (result && result.user) {
-            document.getElementById('login-status').innerText = "Verifying Database...";
-            handleUser(result.user);
-        }
-    } catch (error) {
-        alert("Login Failed: " + error.message);
-    }
-}
-checkRedirect();
-
-const loginBtn = document.getElementById('google-login-btn');
 if(loginBtn) {
+    // 1. LOGIN MODE
     loginBtn.addEventListener('click', async () => {
-        loginBtn.disabled = true;
-        loginBtn.innerHTML = "🔄 Redirecting to Google...";
+        const email = emailInput.value.trim();
+        const pass = passInput.value.trim();
+        if(!email || !pass) return showStatus("Enter email and password", "red");
+
         try {
-            await signInWithRedirect(auth, provider);
-        } catch (error) {
-            alert("Error: " + error.message);
+            loginBtn.innerText = "Verifying...";
+            loginBtn.disabled = true;
+            await signInWithEmailAndPassword(auth, email, pass);
+            // Auth listener handles the rest
+        } catch(e) {
+            showStatus(e.message.replace("Firebase:", ""), "red");
+            loginBtn.innerText = "Login";
             loginBtn.disabled = false;
-            loginBtn.innerHTML = "Login with Gmail";
+        }
+    });
+
+    // 2. SETUP MODE (Register)
+    setupBtn.addEventListener('click', async () => {
+        const email = emailInput.value.trim();
+        const pass = passInput.value.trim();
+        
+        if(loginBtn.innerText === "Login") {
+            // Switch UI to Register Mode
+            loginBtn.innerText = "Create Account";
+            setupBtn.innerText = "Back to Login";
+            loginBtn.className = "w-full bg-green-600 text-white py-3 rounded-xl font-bold text-sm shadow-lg";
+            showStatus("Enter your email & set a password", "blue");
+            return;
+        }
+
+        if(setupBtn.innerText === "Back to Login" && (!email || !pass)) {
+             return showStatus("Enter email & new password", "red");
+        }
+
+        // PERFORM REGISTRATION
+        try {
+            loginBtn.innerText = "Checking Permission...";
+            loginBtn.disabled = true;
+
+            // A. Check Whitelist in Firestore
+            const q = query(collection(db, "students"), where("email", "==", email));
+            const snap = await getDocs(q);
+
+            if(snap.empty) {
+                throw new Error("Email not registered by Admin.");
+            }
+
+            // B. Create Auth Account
+            const userCred = await createUserWithEmailAndPassword(auth, email, pass);
+            const user = userCred.user;
+
+            // C. Link Auth ID to Firestore Doc
+            const preDoc = snap.docs[0];
+            const data = preDoc.data();
+            
+            await setDoc(doc(db, "students", user.uid), {
+                ...data,
+                uid: user.uid,
+                email: email,
+                name: data.name || "Student",
+                role: data.role || "student",
+                approved: true
+            });
+
+            // Cleanup old doc if ID was auto-generated
+            if(preDoc.id !== user.uid) await deleteDoc(doc(db, "students", preDoc.id));
+
+            showStatus("Success! Logging in...", "green");
+
+        } catch(e) {
+            showStatus(e.message, "red");
+            loginBtn.innerText = "Create Account";
+            loginBtn.disabled = false;
         }
     });
 }
 
-onAuthStateChanged(auth, (user) => {
-    if (user) handleUser(user);
-    else showLoginScreen();
-});
+function showStatus(msg, color) {
+    statusMsg.innerText = msg;
+    statusMsg.className = `text-xs text-center mt-4 font-medium h-5 text-${color}-600`;
+}
 
-// --- USER CHECK (STRICT) ---
-async function handleUser(user) {
-    const status = document.getElementById('login-status');
-    if(status) status.innerText = "Checking permissions...";
-
-    try {
-        const userRef = doc(db, "students", user.uid);
-        let snap = await getDoc(userRef);
-
-        if (snap.exists()) {
+// --- AUTH STATE ---
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        // Fetch User Data
+        const snap = await getDoc(doc(db, "students", user.uid));
+        if(snap.exists()) {
             currentUser = snap.data();
             initDashboard();
-            return;
-        }
-
-        const q = query(collection(db, "students"), where("email", "==", user.email));
-        const querySnap = await getDocs(q);
-
-        if (!querySnap.empty) {
-            const preData = querySnap.docs[0].data();
-            const oldId = querySnap.docs[0].id;
-            
-            await setDoc(userRef, {
-                ...preData,
-                uid: user.uid,
-                name: user.displayName,
-                photo: user.photoURL,
-                role: preData.role || 'student',
-                approved: true
-            });
-            
-            if(oldId !== user.uid) await deleteDoc(doc(db, "students", oldId));
-            currentUser = { ...preData, uid: user.uid, name: user.displayName, photo: user.photoURL };
-            initDashboard();
         } else {
-            alert("⛔ ACCESS DENIED\n\nEmail: " + user.email + "\nStatus: Not Registered.\n\nPlease ask the Admin to register you.");
-            await signOut(auth);
-            showLoginScreen();
-            if(loginBtn) {
-                loginBtn.disabled = false;
-                loginBtn.innerHTML = "Login with Gmail";
-            }
+            // Rare edge case: Auth exists but DB deleted
+            signOut(auth);
+            showStatus("Account deleted by Admin", "red");
         }
-    } catch(err) {
-        alert("DB Error: " + err.message);
+    } else {
+        document.getElementById('login-section').classList.remove('hidden');
+        document.getElementById('dashboard-section').classList.add('hidden');
     }
-}
+});
 
-function showLoginScreen() {
-    document.getElementById('login-section').classList.remove('hidden');
-    document.getElementById('dashboard-section').classList.add('hidden');
-}
-
+// --- DASHBOARD ---
 function initDashboard() {
     document.getElementById('login-section').classList.add('hidden');
     document.getElementById('dashboard-section').classList.remove('hidden');
     
     document.getElementById('profile-name').innerText = currentUser.name;
     document.getElementById('profile-email').innerText = currentUser.email;
-    document.getElementById('profile-photo').src = currentUser.photo;
+    document.getElementById('profile-initial').innerText = currentUser.name.charAt(0).toUpperCase();
 
-    // Show Admin Button
     if (currentUser.role === 'admin') {
         document.getElementById('admin-link-btn').classList.remove('hidden');
     }
@@ -152,11 +172,6 @@ function renderNotes(notes) {
     });
 }
 
-document.getElementById('global-search').addEventListener('input', (e) => {
-    const term = e.target.value.toLowerCase();
-    renderNotes(allNotes.filter(n => n.title.toLowerCase().includes(term)));
-});
-
 // --- EXAMS ---
 async function loadExams() {
     const snaps = await getDocs(query(collection(db, "exams"), orderBy("createdAt", "desc")));
@@ -178,12 +193,6 @@ async function loadExams() {
             ${!isTaken ? `<button onclick="startExam('${doc.id}')" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm">Start</button>` : `<span class="text-[10px] font-bold text-green-500 bg-green-50 px-2 py-1 rounded">Done</span>`}
         </div>`;
     });
-    
-    if(takenIds.length > 0) {
-        document.getElementById('student-score-card').classList.remove('hidden');
-        const resList = document.getElementById('my-results-list'); resList.innerHTML = "";
-        resSnaps.forEach(doc => { const r = doc.data(); resList.innerHTML += `<div class="flex justify-between bg-slate-50 p-2 rounded-lg text-xs"><span class="font-bold text-slate-600 truncate w-32">${r.examTitle}</span><span class="font-bold text-green-600">${r.score}/${r.total}</span></div>`; });
-    }
 }
 
 window.startExam = async (eid) => {
@@ -201,10 +210,9 @@ window.startExam = async (eid) => {
 window.submitExam = async () => {
     clearInterval(examTimer); let score=0; currentExam.questions.forEach((q, idx) => { const sel = document.querySelector(`input[name="q-${idx}"]:checked`); if(sel && parseInt(sel.value)===q.correct) score++; });
     await addDoc(collection(db, "results"), { examId: currentExam.id, examTitle: currentExam.title, studentId: currentUser.uid, studentName: currentUser.name, score, total: currentExam.questions.length, submittedAt: serverTimestamp() });
-    document.getElementById('exam-taker-modal').classList.add('hidden'); showToast(`Score: ${score}`, 'success'); loadExams(); loadLeaderboard();
+    document.getElementById('exam-taker-modal').classList.add('hidden'); alert(`Score: ${score}`); loadExams(); loadLeaderboard();
 };
 
-// --- LEADERBOARD ---
 async function loadLeaderboard() {
     const list = document.getElementById('leaderboard-list'); list.innerHTML = "";
     const snaps = await getDocs(query(collection(db, "results"), orderBy("score", "desc"), limit(10)));

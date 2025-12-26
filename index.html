@@ -2,104 +2,167 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LMS Pro Mobile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Smart LMS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-50 min-h-screen font-sans pb-20">
+<body class="bg-gray-50 pb-24">
 
-    <!-- LOGIN SCREEN -->
-    <div id="login-section" class="flex flex-col items-center justify-center h-screen px-4">
-        <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-sm text-center">
-            <div class="text-6xl mb-4">🎓</div>
-            <h1 class="text-3xl font-extrabold text-blue-600 mb-2">Smart LMS</h1>
-            <button id="google-login-btn" class="bg-white border border-gray-300 text-gray-700 font-bold py-3 px-6 rounded-lg w-full flex items-center justify-center gap-3 hover:bg-gray-50 mt-6">
-                <i class="fab fa-google text-red-500"></i> Sign in with Google
+    <div id="toast-container"></div>
+
+    <!-- LOGIN SCREEN (Restricted) -->
+    <div id="login-section" class="login-bg flex flex-col items-center justify-center h-screen px-6">
+        <div class="blob blob-1 animate-float"></div>
+        <div class="blob blob-2 animate-float" style="animation-delay: 2s"></div>
+
+        <div class="login-card w-full max-w-sm p-8 rounded-3xl relative z-10 animate-fade-in text-center">
+            <div class="w-20 h-20 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-200">
+                <i class="fas fa-university text-3xl text-white"></i>
+            </div>
+
+            <h1 class="text-2xl font-bold text-slate-800 mb-1">Student Portal</h1>
+            <p class="text-slate-500 mb-8 text-xs font-medium bg-red-50 text-red-500 py-2 px-4 rounded-lg inline-block">
+                <i class="fas fa-lock mr-1"></i> Private Access Only
+            </p>
+
+            <button id="google-login-btn" class="w-full bg-white border border-gray-200 text-slate-700 font-bold py-4 rounded-xl flex items-center justify-center gap-3 shadow-sm hover:bg-gray-50 active:scale-95 transition">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5">
+                <span class="text-sm">Login with Registered Gmail</span>
             </button>
+
+            <div class="mt-8 text-[10px] text-gray-400">
+                <p>Not registered?</p>
+                <p class="mt-1">Contact your Administrator to enable access.</p>
+            </div>
         </div>
     </div>
 
     <!-- DASHBOARD -->
     <div id="dashboard-section" class="hidden">
+        
         <!-- Navbar -->
-        <nav class="bg-blue-600 text-white p-4 shadow flex justify-between items-center sticky top-0 z-40">
-            <div class="flex flex-col">
-                <span class="font-bold tracking-wider text-lg">🎓 LMS</span>
-                <span id="role-badge-nav" class="text-[10px] bg-blue-800 px-2 py-0.5 rounded w-fit mt-1 opacity-90">STUDENT</span>
+        <nav class="bg-white/90 backdrop-blur fixed top-0 w-full z-40 px-4 py-3 flex justify-between items-center border-b border-gray-100">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">S</div>
+                <span class="font-bold text-gray-800">Smart LMS</span>
             </div>
-            <div onclick="openProfileModal()" class="flex items-center gap-2 cursor-pointer bg-blue-700 p-1 rounded-full pr-3">
-                <img id="nav-photo" src="" class="w-8 h-8 rounded-full border-2 border-white">
-                <span class="text-xs font-bold">Menu</span>
+            <div onclick="openProfileModal()" class="relative cursor-pointer">
+                <img id="nav-photo" src="" class="w-9 h-9 rounded-full border border-gray-100 object-cover">
+                <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></div>
             </div>
         </nav>
 
-        <div class="p-4">
-            <!-- Approval Warning -->
-            <div id="approval-warning" class="hidden bg-yellow-50 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 rounded shadow-sm">
-                <p class="font-bold">⚠️ Account Pending</p>
-                <p class="text-sm">Wait for Admin approval to access content.</p>
+        <div class="mt-20 px-4">
+            
+            <!-- Greeting -->
+            <div class="mb-6 animate-fade-in">
+                <h2 class="text-xl font-bold text-gray-800">Welcome, <span id="header-name" class="text-blue-600">Student</span></h2>
+                <div class="mt-3 relative">
+                    <i class="fas fa-search absolute left-3 top-3.5 text-gray-400 text-sm"></i>
+                    <input type="text" id="global-search" placeholder="Search notes, exams..." class="w-full bg-white pl-9 pr-4 py-3 rounded-xl border border-gray-100 text-sm focus:outline-none focus:border-blue-300 transition shadow-sm">
+                </div>
             </div>
 
-            <!-- MAIN CONTENT -->
+            <!-- Announcement -->
+            <div id="announcement-area" class="hidden mb-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-4 text-white shadow-lg relative overflow-hidden animate-fade-in">
+                <div class="relative z-10">
+                    <div class="flex justify-between items-start">
+                        <span class="text-[10px] font-bold bg-white/20 px-2 py-0.5 rounded uppercase tracking-wide">Notice</span>
+                        <button id="edit-announce-btn" onclick="postAnnouncement()" class="hidden text-xs bg-white/20 px-2 py-1 rounded hover:bg-white/30"><i class="fas fa-pen"></i></button>
+                    </div>
+                    <p id="announcement-text" class="font-medium text-sm mt-2 leading-relaxed">...</p>
+                </div>
+            </div>
+
+            <!-- Tabs -->
             <div id="main-content" class="hidden">
-                
-                <!-- Admin Stats -->
-                <div id="admin-stats" class="hidden grid-cols-2 gap-3 mb-4">
-                    <div class="bg-white p-3 rounded shadow text-center">
-                        <div class="text-2xl font-bold text-blue-600" id="stat-users">0</div>
-                        <div class="text-xs text-gray-500">Students</div>
-                    </div>
-                    <div class="bg-white p-3 rounded shadow text-center">
-                        <div class="text-2xl font-bold text-green-600" id="stat-exams">0</div>
-                        <div class="text-xs text-gray-500">Exams</div>
-                    </div>
+                <div class="flex justify-between bg-white p-1.5 rounded-xl border border-gray-100 mb-6 gap-2">
+                    <button onclick="switchTab('notes')" id="tab-notes" class="flex-1 py-2 text-xs font-bold rounded-lg active-tab">Notes</button>
+                    <button onclick="switchTab('exams')" id="tab-exams" class="flex-1 py-2 text-xs font-medium rounded-lg inactive-tab">Exams</button>
+                    <button onclick="switchTab('leaderboard')" id="tab-leaderboard" class="flex-1 py-2 text-xs font-medium rounded-lg inactive-tab">Rank</button>
+                    <button onclick="switchTab('admin')" id="tab-admin" class="hidden flex-1 py-2 text-xs font-medium rounded-lg inactive-tab">Admin</button>
                 </div>
 
-                <!-- Tabs -->
-                <div class="flex mb-4 bg-white rounded-lg shadow-sm overflow-hidden text-sm font-medium">
-                    <button onclick="switchTab('notes')" id="tab-notes" class="flex-1 py-3 active-tab">📚 Notes</button>
-                    <button onclick="switchTab('exams')" id="tab-exams" class="flex-1 py-3 inactive-tab">📝 Exams</button>
-                    <button onclick="switchTab('users')" id="tab-users" class="hidden flex-1 py-3 inactive-tab text-purple-600">👥 Users</button>
-                </div>
-
-                <!-- 1. NOTES TAB -->
-                <div id="view-notes">
-                    <!-- Cloudinary Upload UI (Admin Only) -->
-                    <div id="admin-upload-ui" class="hidden bg-white p-4 rounded-lg shadow mb-4 border border-blue-100">
-                        <h3 class="font-bold text-gray-800 mb-3 text-sm flex items-center gap-2">
-                            <i class="fas fa-cloud-upload-alt text-orange-500"></i> Upload to Cloud
-                        </h3>
-                        <input type="text" id="note-title" placeholder="Note Title" class="w-full border p-2 rounded mb-2 text-sm bg-gray-50">
-                        <input type="file" id="note-file" class="w-full text-sm mb-3 text-gray-500">
-                        <button id="upload-btn" class="bg-orange-600 text-white px-4 py-2 rounded w-full font-bold text-sm">Upload File</button>
-                        <p id="upload-status" class="text-xs mt-2 text-gray-500 text-center"></p>
+                <!-- NOTES TAB -->
+                <div id="view-notes" class="animate-fade-in">
+                    <div id="admin-upload-ui" class="hidden bg-white p-5 rounded-xl border border-blue-100 mb-6 shadow-sm">
+                        <h3 class="font-bold text-gray-800 text-sm mb-3"><i class="fas fa-cloud-upload-alt text-blue-500 mr-2"></i>Upload Material</h3>
+                        <input type="text" id="note-title" placeholder="Title" class="w-full bg-gray-50 border-none p-3 rounded-lg text-sm mb-2">
+                        <input type="file" id="note-file" class="w-full text-xs text-gray-500 mb-3 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700">
+                        <button id="upload-btn" class="w-full bg-gray-900 text-white py-2.5 rounded-lg text-sm font-bold">Upload</button>
+                        <p id="upload-status" class="text-xs mt-2 text-center text-gray-400"></p>
                     </div>
-                    <!-- Notes List -->
-                    <div id="notes-list" class="space-y-3"></div>
+                    <div id="notes-skeleton" class="space-y-3">
+                        <div class="skeleton h-20 w-full"></div><div class="skeleton h-20 w-full"></div>
+                    </div>
+                    <div id="notes-list" class="space-y-3 hidden"></div>
                 </div>
 
-                <!-- 2. EXAMS TAB -->
-                <div id="view-exams" class="hidden">
-                    <!-- Admin Create Button -->
+                <!-- EXAMS TAB -->
+                <div id="view-exams" class="hidden animate-fade-in">
                     <div id="admin-exam-ui" class="hidden mb-4">
-                        <button onclick="openExamCreator()" class="bg-indigo-600 text-white w-full py-3 rounded-lg shadow font-bold flex justify-center items-center gap-2">
-                            <i class="fas fa-plus-circle"></i> Create New Exam
-                        </button>
+                        <button onclick="openExamCreator()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold shadow-md shadow-indigo-200 text-sm"><i class="fas fa-plus mr-2"></i>Create Exam</button>
                     </div>
-                    <!-- Student Score Summary -->
-                    <div id="student-score-card" class="bg-white p-4 rounded-lg shadow mb-4 hidden">
-                        <h3 class="font-bold text-gray-700 mb-2 text-sm">📊 My Results</h3>
-                        <div id="my-results-list" class="space-y-2 text-sm"></div>
+                    <div id="student-score-card" class="bg-white p-4 rounded-xl border border-gray-100 mb-5 hidden">
+                        <h3 class="font-bold text-gray-800 text-sm mb-3">Recent Performance</h3>
+                        <div id="my-results-list" class="space-y-2"></div>
                     </div>
                     <div id="exams-list" class="space-y-3"></div>
                 </div>
 
-                <!-- 3. USERS TAB (Admin) -->
-                <div id="view-users" class="hidden">
-                    <div class="bg-white rounded-lg shadow overflow-hidden">
-                        <div id="users-list" class="divide-y divide-gray-100"></div>
+                <!-- LEADERBOARD TAB -->
+                <div id="view-leaderboard" class="hidden animate-fade-in">
+                    <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                        <div class="p-4 border-b border-gray-50 bg-gray-50/50"><h3 class="font-bold text-gray-700 text-sm">Top Students</h3></div>
+                        <div id="leaderboard-list" class="divide-y divide-gray-50"></div>
+                    </div>
+                </div>
+
+                <!-- ADMIN PANEL -->
+                <div id="view-admin" class="hidden animate-fade-in pb-10">
+                    
+                    <!-- Stats -->
+                    <div class="grid grid-cols-2 gap-3 mb-6">
+                        <div class="bg-white p-4 rounded-xl border border-gray-100 text-center">
+                            <span class="text-[10px] text-gray-400 font-bold uppercase">Total Students</span>
+                            <span id="admin-stat-users" class="text-2xl font-bold text-blue-600 block mt-1">0</span>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-gray-100 text-center">
+                            <span class="text-[10px] text-gray-400 font-bold uppercase">Published Exams</span>
+                            <span id="admin-stat-exams" class="text-2xl font-bold text-indigo-600 block mt-1">0</span>
+                        </div>
+                    </div>
+
+                    <h3 class="font-bold text-gray-800 text-sm mb-3 ml-1">Controls</h3>
+                    <div class="space-y-3">
+                        <!-- Add Student -->
+                        <div class="bg-white p-4 rounded-xl border border-gray-100">
+                            <h4 class="font-bold text-sm text-gray-800 mb-2 flex items-center gap-2"><i class="fas fa-user-plus text-green-500"></i> Register New Student</h4>
+                            <div class="flex gap-2">
+                                <input type="email" id="new-student-email" placeholder="student@gmail.com" class="flex-grow bg-gray-50 border-none p-2 rounded-lg text-sm">
+                                <button onclick="registerStudent()" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold">Add</button>
+                            </div>
+                            <p class="text-[10px] text-gray-400 mt-2">Only emails added here can log in.</p>
+                        </div>
+
+                        <button onclick="toggleAdminSection('section-students')" class="w-full bg-white p-4 rounded-xl border border-gray-100 flex justify-between items-center text-sm font-medium">
+                            <span><i class="fas fa-users text-blue-500 mr-3"></i>View All Students</span> <i class="fas fa-chevron-right text-gray-300"></i>
+                        </button>
+
+                        <button onclick="toggleAdminSection('section-content')" class="w-full bg-white p-4 rounded-xl border border-gray-100 flex justify-between items-center text-sm font-medium">
+                            <span><i class="fas fa-trash-alt text-red-500 mr-3"></i>Delete Content</span> <i class="fas fa-chevron-right text-gray-300"></i>
+                        </button>
+                    </div>
+
+                    <!-- Hidden Lists -->
+                    <div id="section-students" class="hidden mt-4 bg-white rounded-xl border border-gray-100 p-2 max-h-80 overflow-y-auto">
+                        <div id="users-list" class="divide-y divide-gray-50"></div>
+                    </div>
+                    <div id="section-content" class="hidden mt-4 space-y-4">
+                        <div class="bg-white rounded-xl border border-gray-100 p-2"><div class="p-2 text-xs font-bold text-gray-400">NOTES</div><div id="admin-notes-list"></div></div>
+                        <div class="bg-white rounded-xl border border-gray-100 p-2"><div class="p-2 text-xs font-bold text-gray-400">EXAMS</div><div id="admin-exams-list"></div></div>
                     </div>
                 </div>
 
@@ -107,53 +170,48 @@
         </div>
     </div>
 
-    <!-- MODALS -->
-    
-    <!-- Profile Modal -->
-    <div id="profile-modal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-sm rounded-xl p-6 relative">
-            <button onclick="document.getElementById('profile-modal').classList.add('hidden')" class="absolute top-3 right-4 text-2xl text-gray-400">&times;</button>
+    <!-- MODALS (Profile, Viewer, Exam) -->
+    <div id="profile-modal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-6">
+        <div class="bg-white w-full max-w-xs rounded-2xl p-6 relative animate-fade-in">
+            <button onclick="document.getElementById('profile-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-300 hover:text-gray-500 text-xl">&times;</button>
             <div class="text-center">
-                <img id="profile-photo" src="" class="w-20 h-20 rounded-full mx-auto mb-3 border-4 border-blue-50">
-                <h2 id="profile-name" class="text-xl font-bold">User</h2>
-                <p id="profile-email" class="text-gray-500 text-sm mb-4">...</p>
-                <button id="logout-btn" class="bg-red-50 text-red-600 border border-red-200 w-full py-2 rounded font-bold">Log Out</button>
+                <img id="profile-photo" src="" class="w-20 h-20 rounded-full mx-auto mb-3 border-4 border-gray-50">
+                <h2 id="profile-name" class="text-lg font-bold text-gray-800">User</h2>
+                <p id="profile-email" class="text-gray-400 text-xs mb-4">...</p>
+                <div class="bg-gray-50 rounded-xl p-3 mb-4 text-xs font-medium text-left">
+                    <div class="flex justify-between mb-2"><span>Role</span><span id="profile-role" class="font-bold text-blue-600">STUDENT</span></div>
+                    <div class="flex justify-between"><span>Status</span><span class="font-bold text-green-600">Active</span></div>
+                </div>
+                <button id="logout-btn" class="w-full bg-red-50 text-red-500 py-2.5 rounded-xl font-bold text-sm">Log Out</button>
             </div>
         </div>
     </div>
 
-    <!-- Exam Creator -->
-    <div id="exam-creator-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50">
-        <div class="bg-white w-full h-[95vh] sm:h-auto sm:max-w-lg rounded-t-xl sm:rounded-xl p-4 flex flex-col">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-bold">Create Exam</h2>
-                <button onclick="closeExamCreator()" class="text-2xl text-gray-500">&times;</button>
-            </div>
-            <div class="overflow-y-auto flex-grow mb-4 px-1">
-                <input id="new-exam-title" type="text" placeholder="Title" class="w-full border p-2 rounded mb-2 bg-gray-50">
-                <input id="new-exam-duration" type="number" placeholder="Minutes" class="w-full border p-2 rounded mb-4 bg-gray-50">
-                <div id="questions-container" class="space-y-4"></div>
-                <button onclick="addQuestionField()" class="w-full mt-4 border-2 border-dashed border-blue-300 text-blue-500 p-2 rounded font-bold">+ Add Question</button>
-            </div>
-            <button onclick="publishExam()" class="bg-indigo-600 text-white py-3 rounded-lg font-bold w-full">Publish</button>
+    <div id="exam-creator-modal" class="hidden fixed inset-0 z-50 bg-white flex flex-col">
+        <div class="px-4 py-3 border-b flex justify-between items-center bg-gray-50">
+            <h2 class="font-bold text-gray-800 text-sm">New Exam</h2>
+            <button onclick="closeExamCreator()" class="text-2xl text-gray-400">&times;</button>
         </div>
+        <div class="flex-grow overflow-y-auto p-4">
+            <input id="new-exam-title" type="text" placeholder="Exam Title" class="w-full bg-gray-50 p-3 rounded-lg font-bold text-sm mb-3">
+            <input id="new-exam-duration" type="number" placeholder="Duration (min)" class="w-full bg-gray-50 p-3 rounded-lg text-sm mb-5">
+            <div id="questions-container" class="space-y-4"></div>
+            <button onclick="addQuestionField()" class="w-full mt-4 py-3 border-2 border-dashed border-gray-200 text-gray-400 rounded-lg text-xs font-bold">+ Add Question</button>
+        </div>
+        <div class="p-4 border-t"><button onclick="publishExam()" class="w-full bg-black text-white py-3 rounded-xl font-bold text-sm">Publish</button></div>
     </div>
 
-    <!-- Exam Taker -->
-    <div id="exam-taker-modal" class="hidden fixed inset-0 bg-white z-[60] flex flex-col">
-        <div class="bg-gray-900 text-white p-4 shadow flex justify-between items-center">
-            <h2 id="taking-exam-title" class="font-bold truncate w-40">Exam</h2>
-            <div id="timer-display" class="bg-red-600 px-3 py-1 rounded font-mono font-bold">00:00</div>
+    <div id="exam-taker-modal" class="hidden fixed inset-0 z-[60] bg-white flex flex-col">
+        <div class="px-4 py-3 bg-slate-900 text-white flex justify-between items-center">
+            <h2 id="taking-exam-title" class="font-bold text-sm truncate w-40">Exam</h2>
+            <div id="timer-display" class="bg-slate-800 px-3 py-1 rounded font-mono text-yellow-400 font-bold text-sm">00:00</div>
         </div>
-        <div id="exam-questions-area" class="flex-grow overflow-y-auto p-4 bg-gray-50 pb-20"></div>
-        <div class="p-4 bg-white border-t fixed bottom-0 w-full">
-            <button onclick="submitExam()" class="bg-green-600 text-white w-full py-3 rounded-lg font-bold">Submit</button>
-        </div>
+        <div id="exam-questions-area" class="flex-grow overflow-y-auto p-5 pb-20 bg-gray-50"></div>
+        <div class="p-4 bg-white border-t fixed bottom-0 w-full"><button onclick="submitExam()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold text-sm">Submit</button></div>
     </div>
 
-    <!-- Viewer -->
-    <div id="viewer-modal" class="hidden fixed inset-0 z-[70] bg-black bg-opacity-95 flex flex-col justify-center items-center">
-        <button onclick="closeViewer()" class="absolute top-4 right-4 text-white text-4xl font-bold z-[80]">&times;</button>
+    <div id="viewer-modal" class="hidden fixed inset-0 z-[70] bg-black/95 flex flex-col justify-center items-center">
+        <button onclick="closeViewer()" class="absolute top-4 right-4 text-white text-3xl opacity-70">&times;</button>
         <div id="watermark-overlay" class="absolute inset-0 flex flex-wrap opacity-10 z-[75] overflow-hidden pointer-events-none"></div>
         <div class="relative w-full h-full sm:w-11/12 sm:h-5/6 bg-white flex justify-center items-center">
             <iframe id="pdf-frame" class="w-full h-full hidden"></iframe>

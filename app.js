@@ -1,18 +1,38 @@
 // app.js
 import { auth, db, provider } from './firebase-config.js';
 import { signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { doc, getDoc, setDoc, collection, addDoc, getDocs, query, orderBy, serverTimestamp, updateDoc, where } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { doc, getDoc, setDoc, collection, addDoc, getDocs, query, orderBy, serverTimestamp, updateDoc, where, limit, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 let currentUser = null;
 let currentExam = null;
 let examTimer = null;
+let allNotes = [];
+let allExams = [];
 
-// --- AUTH ---
+// --- UTILS ---
+function showToast(msg, type = 'neutral') {
+    const box = document.getElementById('toast-container');
+    const el = document.createElement('div');
+    const icon = type === 'success' ? 'check-circle text-green-400' : (type === 'error' ? 'exclamation-circle text-red-400' : 'info-circle text-blue-400');
+    el.className = "toast";
+    el.innerHTML = `<i class="fas fa-${icon}"></i> <span>${msg}</span>`;
+    box.appendChild(el);
+    setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 3000);
+}
+
+// --- AUTH & STRICT LOGIN LOGIC ---
 document.getElementById('google-login-btn')?.addEventListener('click', async () => {
+    const btn = document.getElementById('google-login-btn');
+    const oldText = btn.innerHTML;
     try {
+        btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Checking Access...`;
         const res = await signInWithPopup(auth, provider);
-        handleUser(res.user);
-    } catch(e) { alert("Login failed: " + e.message); }
+        await handleUser(res.user);
+    } catch(e) { 
+        showToast(e.message, 'error'); 
+        btn.innerHTML = oldText;
+        await signOut(auth); // Ensure logout on error
+    }
 });
 
 document.getElementById('logout-btn')?.addEventListener('click', () => {
@@ -25,19 +45,49 @@ onAuthStateChanged(auth, (user) => {
 });
 
 async function handleUser(user) {
+    // 1. Check if user exists in DB by ID (Fastest)
     const userRef = doc(db, "students", user.uid);
-    const snap = await getDoc(userRef);
-    
+    let snap = await getDoc(userRef);
+
     if (snap.exists()) {
+        // User already logged in before and is valid
         currentUser = snap.data();
-    } else {
-        currentUser = {
-            uid: user.uid, name: user.displayName, email: user.email,
-            role: "student", approved: false, photo: user.photoURL
-        };
-        await setDoc(userRef, currentUser);
+        initDashboard();
+        return;
     }
-    initDashboard();
+
+    // 2. If not found by UID, check if email is Pre-Registered (By Admin)
+    const q = query(collection(db, "students"), where("email", "==", user.email));
+    const querySnap = await getDocs(q);
+
+    if (!querySnap.empty) {
+        // Email Found! Link Auth UID to this pre-registered doc
+        const preRegDoc = querySnap.docs[0];
+        const preRegData = preRegDoc.data();
+        
+        // Update the doc: Set the real UID and Photo
+        await setDoc(userRef, {
+            ...preRegData,
+            uid: user.uid,
+            name: user.displayName,
+            photo: user.photoURL,
+            role: preRegData.role || 'student',
+            approved: true
+        });
+        
+        // Delete the old placeholder doc if it had a different ID (Optional cleanup)
+        if(preRegDoc.id !== user.uid) await deleteDoc(doc(db, "students", preRegDoc.id));
+
+        currentUser = { ...preRegData, uid: user.uid, name: user.displayName, photo: user.photoURL };
+        initDashboard();
+    } else {
+        // 3. REJECT USER: Email not in DB
+        showToast("Access Denied: Your email is not registered.", "error");
+        await signOut(auth);
+        showLoginScreen();
+        // Optional: Reset button UI
+        document.getElementById('google-login-btn').innerHTML = `<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5"><span class="text-sm">Login with Registered Gmail</span>`;
+    }
 }
 
 function showLoginScreen() {
@@ -49,117 +99,94 @@ function initDashboard() {
     document.getElementById('login-section').classList.add('hidden');
     document.getElementById('dashboard-section').classList.remove('hidden');
     
-    // UI Updates
     document.getElementById('nav-photo').src = currentUser.photo;
     document.getElementById('profile-photo').src = currentUser.photo;
     document.getElementById('profile-name').innerText = currentUser.name;
     document.getElementById('profile-email').innerText = currentUser.email;
-    document.getElementById('role-badge-nav').innerText = currentUser.role.toUpperCase();
-
-    if (!currentUser.approved) {
-        document.getElementById('approval-warning').classList.remove('hidden');
-        return; 
-    }
+    document.getElementById('header-name').innerText = currentUser.name.split(' ')[0];
+    document.getElementById('profile-role').innerText = currentUser.role.toUpperCase();
 
     document.getElementById('main-content').classList.remove('hidden');
+    loadAnnouncement();
 
-    // Admin Features
     if (currentUser.role === 'admin') {
-        document.getElementById('admin-stats').classList.remove('hidden'); 
-        document.getElementById('admin-stats').classList.add('grid');
         document.getElementById('admin-upload-ui').classList.remove('hidden');
         document.getElementById('admin-exam-ui').classList.remove('hidden');
-        document.getElementById('tab-users').classList.remove('hidden'); 
+        document.getElementById('edit-announce-btn').classList.remove('hidden');
+        document.getElementById('tab-admin').classList.remove('hidden');
         loadAllUsers();
+        loadAdminContent();
     } else {
         document.getElementById('student-score-card').classList.remove('hidden');
         loadMyResults();
     }
-
-    loadNotes();
-    loadExams();
+    loadNotes(); loadExams(); loadLeaderboard();
 }
 
-window.openProfileModal = () => document.getElementById('profile-modal').classList.remove('hidden');
+// --- ADMIN: REGISTER STUDENT ---
+window.registerStudent = async () => {
+    const emailInput = document.getElementById('new-student-email');
+    const email = emailInput.value.trim();
+    if(!email) return showToast("Enter an email", "error");
+
+    // Check if exists
+    const q = query(collection(db, "students"), where("email", "==", email));
+    const snap = await getDocs(q);
+    if(!snap.empty) return showToast("Email already registered", "error");
+
+    // Add placeholder doc
+    await addDoc(collection(db, "students"), {
+        email: email,
+        name: "New Student", // Will update on first login
+        role: "student",
+        approved: true, // Auto-approve since Admin added them
+        photo: "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+    });
+
+    showToast("Student Registered!", "success");
+    emailInput.value = "";
+    loadAllUsers();
+};
 
 // --- TABS ---
 window.switchTab = (tab) => {
-    ['notes', 'exams', 'users'].forEach(t => {
+    ['notes', 'exams', 'leaderboard', 'admin'].forEach(t => {
         const btn = document.getElementById(`tab-${t}`);
         const view = document.getElementById(`view-${t}`);
         if(btn) {
-            if(t === tab) {
-                btn.className = "flex-1 py-3 active-tab font-bold";
-                view?.classList.remove('hidden');
-            } else {
-                btn.className = "flex-1 py-3 inactive-tab";
-                view?.classList.add('hidden');
-            }
+            btn.className = t === tab ? "flex-1 py-2 text-xs font-bold rounded-lg bg-white shadow text-blue-600 transition" : "flex-1 py-2 text-xs font-medium rounded-lg text-gray-400 hover:bg-gray-50 transition";
+            view?.classList.toggle('hidden', t !== tab);
         }
     });
 };
 
-// --- 1. ADMIN: USER MANAGEMENT ---
-async function loadAllUsers() {
-    if(currentUser.role !== 'admin') return;
-    const snaps = await getDocs(collection(db, "students"));
-    const list = document.getElementById('users-list');
-    list.innerHTML = "";
-    
-    let count = 0;
-    snaps.forEach(doc => {
-        const u = doc.data();
-        count++;
-        const div = document.createElement('div');
-        div.className = "table-row flex justify-between items-center";
-        div.innerHTML = `
-            <div class="flex items-center gap-3">
-                <img src="${u.photo}" class="w-8 h-8 rounded-full">
-                <div>
-                    <div class="font-bold text-sm text-gray-800">${u.name}</div>
-                    <div class="text-xs text-gray-500">${u.email}</div>
-                </div>
-            </div>
-            <div class="flex flex-col items-end gap-1">
-                <span class="${u.role==='admin'?'badge-admin':(u.approved?'badge-approved':'badge-pending')}">
-                    ${u.role==='admin'?'Admin':(u.approved?'Active':'Pending')}
-                </span>
-                ${u.role !== 'admin' ? 
-                    `<button onclick="toggleUserStatus('${u.uid}', ${u.approved})" class="text-xs text-blue-600 font-bold">
-                        ${u.approved ? 'Block' : 'Approve'}
-                    </button>` : ''
-                }
-            </div>
-        `;
-        list.appendChild(div);
-    });
-    document.getElementById('stat-users').innerText = count;
-}
+// --- SEARCH ---
+document.getElementById('global-search').addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase();
+    renderNotes(allNotes.filter(n => n.title.toLowerCase().includes(term)));
+    renderExams(allExams.filter(e => e.title.toLowerCase().includes(term)));
+});
 
-window.toggleUserStatus = async (uid, currentStatus) => {
-    if(!confirm(`Change status?`)) return;
-    await updateDoc(doc(db, "students", uid), { approved: !currentStatus });
-    loadAllUsers();
-};
-
-// --- 2. NOTES SYSTEM (CLOUDINARY) ---
+// --- NOTES (CLOUDINARY) ---
 document.getElementById('upload-btn')?.addEventListener('click', async () => {
     const fileInput = document.getElementById('note-file');
     const title = document.getElementById('note-title').value;
+    const btn = document.getElementById('upload-btn');
     const status = document.getElementById('upload-status');
 
-    // 🔴🔴 MAKE SURE YOU CREATED "lms_upload" PRESET IN CLOUDINARY 🔴🔴
+    // 🔴 CLOUDINARY
     const CLOUD_NAME = "dpe74ejhl"; 
     const UPLOAD_PRESET = "lms_upload"; 
 
-    if(fileInput.files.length === 0 || !title) return alert("Missing fields");
+    if(fileInput.files.length === 0 || !title) return showToast("Missing fields", 'error');
 
     const formData = new FormData();
     formData.append('file', fileInput.files[0]);
     formData.append('upload_preset', UPLOAD_PRESET);
 
-    status.innerText = "⏳ Uploading to Cloud...";
-    
+    btn.disabled = true; btn.innerText = "Uploading...";
+    status.innerText = "Uploading to cloud...";
+
     try {
         const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, { method: 'POST', body: formData });
         const data = await res.json();
@@ -168,77 +195,62 @@ document.getElementById('upload-btn')?.addEventListener('click', async () => {
         let type = 'image';
         if(data.format === 'pdf' || fileInput.files[0].name.endsWith('.pdf')) type = 'pdf';
 
-        await addDoc(collection(db, "notes"), {
-            title, url: data.secure_url, type, createdAt: serverTimestamp()
-        });
-        
-        status.innerText = "✅ Uploaded!";
-        fileInput.value = ""; document.getElementById('note-title').value = "";
+        await addDoc(collection(db, "notes"), { title, url: data.secure_url, type, createdAt: serverTimestamp() });
+        showToast("Uploaded!", 'success');
+        fileInput.value = ""; document.getElementById('note-title').value = ""; status.innerText = "";
         loadNotes();
-    } catch(e) { status.innerText = "Error: " + e.message; }
+        if(currentUser.role === 'admin') loadAdminContent(); // Refresh admin list
+    } catch(e) { showToast(e.message, 'error'); }
+    btn.disabled = false; btn.innerText = "Upload";
 });
 
 async function loadNotes() {
+    document.getElementById('notes-skeleton').classList.remove('hidden');
+    document.getElementById('notes-list').classList.add('hidden');
     const snaps = await getDocs(query(collection(db, "notes"), orderBy("createdAt", "desc")));
-    const list = document.getElementById('notes-list');
-    list.innerHTML = "";
-    snaps.forEach(doc => {
-        const n = doc.data();
-        const div = document.createElement('div');
-        div.className = "bg-white p-3 rounded shadow border-l-4 border-orange-400 flex justify-between items-center";
-        div.innerHTML = `
-            <div>
-                <h4 class="font-bold text-gray-800 text-sm">${n.title}</h4>
-                <span class="text-xs text-gray-400 uppercase">${n.type}</span>
-            </div>
-            <button onclick="openViewer('${n.url}', '${n.type}')" class="bg-blue-50 text-blue-600 px-3 py-1 rounded text-xs font-bold">Open</button>
-        `;
-        list.appendChild(div);
+    allNotes = []; snaps.forEach(doc => allNotes.push(doc.data()));
+    renderNotes(allNotes);
+    document.getElementById('notes-skeleton').classList.add('hidden');
+    document.getElementById('notes-list').classList.remove('hidden');
+}
+
+function renderNotes(notes) {
+    const list = document.getElementById('notes-list'); list.innerHTML = "";
+    if(notes.length === 0) list.innerHTML = `<div class="text-center py-6 text-gray-300 text-xs">No notes found</div>`;
+    notes.forEach(n => {
+        const icon = n.type === 'pdf' ? 'fa-file-pdf text-red-500' : 'fa-file-image text-blue-500';
+        list.innerHTML += `
+        <div onclick="openViewer('${n.url}', '${n.type}')" class="bg-white p-3 rounded-xl border border-gray-100 flex items-center gap-3 active:scale-[0.98] transition cursor-pointer">
+            <div class="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center"><i class="fas ${icon}"></i></div>
+            <div class="flex-grow"><h4 class="font-bold text-gray-700 text-xs">${n.title}</h4><span class="text-[10px] text-gray-400 uppercase">${n.type}</span></div>
+            <i class="fas fa-chevron-right text-gray-200 text-xs"></i>
+        </div>`;
     });
 }
 
 window.openViewer = (url, type) => {
     document.getElementById('viewer-modal').classList.remove('hidden');
     const wm = document.getElementById('watermark-overlay');
-    wm.innerHTML = "";
-    for(let i=0; i<30; i++) wm.innerHTML += `<div class="watermark-text">${currentUser.email}</div>`;
-    
-    const pdf = document.getElementById('pdf-frame');
-    const img = document.getElementById('image-frame');
-    if(type === 'pdf') {
-        pdf.src = url; pdf.classList.remove('hidden'); img.classList.add('hidden');
-    } else {
-        img.src = url; img.classList.remove('hidden'); pdf.classList.add('hidden');
-    }
+    wm.innerHTML = ""; for(let i=0;i<30;i++) wm.innerHTML += `<div class="watermark-text">${currentUser.email}</div>`;
+    const pdf = document.getElementById('pdf-frame'); const img = document.getElementById('image-frame');
+    if(type === 'pdf') { pdf.src = url; pdf.classList.remove('hidden'); img.classList.add('hidden'); }
+    else { img.src = url; img.classList.remove('hidden'); pdf.classList.add('hidden'); }
 };
-window.closeViewer = () => {
-    document.getElementById('viewer-modal').classList.add('hidden');
-    document.getElementById('pdf-frame').src = "";
-};
+window.closeViewer = () => { document.getElementById('viewer-modal').classList.add('hidden'); document.getElementById('pdf-frame').src = ""; };
 
-// --- 3. EXAM SYSTEM ---
+// --- EXAMS ---
 window.openExamCreator = () => document.getElementById('exam-creator-modal').classList.remove('hidden');
 window.closeExamCreator = () => document.getElementById('exam-creator-modal').classList.add('hidden');
 
 window.addQuestionField = () => {
     const c = document.getElementById('questions-container');
     const div = document.createElement('div');
-    div.className = "bg-gray-50 p-3 rounded border q-block relative";
+    div.className = "bg-white p-3 rounded-lg border border-gray-200 q-block relative animate-fade-in";
     div.innerHTML = `
-        <div class="absolute right-2 top-2 text-xs text-gray-400">Q${c.children.length+1}</div>
-        <input class="w-full border p-2 mb-2 rounded font-bold text-sm q-text bg-white" placeholder="Question">
-        <div class="grid grid-cols-2 gap-2 mb-2">
-            <input class="border p-1 rounded text-xs q-opt1" placeholder="A">
-            <input class="border p-1 rounded text-xs q-opt2" placeholder="B">
-            <input class="border p-1 rounded text-xs q-opt3" placeholder="C">
-            <input class="border p-1 rounded text-xs q-opt4" placeholder="D">
-        </div>
-        <select class="w-full border p-2 rounded text-sm q-correct bg-white">
-            <option value="1">Correct: A</option>
-            <option value="2">Correct: B</option>
-            <option value="3">Correct: C</option>
-            <option value="4">Correct: D</option>
-        </select>
+        <div class="absolute right-2 top-2 text-[10px] font-bold text-gray-300">Q${c.children.length+1}</div>
+        <input class="w-full border-b border-gray-100 p-2 mb-2 font-bold text-sm q-text outline-none" placeholder="Question...">
+        <div class="grid gap-2 mb-2">${[1,2,3,4].map(i => `<input class="bg-gray-50 border-none p-2 rounded text-xs q-opt${i}" placeholder="Opt ${i}">`).join('')}</div>
+        <select class="w-full bg-blue-50 text-blue-600 p-2 rounded text-xs font-bold q-correct border-none"><option value="1">Ans: 1</option><option value="2">Ans: 2</option><option value="3">Ans: 3</option><option value="4">Ans: 4</option></select>
     `;
     c.appendChild(div);
 };
@@ -247,113 +259,4 @@ window.publishExam = async () => {
     const title = document.getElementById('new-exam-title').value;
     const dur = document.getElementById('new-exam-duration').value;
     const qBlocks = document.querySelectorAll('.q-block');
-    
-    if(!title || !dur || qBlocks.length===0) return alert("Incomplete");
-    
-    const questions = [];
-    qBlocks.forEach(b => {
-        questions.push({
-            text: b.querySelector('.q-text').value,
-            options: [
-                b.querySelector('.q-opt1').value, b.querySelector('.q-opt2').value,
-                b.querySelector('.q-opt3').value, b.querySelector('.q-opt4').value
-            ],
-            correct: parseInt(b.querySelector('.q-correct').value) - 1
-        });
-    });
-
-    await addDoc(collection(db, "exams"), { title, duration: parseInt(dur), questions, createdAt: serverTimestamp() });
-    closeExamCreator(); loadExams();
-};
-
-async function loadExams() {
-    const snaps = await getDocs(query(collection(db, "exams"), orderBy("createdAt", "desc")));
-    const list = document.getElementById('exams-list');
-    list.innerHTML = "";
-    
-    const resSnaps = await getDocs(query(collection(db, "results"), where("studentId", "==", currentUser.uid)));
-    const takenIds = [];
-    resSnaps.forEach(doc => takenIds.push(doc.data().examId));
-
-    if(currentUser.role === 'admin') document.getElementById('stat-exams').innerText = snaps.size;
-
-    snaps.forEach(doc => {
-        const e = doc.data();
-        const isTaken = takenIds.includes(doc.id);
-        const div = document.createElement('div');
-        div.className = "bg-white p-4 rounded shadow flex justify-between items-center " + (isTaken ? "border-l-4 border-green-500" : "border-l-4 border-indigo-500");
-        div.innerHTML = `
-            <div>
-                <h3 class="font-bold text-gray-800 text-sm">${e.title}</h3>
-                <p class="text-xs text-gray-500">${e.duration}m • ${e.questions.length}Q</p>
-            </div>
-            ${isTaken 
-                ? `<span class="text-xs font-bold text-green-700 bg-green-100 px-2 py-1 rounded">Done</span>`
-                : `<button onclick="startExam('${doc.id}')" class="bg-indigo-600 text-white px-3 py-1.5 rounded text-xs font-bold">Start</button>`
-            }
-        `;
-        list.appendChild(div);
-    });
-}
-
-async function loadMyResults() {
-    const q = query(collection(db, "results"), where("studentId", "==", currentUser.uid), orderBy("submittedAt", "desc"));
-    const snaps = await getDocs(q);
-    const list = document.getElementById('my-results-list');
-    list.innerHTML = snaps.empty ? "<p class='text-gray-400 italic'>No exams yet.</p>" : "";
-    
-    snaps.forEach(doc => {
-        const r = doc.data();
-        const percent = Math.round((r.score / r.total) * 100);
-        const color = percent >= 40 ? 'text-green-600' : 'text-red-600';
-        list.innerHTML += `<div class="flex justify-between border-b pb-1 mb-1 last:border-0"><span class="truncate w-32">${r.examTitle}</span><span class="font-bold ${color}">${r.score}/${r.total}</span></div>`;
-    });
-}
-
-window.startExam = async (eid) => {
-    const docSnap = await getDoc(doc(db, "exams", eid));
-    currentExam = { id: docSnap.id, ...docSnap.data() };
-    
-    document.getElementById('exam-taker-modal').classList.remove('hidden');
-    document.getElementById('taking-exam-title').innerText = currentExam.title;
-    const area = document.getElementById('exam-questions-area');
-    area.innerHTML = "";
-    
-    currentExam.questions.forEach((q, idx) => {
-        area.innerHTML += `
-            <div class="bg-white p-4 rounded shadow mb-4">
-                <p class="font-bold text-sm mb-2">${idx+1}. ${q.text}</p>
-                ${q.options.map((opt, i) => `<label class="flex items-center gap-2 border p-2 rounded text-sm mb-2"><input type="radio" name="q-${idx}" value="${i}"> ${opt}</label>`).join('')}
-            </div>
-        `;
-    });
-
-    let time = currentExam.duration * 60;
-    const disp = document.getElementById('timer-display');
-    examTimer = setInterval(() => {
-        time--;
-        const m = Math.floor(time/60);
-        const s = time%60;
-        disp.innerText = `${m}:${s<10?'0'+s:s}`;
-        if(time <= 0) submitExam();
-    }, 1000);
-};
-
-window.submitExam = async () => {
-    clearInterval(examTimer);
-    let score = 0;
-    currentExam.questions.forEach((q, idx) => {
-        const sel = document.querySelector(`input[name="q-${idx}"]:checked`);
-        if(sel && parseInt(sel.value) === q.correct) score++;
-    });
-
-    await addDoc(collection(db, "results"), {
-        examId: currentExam.id, examTitle: currentExam.title,
-        studentId: currentUser.uid, studentName: currentUser.name,
-        score, total: currentExam.questions.length, submittedAt: serverTimestamp()
-    });
-
-    document.getElementById('exam-taker-modal').classList.add('hidden');
-    alert(`Score: ${score}/${currentExam.questions.length}`);
-    loadExams(); loadMyResults();
-};
+    if(!title || !dur |

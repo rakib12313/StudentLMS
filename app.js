@@ -9,123 +9,154 @@ import {
     doc, getDoc, setDoc, collection, getDocs, query, orderBy, serverTimestamp, where, limit, deleteDoc 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+// STATE
+let isLoginMode = true; // Default to Login
 let currentUser = null;
 let currentExam = null;
 let examTimer = null;
 let allNotes = [];
 
-// --- LOGIN & REGISTER LOGIC ---
+// ELEMENTS
 const emailInput = document.getElementById('email');
 const passInput = document.getElementById('password');
-const loginBtn = document.getElementById('login-btn');
-const setupBtn = document.getElementById('setup-btn');
+const mainBtn = document.getElementById('main-action-btn');
+const toggleBtn = document.getElementById('toggle-mode-btn');
 const statusMsg = document.getElementById('status-msg');
 
-if(loginBtn) {
-    // 1. LOGIN MODE
-    loginBtn.addEventListener('click', async () => {
-        const email = emailInput.value.trim();
-        const pass = passInput.value.trim();
-        if(!email || !pass) return showStatus("Enter email and password", "red");
-
-        try {
-            loginBtn.innerText = "Verifying...";
-            loginBtn.disabled = true;
-            await signInWithEmailAndPassword(auth, email, pass);
-            // Auth listener handles the rest
-        } catch(e) {
-            showStatus(e.message.replace("Firebase:", ""), "red");
-            loginBtn.innerText = "Login";
-            loginBtn.disabled = false;
+// --- TOGGLE LOGIN / REGISTER ---
+if(toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+        isLoginMode = !isLoginMode; // Switch Mode
+        
+        // Update UI based on mode
+        if (isLoginMode) {
+            document.getElementById('page-title').innerText = "Student Login";
+            document.getElementById('page-subtitle').innerText = "Enter your credentials";
+            mainBtn.innerText = "Login";
+            mainBtn.classList.replace("bg-green-600", "bg-blue-600");
+            mainBtn.classList.replace("hover:bg-green-700", "hover:bg-blue-700");
+            document.getElementById('toggle-text').innerText = "First time here?";
+            toggleBtn.innerText = "Create Account (Setup)";
+            statusMsg.innerText = "";
+        } else {
+            document.getElementById('page-title').innerText = "Account Setup";
+            document.getElementById('page-subtitle').innerText = "Verify email & create password";
+            mainBtn.innerText = "Create Account";
+            mainBtn.classList.replace("bg-blue-600", "bg-green-600");
+            mainBtn.classList.replace("hover:bg-blue-700", "hover:bg-green-700");
+            document.getElementById('toggle-text').innerText = "Already set up?";
+            toggleBtn.innerText = "Back to Login";
+            statusMsg.innerText = "";
         }
     });
+}
 
-    // 2. SETUP MODE (Register)
-    setupBtn.addEventListener('click', async () => {
+// --- MAIN ACTION (Login or Register) ---
+if(mainBtn) {
+    mainBtn.addEventListener('click', async () => {
         const email = emailInput.value.trim();
         const pass = passInput.value.trim();
-        
-        if(loginBtn.innerText === "Login") {
-            // Switch UI to Register Mode
-            loginBtn.innerText = "Create Account";
-            setupBtn.innerText = "Back to Login";
-            loginBtn.className = "w-full bg-green-600 text-white py-3 rounded-xl font-bold text-sm shadow-lg";
-            showStatus("Enter your email & set a password", "blue");
-            return;
-        }
 
-        if(setupBtn.innerText === "Back to Login" && (!email || !pass)) {
-             return showStatus("Enter email & new password", "red");
-        }
+        if(!email || !pass) return showStatus("Please enter email and password", "red");
 
-        // PERFORM REGISTRATION
+        mainBtn.disabled = true;
+        mainBtn.style.opacity = "0.7";
+
         try {
-            loginBtn.innerText = "Checking Permission...";
-            loginBtn.disabled = true;
+            if (isLoginMode) {
+                // LOGIN FLOW
+                mainBtn.innerText = "Verifying...";
+                await signInWithEmailAndPassword(auth, email, pass);
+                // Listener handles redirect
+            } else {
+                // REGISTER FLOW
+                mainBtn.innerText = "Checking Admin List...";
+                
+                // 1. Check if Admin added this email
+                const q = query(collection(db, "students"), where("email", "==", email));
+                const snap = await getDocs(q);
 
-            // A. Check Whitelist in Firestore
-            const q = query(collection(db, "students"), where("email", "==", email));
-            const snap = await getDocs(q);
+                if(snap.empty) {
+                    throw new Error("This email is not registered by Admin.");
+                }
 
-            if(snap.empty) {
-                throw new Error("Email not registered by Admin.");
+                // 2. Create Auth
+                mainBtn.innerText = "Creating...";
+                const userCred = await createUserWithEmailAndPassword(auth, email, pass);
+                const user = userCred.user;
+
+                // 3. Link Database
+                const preDoc = snap.docs[0];
+                const data = preDoc.data();
+                
+                await setDoc(doc(db, "students", user.uid), {
+                    ...data,
+                    uid: user.uid,
+                    email: email,
+                    name: data.name || "Student", // Use name set by admin
+                    role: data.role || "student",
+                    approved: true
+                });
+
+                // Cleanup placeholder
+                if(preDoc.id !== user.uid) await deleteDoc(doc(db, "students", preDoc.id));
+
+                showStatus("Success! Logging you in...", "green");
             }
-
-            // B. Create Auth Account
-            const userCred = await createUserWithEmailAndPassword(auth, email, pass);
-            const user = userCred.user;
-
-            // C. Link Auth ID to Firestore Doc
-            const preDoc = snap.docs[0];
-            const data = preDoc.data();
-            
-            await setDoc(doc(db, "students", user.uid), {
-                ...data,
-                uid: user.uid,
-                email: email,
-                name: data.name || "Student",
-                role: data.role || "student",
-                approved: true
-            });
-
-            // Cleanup old doc if ID was auto-generated
-            if(preDoc.id !== user.uid) await deleteDoc(doc(db, "students", preDoc.id));
-
-            showStatus("Success! Logging in...", "green");
-
         } catch(e) {
-            showStatus(e.message, "red");
-            loginBtn.innerText = "Create Account";
-            loginBtn.disabled = false;
+            console.error(e);
+            let msg = e.message;
+            if(msg.includes("auth/invalid-credential")) msg = "Wrong Email or Password.";
+            if(msg.includes("auth/email-already-in-use")) msg = "Account already exists. Please Login.";
+            if(msg.includes("weak-password")) msg = "Password should be at least 6 chars.";
+            
+            showStatus(msg, "red");
+            mainBtn.disabled = false;
+            mainBtn.style.opacity = "1";
+            mainBtn.innerText = isLoginMode ? "Login" : "Create Account";
         }
     });
 }
 
 function showStatus(msg, color) {
     statusMsg.innerText = msg;
-    statusMsg.className = `text-xs text-center mt-4 font-medium h-5 text-${color}-600`;
+    statusMsg.className = `text-xs text-center mt-4 font-bold h-5 text-${color}-600`;
 }
 
-// --- AUTH STATE ---
+// --- AUTH STATE LISTENER ---
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         // Fetch User Data
-        const snap = await getDoc(doc(db, "students", user.uid));
-        if(snap.exists()) {
-            currentUser = snap.data();
-            initDashboard();
-        } else {
-            // Rare edge case: Auth exists but DB deleted
-            signOut(auth);
-            showStatus("Account deleted by Admin", "red");
+        try {
+            const snap = await getDoc(doc(db, "students", user.uid));
+            if(snap.exists()) {
+                currentUser = snap.data();
+                initDashboard();
+            } else {
+                // If Auth exists but DB doc missing (Deleted user)
+                await signOut(auth);
+                showStatus("Account not found.", "red");
+                showLoginScreen();
+            }
+        } catch(e) {
+            console.error(e);
         }
     } else {
-        document.getElementById('login-section').classList.remove('hidden');
-        document.getElementById('dashboard-section').classList.add('hidden');
+        showLoginScreen();
     }
 });
 
-// --- DASHBOARD ---
+// --- DASHBOARD FUNCTIONS ---
+function showLoginScreen() {
+    document.getElementById('login-section').classList.remove('hidden');
+    document.getElementById('dashboard-section').classList.add('hidden');
+    if(mainBtn) {
+        mainBtn.disabled = false;
+        mainBtn.style.opacity = "1";
+        mainBtn.innerText = isLoginMode ? "Login" : "Create Account";
+    }
+}
+
 function initDashboard() {
     document.getElementById('login-section').classList.add('hidden');
     document.getElementById('dashboard-section').classList.remove('hidden');
@@ -144,7 +175,9 @@ function initDashboard() {
     loadLeaderboard();
 }
 
-// --- STUDENT FEATURES ---
+// ... (Keep existing Student Logic: Notes, Exams, Leaderboard, Global Utils) ...
+// Below are the essential Student Functions required for the dashboard to work.
+
 async function loadAnnouncement() {
     const snap = await getDoc(doc(db, "settings", "announcement"));
     if(snap.exists() && snap.data().text) {
@@ -172,7 +205,11 @@ function renderNotes(notes) {
     });
 }
 
-// --- EXAMS ---
+document.getElementById('global-search').addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase();
+    renderNotes(allNotes.filter(n => n.title.toLowerCase().includes(term)));
+});
+
 async function loadExams() {
     const snaps = await getDocs(query(collection(db, "exams"), orderBy("createdAt", "desc")));
     const resSnaps = await getDocs(query(collection(db, "results"), where("studentId", "==", currentUser.uid)));
@@ -193,6 +230,12 @@ async function loadExams() {
             ${!isTaken ? `<button onclick="startExam('${doc.id}')" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm">Start</button>` : `<span class="text-[10px] font-bold text-green-500 bg-green-50 px-2 py-1 rounded">Done</span>`}
         </div>`;
     });
+    
+    if(takenIds.length > 0) {
+        document.getElementById('student-score-card').classList.remove('hidden');
+        const resList = document.getElementById('my-results-list'); resList.innerHTML = "";
+        resSnaps.forEach(doc => { const r = doc.data(); resList.innerHTML += `<div class="flex justify-between bg-slate-50 p-2 rounded-lg text-xs"><span class="font-bold text-slate-600 truncate w-32">${r.examTitle}</span><span class="font-bold text-green-600">${r.score}/${r.total}</span></div>`; });
+    }
 }
 
 window.startExam = async (eid) => {
@@ -219,7 +262,6 @@ async function loadLeaderboard() {
     let rank=1; snaps.forEach(doc => { const r = doc.data(); list.innerHTML += `<div class="p-3 flex justify-between items-center"><div class="flex items-center gap-3"><span class="font-bold text-slate-300 text-lg w-6 text-center">${rank++}</span><div><div class="font-bold text-xs text-slate-700">${r.studentName}</div><div class="text-[10px] text-slate-400 truncate w-32">${r.examTitle}</div></div></div><span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded">${r.score}/${r.total}</span></div>`; });
 }
 
-// --- GLOBAL UTILS ---
 window.switchTab = (tab) => {
     ['notes', 'exams', 'leaderboard'].forEach(t => {
         const btn = document.getElementById(`tab-${t}`); const view = document.getElementById(`view-${t}`);

@@ -5,192 +5,344 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Student Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="manifest" href="manifest.json">
 </head>
-<body class="bg-slate-50 transition-colors duration-200">
+<body>
+
+    <div class="animated-bg"></div>
+    <div class="bg-overlay"></div>
 
     <div id="toast-container"></div>
 
-    <!-- CHEAT WARNING OVERLAY -->
-    <div id="cheat-warning" class="hidden fixed inset-0 z-[100] flex flex-col items-center justify-center text-white text-center p-6">
-        <i class="fas fa-exclamation-triangle text-6xl mb-4 animate-bounce"></i>
-        <h2 class="text-2xl font-bold mb-2">WARNING!</h2>
-        <p class="text-sm mb-6">Do not switch tabs during an exam.</p>
-        <p class="font-bold text-lg">Attempts Remaining: <span id="cheat-count">2</span></p>
-        <button onclick="resumeExam()" class="mt-8 bg-white text-red-600 px-6 py-3 rounded-full font-bold shadow-lg">Resume Exam</button>
+    <div id="cheat-warning" class="hidden fixed inset-0 z-[100] flex flex-col items-center justify-center text-white text-center p-6 animate-enter">
+        <div class="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mb-4 animate-bounce">
+            <i class="fas fa-exclamation-triangle text-4xl"></i>
+        </div>
+        <h2 class="text-3xl font-bold mb-2">WARNING!</h2>
+        <p class="text-lg opacity-90 mb-6">Exam Focus Mode Active. Do not switch tabs.</p>
+        <p class="font-bold text-xl bg-black/30 px-4 py-2 rounded-lg">Attempts Remaining: <span id="cheat-count">2</span></p>
+        <button onclick="resumeExam()" class="mt-8 bg-white text-red-600 px-8 py-3 rounded-full font-bold shadow-2xl hover:scale-105 transition">I Understand, Resume</button>
     </div>
 
-    <!-- LOGIN SECTION -->
-    <div id="login-section" class="login-bg flex flex-col items-center justify-center px-4">
-        <div class="blob blob-1 animate-float"></div>
-        <div class="blob blob-2 animate-float" style="animation-delay: 2s"></div>
-        <div class="login-card w-full max-w-sm p-8 rounded-3xl relative z-10 animate-fade-in shadow-xl">
-            <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg"><i class="fas fa-graduation-cap text-2xl text-white"></i></div>
-                <h1 class="text-2xl font-bold text-slate-800">Student Portal</h1>
-                <p class="text-slate-500 text-xs">Secure Access</p>
+    <div id="login-section" class="min-h-screen flex flex-col items-center justify-center p-4">
+        <div class="blob-shape bg-purple-400 w-64 h-64 top-10 left-10"></div>
+        <div class="blob-shape bg-blue-400 w-64 h-64 bottom-10 right-10"></div>
+
+        <div class="glass-panel w-full max-w-md p-8 relative z-10 animate-enter">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-gradient-to-tr from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl rotate-3 hover:rotate-0 transition">
+                    <i class="fas fa-graduation-cap text-3xl text-white"></i>
+                </div>
+                <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">Welcome Back</h1>
+                <p class="text-slate-500 text-sm mt-1">Your learning journey continues here.</p>
             </div>
             
-            <div class="space-y-3 mb-4">
-                <input id="email" type="email" placeholder="Email" class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-blue-500">
-                <input id="password" type="password" placeholder="Password" class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-blue-500">
-                <button id="email-login-btn" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold text-sm shadow-lg hover:bg-blue-700">Login</button>
+            <div class="space-y-4 mb-6">
+                <div class="relative">
+                    <i class="fas fa-envelope absolute left-4 top-4 text-slate-400"></i>
+                    <input id="email" type="email" placeholder="Email Address" class="w-full pl-10 p-3.5 rounded-xl border border-slate-200 bg-white/50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+                </div>
+                <div class="relative">
+                    <i class="fas fa-lock absolute left-4 top-4 text-slate-400"></i>
+                    <input id="password" type="password" placeholder="Password" class="w-full pl-10 p-3.5 rounded-xl border border-slate-200 bg-white/50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+                </div>
+                <button id="email-login-btn" class="w-full btn-primary py-3.5 rounded-xl font-bold text-sm tracking-wide">LOGIN</button>
             </div>
-            <div class="relative flex py-2 items-center"><div class="flex-grow border-t border-slate-200"></div><span class="flex-shrink mx-4 text-slate-400 text-[10px]">OR</span><div class="flex-grow border-t border-slate-200"></div></div>
-            <button id="google-login-btn" class="w-full bg-white border border-slate-200 text-slate-700 font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-sm hover:bg-slate-50 transition">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5"> <span class="text-sm">Google Login</span>
+            
+            <div class="relative flex py-3 items-center">
+                <div class="flex-grow border-t border-slate-300/50"></div>
+                <span class="flex-shrink mx-4 text-slate-500 text-xs font-bold uppercase">Or continue with</span>
+                <div class="flex-grow border-t border-slate-300/50"></div>
+            </div>
+            
+            <button id="google-login-btn" class="w-full bg-white border border-slate-200 text-slate-700 font-bold py-3.5 rounded-xl flex items-center justify-center gap-3 shadow-sm hover:bg-slate-50 transition">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5"> 
+                <span class="text-sm">Google Account</span>
             </button>
-            <div class="mt-4 text-center"><button id="setup-btn" class="text-xs text-blue-600 font-bold hover:underline">First Time? Create Account</button></div>
+            
+            <div class="mt-6 text-center">
+                <button id="setup-btn" class="text-sm text-blue-600 font-bold hover:text-blue-800 transition">First Time? Create Account</button>
+            </div>
             <p id="login-status" class="mt-4 text-xs text-center text-red-500 font-medium h-5"></p>
         </div>
     </div>
 
-    <!-- DASHBOARD -->
     <div id="dashboard-section" class="hidden min-h-screen pb-24">
-        <!-- Navbar -->
-        <nav class="bg-white p-4 shadow-sm flex justify-between items-center sticky top-0 z-40">
+        <nav class="glass-panel mx-4 mt-4 p-3 flex justify-between items-center sticky top-4 z-40 mb-6">
             <div class="flex items-center gap-3">
-                <img id="nav-photo" src="" class="w-9 h-9 rounded-full border border-slate-200 object-cover" onclick="openProfileModal()">
+                <div class="relative group cursor-pointer" onclick="openProfileModal()">
+                    <img id="nav-photo" src="" class="w-10 h-10 rounded-full border-2 border-white shadow-md object-cover">
+                    <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                </div>
                 <div>
-                    <h2 id="header-name" class="text-sm font-bold text-slate-800">Student</h2>
-                    <div class="flex items-center gap-1"><i class="fas fa-fire text-orange-500 text-[10px]"></i> <span id="streak-count" class="text-[10px] font-bold text-orange-600">0</span></div>
+                    <h2 id="header-name" class="text-sm font-bold text-slate-800 dark:text-white leading-tight">Student</h2>
+                    <div class="flex items-center gap-1 bg-orange-100 dark:bg-orange-900/30 px-1.5 py-0.5 rounded-full w-fit">
+                        <i class="fas fa-fire text-orange-500 text-[10px]"></i> 
+                        <span id="streak-count" class="text-[10px] font-bold text-orange-600 dark:text-orange-400">0 Days</span>
+                    </div>
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <button onclick="toggleTheme()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center"><i id="theme-icon" class="fas fa-moon text-slate-500"></i></button>
+                <button onclick="toggleTheme()" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 transition flex items-center justify-center text-slate-500 dark:text-slate-300">
+                    <i id="theme-icon" class="fas fa-moon"></i>
+                </button>
                 <div class="relative cursor-pointer" onclick="toggleNotifs()">
-                    <i class="fas fa-bell text-slate-500 text-lg"></i>
-                    <span id="notif-badge" class="absolute -top-1 -right-1 bg-red-500 w-2 h-2 rounded-full hidden"></span>
-                    <div id="notif-dropdown" class="hidden absolute right-0 top-8 w-64 bg-white border border-slate-100 shadow-xl rounded-xl z-50 p-2 max-h-48 overflow-y-auto"></div>
+                    <div class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 transition flex items-center justify-center text-slate-500 dark:text-slate-300">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <span id="notif-badge" class="absolute top-0 right-0 bg-red-500 w-3 h-3 rounded-full border-2 border-white hidden animate-ping"></span>
+                    <div id="notif-dropdown" class="hidden absolute right-0 top-12 w-72 glass-panel z-50 p-0 overflow-hidden max-h-60 overflow-y-auto">
+                        <div class="bg-slate-50 dark:bg-slate-800 p-2 text-xs font-bold border-b dark:border-slate-700">Notifications</div>
+                    </div>
                 </div>
-                <a id="admin-link-btn" href="admin.html" class="hidden text-xs bg-slate-900 text-white px-3 py-1.5 rounded-lg font-bold">Admin</a>
+                <a id="admin-link-btn" href="admin.html" class="hidden text-xs bg-slate-900 text-white px-3 py-2 rounded-lg font-bold shadow-lg hover:scale-105 transition">Admin</a>
             </div>
         </nav>
 
-        <div class="max-w-4xl mx-auto p-4">
-            <!-- PWA Install -->
-            <button id="install-btn" class="hidden w-full bg-slate-800 text-white py-3 rounded-xl font-bold text-xs mb-4 flex justify-center gap-2"><i class="fas fa-download"></i> Install App</button>
+        <div class="max-w-5xl mx-auto px-4">
+            <button id="install-btn" class="hidden w-full btn-primary py-3 rounded-xl font-bold text-sm mb-6 flex justify-center gap-2 items-center animate-pulse">
+                <i class="fas fa-download"></i> Install App for Better Experience
+            </button>
 
-            <!-- Live Class Alert -->
-            <div id="live-class-card" class="hidden mb-4 bg-red-50 border border-red-100 rounded-xl p-4 flex justify-between items-center animate-pulse">
-                <div class="flex items-center gap-3"><span class="w-2 h-2 bg-red-600 rounded-full animate-ping"></span><div><h4 class="font-bold text-red-700 text-sm">Live Class</h4><p id="live-topic" class="text-xs text-red-500">Topic...</p></div></div>
-                <a id="live-link" href="#" target="_blank" class="bg-red-600 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-md">JOIN</a>
-            </div>
-
-            <!-- Announcement -->
-            <div id="announcement-area" class="hidden mb-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden">
-                <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded uppercase font-bold">Notice</span>
-                <p id="announcement-text" class="text-sm mt-2 font-medium">...</p>
-            </div>
-
-            <!-- Tabs -->
-            <div class="flex bg-white p-1 rounded-xl border border-slate-200 mb-6 shadow-sm overflow-x-auto no-scrollbar">
-                <button onclick="switchTab('notes')" id="tab-notes" class="flex-1 min-w-[65px] py-2 text-xs font-bold rounded-lg active-tab">Notes</button>
-                <button onclick="switchTab('videos')" id="tab-videos" class="flex-1 min-w-[65px] py-2 text-xs font-medium rounded-lg inactive-tab">Videos</button>
-                <button onclick="switchTab('cards')" id="tab-cards" class="flex-1 min-w-[65px] py-2 text-xs font-medium rounded-lg inactive-tab">Cards</button>
-                <button onclick="switchTab('exams')" id="tab-exams" class="flex-1 min-w-[65px] py-2 text-xs font-medium rounded-lg inactive-tab">Exams</button>
-                <button onclick="switchTab('tasks')" id="tab-tasks" class="flex-1 min-w-[65px] py-2 text-xs font-medium rounded-lg inactive-tab">Tasks</button>
-                <button onclick="switchTab('events')" id="tab-events" class="flex-1 min-w-[65px] py-2 text-xs font-medium rounded-lg inactive-tab">Events</button>
-            </div>
-
-            <!-- TAB CONTENTS -->
-            <div id="view-notes" class="animate-fade-in">
-                <div class="flex gap-2 mb-4">
-                    <input id="global-search" placeholder="Search..." class="flex-grow pl-4 p-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-blue-500">
-                    <button onclick="toggleFavs()" id="fav-filter-btn" class="w-10 bg-white border rounded-xl text-slate-400 hover:text-red-500"><i class="fas fa-heart"></i></button>
+            <div id="live-class-card" class="hidden mb-6 glass-panel border-l-4 border-red-500 p-4 flex justify-between items-center relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-20 h-20 bg-red-500 rounded-full opacity-10 group-hover:scale-150 transition duration-500"></div>
+                <div class="flex items-center gap-4 relative z-10">
+                    <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 animate-pulse">
+                        <i class="fas fa-broadcast-tower"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-800 dark:text-white text-sm">Live Class in Progress</h4>
+                        <p id="live-topic" class="text-xs text-slate-500 dark:text-slate-300">Topic...</p>
+                    </div>
                 </div>
-                <div id="notes-list" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+                <a id="live-link" href="#" target="_blank" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-full text-xs font-bold shadow-lg shadow-red-500/30 transition relative z-10">JOIN NOW</a>
             </div>
 
-            <div id="view-videos" class="hidden animate-fade-in"><div id="video-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div></div>
-            <div id="view-cards" class="hidden animate-fade-in"><div id="card-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div></div>
-            <div id="view-exams" class="hidden animate-fade-in"><div id="exams-list" class="grid gap-3"></div></div>
-            <div id="view-events" class="hidden animate-fade-in"><h3 class="font-bold text-sm mb-3 text-slate-700">Schedule</h3><div id="events-list" class="space-y-3"></div></div>
+            <div id="announcement-area" class="hidden mb-8 relative group">
+                <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl blur opacity-30 group-hover:opacity-50 transition"></div>
+                <div class="relative bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-xl overflow-hidden">
+                    <i class="fas fa-bullhorn absolute right-4 bottom-[-10px] text-8xl text-white opacity-10 rotate-[-15deg]"></i>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-[10px] bg-white/20 backdrop-blur px-2 py-0.5 rounded uppercase font-bold tracking-wider">Notice Board</span>
+                    </div>
+                    <p id="announcement-text" class="text-sm font-medium leading-relaxed">...</p>
+                </div>
+            </div>
 
-            <div id="view-tasks" class="hidden animate-fade-in">
-                <h3 class="font-bold text-sm mb-3 text-slate-700">Assignments</h3>
-                <div id="assignment-list" class="space-y-3 mb-6"></div> 
-                <div class="border-t pt-4">
-                    <h3 class="font-bold text-sm mb-2 text-slate-700">My Planner</h3>
-                    <div class="flex gap-2 mb-3"><input id="my-task-in" class="flex-grow border rounded p-2 text-sm" placeholder="Add personal task..."><button onclick="addMyTask()" class="bg-blue-600 text-white px-3 rounded text-lg">+</button></div>
-                    <div id="my-task-list" class="space-y-2"></div>
+            <div class="glass-panel p-1.5 mb-8 flex overflow-x-auto no-scrollbar gap-1 sticky top-24 z-30">
+                <button onclick="switchTab('notes')" id="tab-notes" class="tab-btn active-tab flex-1 min-w-[80px] py-2.5 rounded-xl text-xs flex flex-col items-center gap-1">
+                    <i class="fas fa-book-open text-lg mb-0.5"></i> Notes
+                </button>
+                <button onclick="switchTab('videos')" id="tab-videos" class="tab-btn inactive-tab flex-1 min-w-[80px] py-2.5 rounded-xl text-xs flex flex-col items-center gap-1">
+                    <i class="fas fa-play-circle text-lg mb-0.5"></i> Videos
+                </button>
+                <button onclick="switchTab('cards')" id="tab-cards" class="tab-btn inactive-tab flex-1 min-w-[80px] py-2.5 rounded-xl text-xs flex flex-col items-center gap-1">
+                    <i class="fas fa-layer-group text-lg mb-0.5"></i> Cards
+                </button>
+                <button onclick="switchTab('exams')" id="tab-exams" class="tab-btn inactive-tab flex-1 min-w-[80px] py-2.5 rounded-xl text-xs flex flex-col items-center gap-1">
+                    <i class="fas fa-clipboard-check text-lg mb-0.5"></i> Exams
+                </button>
+                <button onclick="switchTab('tasks')" id="tab-tasks" class="tab-btn inactive-tab flex-1 min-w-[80px] py-2.5 rounded-xl text-xs flex flex-col items-center gap-1">
+                    <i class="fas fa-tasks text-lg mb-0.5"></i> Tasks
+                </button>
+            </div>
+
+            <div id="view-notes" class="animate-enter">
+                <div class="flex gap-3 mb-6">
+                    <div class="relative flex-grow">
+                        <i class="fas fa-search absolute left-4 top-3.5 text-slate-400"></i>
+                        <input id="global-search" placeholder="Search notes..." class="w-full pl-10 p-3 rounded-2xl border-none bg-white/60 dark:bg-slate-800/60 shadow-sm focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                    </div>
+                    <button onclick="toggleFavs()" id="fav-filter-btn" class="w-12 bg-white/60 dark:bg-slate-800/60 shadow-sm rounded-2xl text-slate-400 hover:text-red-500 hover:bg-red-50 transition flex items-center justify-center"><i class="fas fa-heart"></i></button>
+                </div>
+                <div id="notes-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+
+            <div id="view-videos" class="hidden animate-enter"><div id="video-list" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div></div>
+            <div id="view-cards" class="hidden animate-enter"><div id="card-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div></div>
+            <div id="view-exams" class="hidden animate-enter"><div id="exams-list" class="grid gap-4"></div></div>
+            <div id="view-events" class="hidden animate-enter">
+                <h3 class="font-bold text-lg mb-4 text-slate-700 dark:text-white">Upcoming Schedule</h3>
+                <div id="events-list" class="space-y-4"></div>
+            </div>
+
+            <div id="view-tasks" class="hidden animate-enter">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-bold text-lg mb-4 text-slate-700 dark:text-white flex items-center gap-2"><i class="fas fa-school text-blue-500"></i> Assignments</h3>
+                        <div id="assignment-list" class="space-y-3 mb-8"></div> 
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-4 text-slate-700 dark:text-white flex items-center gap-2"><i class="fas fa-user-edit text-purple-500"></i> My Planner</h3>
+                        <div class="glass-panel p-2 flex gap-2 mb-4">
+                            <input id="my-task-in" class="flex-grow bg-transparent border-none outline-none text-sm px-2" placeholder="Add personal task...">
+                            <button onclick="addMyTask()" class="bg-blue-600 text-white w-8 h-8 rounded-lg flex items-center justify-center hover:bg-blue-700 transition">+</button>
+                        </div>
+                        <div id="my-task-list" class="space-y-2"></div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Mobile Bottom Nav -->
-        <div class="fixed bottom-0 w-full bg-white border-t border-slate-100 p-2 flex justify-around shadow-lg z-50 lg:hidden">
-            <button onclick="switchTab('notes')" class="flex flex-col items-center text-blue-600 w-12"><i class="fas fa-book text-lg"></i><span class="text-[9px]">Home</span></button>
-            <button onclick="switchTab('exams')" class="flex flex-col items-center text-slate-400 w-12"><i class="fas fa-pen-alt text-lg"></i><span class="text-[9px]">Exams</span></button>
-            <button onclick="switchTab('tasks')" class="flex flex-col items-center text-slate-400 w-12"><i class="fas fa-tasks text-lg"></i><span class="text-[9px]">Tasks</span></button>
-            <button onclick="switchTab('events')" class="flex flex-col items-center text-slate-400 w-12"><i class="fas fa-calendar-alt text-lg"></i><span class="text-[9px]">Events</span></button>
+        <div class="fixed bottom-0 w-full glass-panel rounded-b-none border-x-0 border-b-0 p-3 flex justify-around shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-50 lg:hidden backdrop-blur-xl">
+            <button onclick="switchTab('notes')" class="flex flex-col items-center text-blue-600 hover:scale-110 transition"><i class="fas fa-home text-xl mb-1"></i></button>
+            <button onclick="switchTab('exams')" class="flex flex-col items-center text-slate-400 hover:text-blue-500 hover:scale-110 transition"><i class="fas fa-file-alt text-xl mb-1"></i></button>
+            <button onclick="document.getElementById('calc-modal').classList.remove('hidden')" class="flex flex-col items-center justify-center -mt-8 bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg shadow-blue-500/50 hover:scale-110 transition"><i class="fas fa-calculator text-xl"></i></button>
+            <button onclick="switchTab('tasks')" class="flex flex-col items-center text-slate-400 hover:text-blue-500 hover:scale-110 transition"><i class="fas fa-check-square text-xl mb-1"></i></button>
+            <button onclick="openProfileModal()" class="flex flex-col items-center text-slate-400 hover:text-blue-500 hover:scale-110 transition"><i class="fas fa-user text-xl mb-1"></i></button>
         </div>
     </div>
 
-    <!-- MODALS -->
-    
-    <!-- Profile & Attendance -->
-    <div id="profile-modal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-xs rounded-2xl p-6 relative animate-fade-in modal-content">
-            <button onclick="document.getElementById('profile-modal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-300">&times;</button>
-            <div class="text-center">
-                <div class="relative w-20 h-20 mx-auto mb-3 group" onclick="document.getElementById('p-file').click()">
-                    <img id="profile-photo" src="" class="w-full h-full rounded-full border-4 border-slate-50 object-cover">
-                    <div class="absolute inset-0 bg-black/30 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100"><i class="fas fa-camera text-white"></i></div>
+    <div id="profile-modal" class="hidden fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-sm p-6 relative animate-enter">
+            <button onclick="document.getElementById('profile-modal').classList.add('hidden')" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-red-100 hover:text-red-500 transition">&times;</button>
+            
+            <div class="text-center mt-2">
+                <div class="relative w-24 h-24 mx-auto mb-4 group cursor-pointer" onclick="document.getElementById('p-file').click()">
+                    <img id="profile-photo" src="" class="w-full h-full rounded-full border-4 border-white shadow-lg object-cover">
+                    <div class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition"><i class="fas fa-camera text-white"></i></div>
                     <input type="file" id="p-file" class="hidden" onchange="uploadProfilePhoto(this)">
                 </div>
-                <h2 id="profile-name" class="font-bold text-slate-800">User</h2>
-                <div class="xp-container w-full mb-1"><div id="xp-bar" class="xp-fill"></div></div>
-                <p id="xp-text" class="text-[10px] text-slate-400 mb-4">0 XP</p>
-                <!-- Attendance Cal -->
-                <div class="bg-slate-50 p-2 rounded-lg mb-4">
-                    <p class="text-[10px] font-bold text-slate-400 mb-2 uppercase">Attendance (This Month)</p>
-                    <div id="attendance-grid" class="calendar-grid"></div>
+                <h2 id="profile-name" class="font-bold text-xl text-slate-800 dark:text-white">User</h2>
+                
+                <div class="bg-slate-100 dark:bg-slate-700 rounded-full h-4 w-full mt-3 overflow-hidden relative">
+                    <div id="xp-bar" class="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-1000" style="width: 0%"></div>
                 </div>
-                <div class="text-left space-y-2 mb-4">
-                    <input id="edit-phone" placeholder="Phone" class="w-full bg-slate-50 border p-2 rounded text-xs">
-                    <textarea id="edit-bio" placeholder="Bio" class="w-full bg-slate-50 border p-2 rounded text-xs"></textarea>
+                <p id="xp-text" class="text-xs font-bold text-slate-500 mt-1 uppercase tracking-wide">0 XP Level 1</p>
+
+                <div class="mt-6 bg-white/50 dark:bg-slate-800/50 rounded-xl p-3">
+                    <p class="text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-widest">Attendance Streak</p>
+                    <div id="attendance-grid" class="grid grid-cols-7 gap-1 text-[10px]"></div>
                 </div>
-                <button onclick="saveProfile()" class="w-full bg-blue-600 text-white py-2 rounded-xl text-xs font-bold">Save Changes</button>
-                <button id="logout-btn" class="w-full bg-red-50 text-red-500 py-2 rounded-xl text-xs font-bold mt-2">Log Out</button>
+
+                <div class="mt-4 space-y-3">
+                    <input id="edit-phone" placeholder="+1 234..." class="w-full p-2 rounded-lg border-none bg-slate-50 dark:bg-slate-900 text-xs">
+                    <textarea id="edit-bio" placeholder="Short bio..." class="w-full p-2 rounded-lg border-none bg-slate-50 dark:bg-slate-900 text-xs h-16"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 mt-6">
+                    <button onclick="saveProfile()" class="btn-primary py-2 rounded-xl text-xs font-bold">Save</button>
+                    <button id="logout-btn" class="bg-red-50 text-red-500 hover:bg-red-100 py-2 rounded-xl text-xs font-bold transition">Log Out</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Homework Upload -->
-    <div id="submit-modal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-sm rounded-2xl p-6 relative animate-slide-up">
+    <div id="submit-modal" class="hidden fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-sm p-6 relative animate-enter">
             <button onclick="document.getElementById('submit-modal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400">&times;</button>
-            <h3 class="font-bold text-slate-800 text-lg mb-1">Submit Homework</h3>
-            <p id="submit-task-title" class="text-xs text-slate-500 mb-4">...</p>
-            <input type="file" id="hw-file" class="w-full text-xs border rounded p-2 mb-4">
-            <button onclick="submitHomework()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold shadow-lg">Submit Work</button>
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2 text-blue-600"><i class="fas fa-cloud-upload-alt text-xl"></i></div>
+                <h3 class="font-bold text-lg">Upload Homework</h3>
+                <p id="submit-task-title" class="text-xs text-slate-500">...</p>
+            </div>
+            <label class="block w-full border-2 border-dashed border-blue-300 rounded-xl p-8 text-center cursor-pointer hover:bg-blue-50 transition mb-4">
+                <i class="fas fa-file-import text-2xl text-blue-400 mb-2"></i>
+                <p class="text-xs text-slate-500">Click to Select File</p>
+                <input type="file" id="hw-file" class="hidden">
+            </label>
+            <button onclick="submitHomework()" class="w-full btn-primary py-3 rounded-xl font-bold shadow-lg">Submit Work</button>
         </div>
     </div>
 
-    <!-- Exam Taker (Hybrid) -->
-    <div id="exam-taker-modal" class="hidden fixed inset-0 z-50 bg-slate-100 flex flex-col">
-        <div class="p-3 bg-slate-900 text-white flex justify-between items-center shadow-md">
-            <h2 id="taking-exam-title" class="font-bold text-sm">Exam</h2><div id="timer-display" class="bg-slate-800 px-3 py-1 rounded font-mono text-yellow-400 text-sm">00:00</div>
+    <div id="calc-modal" class="hidden fixed inset-0 z-[90] bg-black/50 flex items-end justify-center pointer-events-none pb-20 lg:pb-0 lg:items-center">
+        <div class="glass-panel w-72 p-4 shadow-2xl pointer-events-auto animate-enter">
+            <div class="flex justify-between mb-3 items-center">
+                <span class="font-bold text-slate-700 dark:text-white"><i class="fas fa-calculator mr-2"></i>Solver</span>
+                <button onclick="document.getElementById('calc-modal').classList.add('hidden')" class="w-6 h-6 bg-red-100 text-red-500 rounded-full flex items-center justify-center text-xs">&times;</button>
+            </div>
+            <input id="calc-display" class="w-full bg-slate-100 dark:bg-slate-900 p-3 text-right mb-3 rounded-xl font-mono text-xl font-bold shadow-inner" readonly value="0">
+            <div class="grid grid-cols-4 gap-2">
+                <button onclick="calcApp('C')" class="p-3 bg-red-100 text-red-600 rounded-lg font-bold text-xs hover:bg-red-200">C</button>
+                <button onclick="calcApp('/')" class="p-3 bg-blue-50 text-blue-600 rounded-lg font-bold text-xs hover:bg-blue-100">/</button>
+                <button onclick="calcApp('*')" class="p-3 bg-blue-50 text-blue-600 rounded-lg font-bold text-xs hover:bg-blue-100">x</button>
+                <button onclick="calcApp('DEL')" class="p-3 bg-orange-100 text-orange-600 rounded-lg font-bold text-xs hover:bg-orange-200"><</button>
+                <button onclick="calcApp('7')" class="p-3 bg-white dark:bg-slate-700 shadow rounded-lg text-sm hover:bg-slate-50">7</button>
+                <button onclick="calcApp('8')" class="p-3 bg-white dark:bg-slate-700 shadow rounded-lg text-sm hover:bg-slate-50">8</button>
+                <button onclick="calcApp('9')" class="p-3 bg-white dark:bg-slate-700 shadow rounded-lg text-sm hover:bg-slate-50">9</button>
+                <button onclick="calcApp('-')" class="p-3 bg-blue-50 text-blue-600 rounded-lg font-bold text-xs hover:bg-blue-100">-</button>
+                <button onclick="calcApp('4')" class="p-3 bg-white dark:bg-slate-700 shadow rounded-lg text-sm hover:bg-slate-50">4</button>
+                <button onclick="calcApp('5')" class="p-3 bg-white dark:bg-slate-700 shadow rounded-lg text-sm hover:bg-slate-50">5</button>
+                <button onclick="calcApp('6')" class="p-3 bg-white dark:bg-slate-700 shadow rounded-lg text-sm hover:bg-slate-50">6</button>
+                <button onclick="calcApp('+')" class="p-3 bg-blue-50 text-blue-600 rounded-lg font-bold text-xs hover:bg-blue-100">+</button>
+                <button onclick="calcApp('1')" class="p-3 bg-white dark:bg-slate-700 shadow rounded-lg text-sm hover:bg-slate-50">1</button>
+                <button onclick="calcApp('2')" class="p-3 bg-white dark:bg-slate-700 shadow rounded-lg text-sm hover:bg-slate-50">2</button>
+                <button onclick="calcApp('3')" class="p-3 bg-white dark:bg-slate-700 shadow rounded-lg text-sm hover:bg-slate-50">3</button>
+                <button onclick="calcSolve()" class="p-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-bold text-sm row-span-2 shadow-lg shadow-blue-500/30">=</button>
+                <button onclick="calcApp('0')" class="p-3 bg-white dark:bg-slate-700 shadow rounded-lg text-sm col-span-2 hover:bg-slate-50">0</button>
+                <button onclick="calcApp('.')" class="p-3 bg-white dark:bg-slate-700 shadow rounded-lg text-sm hover:bg-slate-50">.</button>
+            </div>
         </div>
-        <div id="exam-layout" class="flex-grow flex flex-col lg:flex-row overflow-hidden">
-            <div id="pdf-panel" class="hidden w-full lg:w-1/2 h-1/2 lg:h-full bg-black"><iframe id="exam-pdf-frame" class="w-full h-full"></iframe></div>
-            <div id="questions-panel" class="w-full lg:w-1/2 h-full flex flex-col bg-white"><div id="exam-questions-area" class="flex-grow overflow-y-auto p-5 pb-20"></div><div class="p-4 bg-white border-t"><button onclick="submitExam()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold text-sm">Submit</button></div></div>
+    </div>
+    
+    <div id="exam-taker-modal" class="hidden fixed inset-0 z-50 bg-slate-50 dark:bg-slate-900 flex flex-col">
+        <div class="p-4 bg-slate-900 text-white flex justify-between items-center shadow-lg z-20">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded bg-white/10 flex items-center justify-center"><i class="fas fa-pen-nib"></i></div>
+                <h2 id="taking-exam-title" class="font-bold text-sm">Exam Session</h2>
+            </div>
+            <div id="timer-display" class="bg-red-600 px-4 py-1.5 rounded-full font-mono font-bold text-sm shadow-lg shadow-red-900/50 animate-pulse">00:00</div>
         </div>
-        <button onclick="document.getElementById('calc-modal').classList.remove('hidden')" class="fixed bottom-20 right-4 bg-slate-800 text-white w-12 h-12 rounded-full shadow-xl flex items-center justify-center z-50"><i class="fas fa-calculator"></i></button>
+        <div id="exam-layout" class="flex-grow flex flex-col lg:flex-row overflow-hidden relative">
+            <div id="pdf-panel" class="hidden w-full lg:w-1/2 h-1/2 lg:h-full bg-black relative"><iframe id="exam-pdf-frame" class="w-full h-full"></iframe></div>
+            <div id="questions-panel" class="w-full lg:w-1/2 h-full flex flex-col bg-slate-50 dark:bg-slate-900 relative">
+                <div id="exam-questions-area" class="flex-grow overflow-y-auto p-6 pb-24 space-y-4"></div>
+                <div class="absolute bottom-0 w-full p-4 glass-panel rounded-none border-x-0 border-b-0">
+                    <button onclick="submitExam()" class="w-full btn-primary py-3 rounded-xl font-bold text-sm shadow-xl">SUBMIT EXAM</button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Calculator, Viewer, Cert, Discussion -->
-    <div id="calc-modal" class="hidden fixed inset-0 z-[90] bg-black/50 flex items-end justify-center pointer-events-none"><div class="bg-white w-64 p-4 rounded-t-2xl shadow-2xl pointer-events-auto mb-4"><div class="flex justify-between mb-2"><span class="font-bold">Calc</span><button onclick="document.getElementById('calc-modal').classList.add('hidden')">&times;</button></div><input id="calc-display" class="w-full bg-slate-100 p-2 text-right mb-2 rounded font-mono" readonly value="0"><div class="grid grid-cols-4 gap-1"><button onclick="calcApp('C')" class="p-2 bg-red-100 rounded text-xs">C</button><button onclick="calcApp('/')" class="p-2 bg-blue-50 rounded text-xs">/</button><button onclick="calcApp('*')" class="p-2 bg-blue-50 rounded text-xs">x</button><button onclick="calcApp('DEL')" class="p-2 bg-red-50 rounded text-xs"><</button><button onclick="calcApp('7')" class="p-2 bg-slate-50 rounded text-xs">7</button><button onclick="calcApp('8')" class="p-2 bg-slate-50 rounded text-xs">8</button><button onclick="calcApp('9')" class="p-2 bg-slate-50 rounded text-xs">9</button><button onclick="calcApp('-')" class="p-2 bg-blue-50 rounded text-xs">-</button><button onclick="calcApp('4')" class="p-2 bg-slate-50 rounded text-xs">4</button><button onclick="calcApp('5')" class="p-2 bg-slate-50 rounded text-xs">5</button><button onclick="calcApp('6')" class="p-2 bg-slate-50 rounded text-xs">6</button><button onclick="calcApp('+')" class="p-2 bg-blue-50 rounded text-xs">+</button><button onclick="calcApp('1')" class="p-2 bg-slate-50 rounded text-xs">1</button><button onclick="calcApp('2')" class="p-2 bg-slate-50 rounded text-xs">2</button><button onclick="calcApp('3')" class="p-2 bg-slate-50 rounded text-xs">3</button><button onclick="calcSolve()" class="p-2 bg-blue-600 text-white rounded text-xs row-span-2">=</button><button onclick="calcApp('0')" class="p-2 bg-slate-50 rounded text-xs col-span-2">0</button><button onclick="calcApp('.')" class="p-2 bg-slate-50 rounded text-xs">.</button></div></div></div>
+    <div id="viewer-modal" class="hidden fixed inset-0 z-[70] bg-black/95 flex flex-col justify-center items-center">
+        <button onclick="closeViewer()" class="absolute top-6 right-6 text-white text-3xl opacity-80 hover:opacity-100 hover:rotate-90 transition">&times;</button>
+        <div id="watermark-overlay" class="absolute inset-0 flex flex-wrap opacity-5 pointer-events-none z-10 overflow-hidden"></div>
+        <iframe id="pdf-frame" class="w-full h-full hidden z-20 max-w-6xl"></iframe>
+        <img id="image-frame" class="max-w-full max-h-full hidden object-contain z-20">
+        <button onclick="toggleDiscuss()" class="absolute bottom-8 right-8 bg-white text-blue-600 p-4 rounded-full shadow-2xl z-40 hover:scale-110 transition animate-bounce"><i class="fas fa-comment-dots text-xl"></i></button>
+    </div>
     
-    <div id="viewer-modal" class="hidden fixed inset-0 z-[70] bg-black/95 flex flex-col justify-center items-center"><button onclick="closeViewer()" class="absolute top-4 right-4 text-white text-3xl opacity-80">&times;</button><div id="watermark-overlay" class="absolute inset-0 flex flex-wrap opacity-10 pointer-events-none z-10 overflow-hidden"></div><iframe id="pdf-frame" class="w-full h-full hidden z-20"></iframe><img id="image-frame" class="max-w-full max-h-full hidden object-contain z-20"><button onclick="toggleDiscuss()" class="absolute bottom-4 right-4 bg-white text-blue-600 p-3 rounded-full shadow-lg z-40"><i class="fas fa-comment"></i></button></div>
+    <div id="discussion-modal" class="hidden fixed inset-0 z-[80] bg-black/50 flex items-end sm:items-center justify-center">
+        <div class="glass-panel w-full sm:max-w-md h-[70vh] rounded-t-2xl sm:rounded-2xl flex flex-col shadow-2xl animate-enter bg-white dark:bg-slate-800">
+            <div class="p-4 border-b flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50 rounded-t-2xl">
+                <h3 class="font-bold text-slate-700 dark:text-white flex items-center gap-2"><i class="fas fa-comments text-blue-500"></i> Class Discussion</h3>
+                <button onclick="document.getElementById('discussion-modal').classList.add('hidden')" class="text-xl text-slate-400 hover:text-red-500">&times;</button>
+            </div>
+            <div id="chat-box" class="flex-grow overflow-y-auto p-4 space-y-3 bg-slate-50/30 text-sm"></div>
+            <div class="p-3 border-t bg-white dark:bg-slate-800 flex gap-2">
+                <input id="chat-input" placeholder="Ask a question..." class="flex-grow p-3 rounded-xl border bg-slate-100 dark:bg-slate-700 dark:border-none text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                <button onclick="sendChat()" class="bg-indigo-600 text-white w-12 rounded-xl flex items-center justify-center hover:bg-indigo-700 transition"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
     
-    <div id="discussion-modal" class="hidden fixed inset-0 z-[80] bg-black/50 flex items-end sm:items-center justify-center"><div class="bg-white w-full sm:max-w-md h-[60vh] rounded-t-2xl sm:rounded-2xl flex flex-col shadow-2xl animate-slide-up"><div class="p-3 border-b flex justify-between items-center bg-slate-50 rounded-t-2xl"><h3 class="font-bold text-slate-700">Discussion</h3><button onclick="document.getElementById('discussion-modal').classList.add('hidden')" class="text-xl text-slate-400">&times;</button></div><div id="chat-box" class="flex-grow overflow-y-auto p-4 space-y-3 bg-white text-xs"></div><div class="p-3 border-t bg-slate-50 flex gap-2"><input id="chat-input" placeholder="Ask a question..." class="flex-grow p-2 rounded-lg border text-xs"><button onclick="sendChat()" class="bg-indigo-600 text-white px-3 rounded-lg"><i class="fas fa-paper-plane"></i></button></div></div></div>
-    
-    <div id="cert-modal" class="hidden fixed inset-0 z-[80] bg-black/80 flex items-center justify-center p-4"><div class="cert-bg w-full max-w-md relative animate-slide-up"><button onclick="document.getElementById('cert-modal').classList.add('hidden')" class="absolute top-2 right-2 text-2xl">&times;</button><i class="fas fa-award text-5xl text-yellow-500 mb-4"></i><h2 class="text-2xl font-serif font-bold text-slate-800">Certificate</h2><p class="text-xs text-slate-500 uppercase tracking-widest mb-4">Awarded To</p><h1 id="cert-name" class="text-3xl font-bold text-blue-600 font-serif border-b-2 border-slate-100 pb-2 mb-4 inline-block">User</h1><p class="text-sm text-slate-600">For excellence in <span id="cert-exam" class="font-bold">Exam</span></p></div></div>
+    <div id="cert-modal" class="hidden fixed inset-0 z-[80] bg-black/90 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-2xl relative animate-enter p-1 border-4 border-yellow-500 rounded-lg">
+            <div class="border-2 border-dashed border-slate-300 p-8 text-center rounded bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')]">
+                <button onclick="document.getElementById('cert-modal').classList.add('hidden')" class="absolute top-2 right-2 text-2xl text-slate-400">&times;</button>
+                <i class="fas fa-certificate text-6xl text-yellow-500 mb-4 drop-shadow-md"></i>
+                <h2 class="text-3xl font-serif font-bold text-slate-800 mb-2">Certificate of Completion</h2>
+                <p class="text-xs text-slate-500 uppercase tracking-widest mb-6">This certifies that</p>
+                <h1 id="cert-name" class="text-4xl font-bold text-blue-600 font-serif border-b-2 border-slate-200 pb-2 mb-6 inline-block px-10">User Name</h1>
+                <p class="text-lg text-slate-600">Has successfully mastered</p>
+                <h3 id="cert-exam" class="text-2xl font-bold text-slate-800 mt-2">Exam Title</h3>
+                <div class="mt-8 flex justify-center gap-10">
+                     <div class="text-center"><div class="w-20 border-b border-slate-400 mb-1"></div><p class="text-[10px]">Instructor</p></div>
+                     <div class="text-center"><div class="w-20 border-b border-slate-400 mb-1"></div><p class="text-[10px]">Date</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script type="module" src="app.js"></script>
+    <script>
+        // Simple confetti trigger for UI fun
+        window.triggerConfetti = () => {
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        };
+    </script>
 </body>
 </html>

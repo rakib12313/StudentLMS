@@ -2,160 +2,67 @@
 
 :root {
     --primary: #4f46e5;
-    --secondary: #ec4899;
-    --accent: #8b5cf6;
-    --glass-border: rgba(255, 255, 255, 0.4);
-    --glass-bg: rgba(255, 255, 255, 0.65);
-    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+    --glass-bg: rgba(255, 255, 255, 0.85); /* Increased opacity for performance */
+    --glass-border: rgba(255, 255, 255, 0.5);
 }
 
 body {
     font-family: 'Outfit', sans-serif;
     margin: 0;
     color: #1e293b;
-    background: #f0f2f5;
+    background: #f1f5f9;
     overflow-x: hidden;
     -webkit-tap-highlight-color: transparent;
 }
 
-/* --- ANIMATED BACKGROUND --- */
+/* Background Animation - Optimized */
 .animated-bg {
-    position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-    background-size: 400% 400%;
-    animation: gradientBG 15s ease infinite;
-    z-index: -2;
-}
-.bg-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(30px);
-    z-index: -1;
+    position: fixed; inset: 0; z-index: -2;
+    background: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
 }
 
-@keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-/* --- GLASSMORPHISM UTILITIES --- */
+/* Glass Panels - Performance Optimized */
 .glass-panel {
     background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(8px); /* Lower blur = Higher FPS */
+    -webkit-backdrop-filter: blur(8px);
     border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    box-shadow: var(--glass-shadow);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .glass-card {
-    background: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 16px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.glass-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
     background: rgba(255, 255, 255, 0.9);
-    border-color: var(--primary);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    transition: transform 0.2s;
 }
+.glass-card:active { transform: scale(0.98); }
 
-/* --- UI ELEMENTS --- */
-.btn-primary {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-    color: white;
-    border: none;
-    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
-    transition: all 0.2s ease;
-}
-.btn-primary:active { transform: scale(0.96); }
+/* Tab System */
+.tab-btn { transition: all 0.3s ease; }
+.active-tab { background: #4f46e5; color: white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
+.inactive-tab { color: #64748b; background: transparent; }
 
-.tab-btn {
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    z-index: 1;
-}
-.active-tab {
-    background: white;
-    color: var(--primary);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    font-weight: 700;
-}
-.inactive-tab {
-    color: #64748b;
-    background: transparent;
-}
-.inactive-tab:hover { background: rgba(255,255,255,0.4); color: #334155; }
-
-/* --- CUSTOM SCROLLBAR --- */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.3); border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.5); }
-
-/* --- DARK MODE OVERRIDES --- */
-body.dark {
-    color: #f1f5f9;
-}
-body.dark .animated-bg {
-    background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #1e293b);
-}
-body.dark .bg-overlay { background: rgba(15, 23, 42, 0.6); }
-body.dark .glass-panel, body.dark .glass-card {
-    background: rgba(30, 41, 59, 0.7);
-    border-color: rgba(255, 255, 255, 0.1);
-    color: #f1f5f9;
-}
-body.dark .glass-card:hover { background: rgba(30, 41, 59, 0.9); }
-body.dark input, body.dark select, body.dark textarea {
-    background: rgba(15, 23, 42, 0.8) !important;
-    color: white !important;
-    border-color: rgba(255,255,255,0.1) !important;
-}
-body.dark .active-tab { background: #334155; color: white; }
-
-/* --- ANIMATIONS & UTILS --- */
-@keyframes fadeInScale { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-.animate-enter { animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-
+/* Utilities */
 .hidden { display: none !important; }
-.blob-shape {
-    position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.6; z-index: -1;
-    animation: float 10s infinite ease-in-out;
-}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* Flashcards & Specific Components */
-.flashcard-container { perspective: 1000px; height: 200px; cursor: pointer; }
-.flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-style: preserve-3d; }
-.flashcard-container.flipped .flashcard-inner { transform: rotateY(180deg); }
-.flashcard-front, .flashcard-back {
-    position: absolute; inset: 0;
-    -webkit-backface-visibility: hidden; backface-visibility: hidden;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 20px; padding: 20px;
-    font-size: 1.1rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-}
-.flashcard-front { background: white; color: #334155; border: 2px solid #e2e8f0; }
-.flashcard-back { background: linear-gradient(135deg, #4f46e5, #8b5cf6); color: white; transform: rotateY(180deg); }
+.animate-enter { animation: slideUp 0.4s ease-out forwards; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* Toast */
-#toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 9999; }
-.toast {
-    background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px);
-    color: white; padding: 12px 24px; border-radius: 50px;
-    font-size: 0.9rem; margin-bottom: 10px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    display: flex; align-items: center; gap: 10px;
-    animation: fadeInScale 0.3s ease;
-}
+/* Dark Mode */
+body.dark { color: #f8fafc; background: #0f172a; }
+body.dark .glass-panel { background: rgba(30, 41, 59, 0.9); border-color: rgba(255,255,255,0.1); }
+body.dark .glass-card { background: rgba(51, 65, 85, 0.6); border-color: rgba(255,255,255,0.05); }
+body.dark .animated-bg { background: linear-gradient(120deg, #0f172a 0%, #1e1b4b 100%); }
+body.dark input, body.dark select, body.dark textarea { background: #1e293b; color: white; border-color: #334155; }
 
-/* Cheat Warning */
-#cheat-warning { background: rgba(220, 38, 38, 0.85); backdrop-filter: blur(10px); }
+/* Flip Card */
+.flashcard-container { perspective: 1000px; height: 180px; cursor: pointer; }
+.flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+.flipped .flashcard-inner { transform: rotateY(180deg); }
+.flashcard-front, .flashcard-back { position: absolute; inset: 0; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; border-radius: 12px; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+.flashcard-front { background: white; color: #333; }
+.flashcard-back { background: #4f46e5; color: white; transform: rotateY(180deg); }

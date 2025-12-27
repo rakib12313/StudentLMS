@@ -10,167 +10,146 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="manifest" href="manifest.json">
 </head>
-<body class="bg-slate-100 select-none"> <!-- Select none prevents copy paste -->
-
+<body class="bg-slate-50 select-none">
     <div class="animated-bg"></div>
 
-    <!-- Login Screen -->
+    <!-- Login -->
     <div id="login-section" class="min-h-screen flex items-center justify-center p-6">
         <div class="glass-card w-full max-w-sm p-8 text-center animate-enter">
             <div class="w-16 h-16 bg-indigo-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-indigo-500/40 mb-6">
-                <i class="fas fa-graduation-cap text-2xl text-white"></i>
+                <i class="fas fa-graduation-cap text-3xl text-white"></i>
             </div>
-            <h1 class="text-2xl font-bold text-slate-800 mb-1">Welcome</h1>
-            <p class="text-sm text-slate-500 mb-6">Sign in to your dashboard</p>
+            <h1 class="text-2xl font-bold text-slate-800 mb-2">Welcome</h1>
+            <p class="text-sm text-slate-500 mb-8">Access your learning dashboard</p>
             
-            <div class="space-y-3">
-                <input id="email" type="email" placeholder="Email" class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:border-indigo-500 outline-none">
-                <input id="password" type="password" placeholder="Password" class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:border-indigo-500 outline-none">
-                <button id="login-btn" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold shadow-lg shadow-indigo-500/30 hover:scale-[1.02] transition">Sign In</button>
-            </div>
-            
-            <div class="mt-4 flex items-center justify-center gap-2">
-                <div class="h-px bg-slate-300 w-1/4"></div>
-                <span class="text-xs text-slate-400">OR</span>
-                <div class="h-px bg-slate-300 w-1/4"></div>
-            </div>
-            
-            <button id="google-btn" class="mt-4 w-full bg-white border text-slate-600 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-slate-50 transition">
-                <i class="fab fa-google"></i> Google Login
+            <button id="google-btn" class="w-full bg-white border border-slate-200 py-3.5 rounded-xl font-bold text-sm text-slate-700 flex items-center justify-center gap-3 shadow-sm hover:bg-slate-50 transition active:scale-95">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5"> 
+                Continue with Google
             </button>
-            
-            <button id="toggle-auth" class="mt-4 text-xs text-indigo-600 font-bold">First time? Create Account</button>
+            <p class="mt-4 text-[10px] text-slate-400">By continuing, you agree to our Terms.</p>
         </div>
     </div>
 
-    <!-- Main Dashboard -->
-    <div id="dashboard-section" class="hidden min-h-screen pb-24 md:pb-8">
+    <!-- Dashboard -->
+    <div id="dashboard-section" class="hidden min-h-screen">
         
-        <!-- Navbar -->
-        <div class="sticky top-0 z-40 glass-panel border-x-0 border-t-0 rounded-none px-4 py-3 flex justify-between items-center mb-6">
+        <!-- Header -->
+        <div class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-100 px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <img id="nav-photo" class="w-9 h-9 rounded-full border border-slate-200 bg-white object-cover">
                 <div>
                     <h3 id="nav-name" class="text-sm font-bold text-slate-800 leading-tight">Student</h3>
-                    <span id="nav-batch" class="text-[10px] text-slate-500 bg-slate-200 px-1.5 rounded-full">Batch</span>
+                    <span id="nav-batch" class="text-[10px] text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded-full">...</span>
                 </div>
             </div>
-            <div class="flex gap-3">
-                 <button onclick="toggleTheme()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fas fa-moon"></i></button>
-                 <button id="logout-btn" class="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-red-500"><i class="fas fa-power-off"></i></button>
+            <div class="flex gap-2">
+                 <button onclick="toggleTheme()" class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"><i class="fas fa-moon"></i></button>
+                 <button id="logout-btn" class="w-9 h-9 rounded-full bg-red-50 flex items-center justify-center text-red-500"><i class="fas fa-power-off"></i></button>
             </div>
         </div>
 
-        <div class="max-w-4xl mx-auto px-4">
+        <div class="max-w-2xl mx-auto px-4 pt-4 pb-24">
             
-            <!-- Live Class Banner -->
-            <div id="live-banner" class="hidden mb-6 bg-gradient-to-r from-red-500 to-pink-600 rounded-xl p-4 text-white shadow-lg shadow-red-500/30 flex justify-between items-center animate-pulse">
+            <!-- Live Banner -->
+            <div id="live-banner" class="hidden mb-6 bg-red-500 rounded-2xl p-4 text-white shadow-lg shadow-red-500/30 flex justify-between items-center animate-pulse cursor-pointer">
                 <div class="flex items-center gap-3">
-                    <span class="w-2 h-2 bg-white rounded-full animate-ping"></span>
-                    <div>
-                        <p class="font-bold text-sm">Live Class Started</p>
-                        <p id="live-topic-txt" class="text-xs opacity-90">Topic...</p>
-                    </div>
+                    <span class="w-2.5 h-2.5 bg-white rounded-full animate-ping"></span>
+                    <p class="font-bold text-sm">Live Class is Active!</p>
                 </div>
-                <a id="live-join-btn" href="#" target="_blank" class="bg-white text-red-600 px-4 py-1.5 rounded-lg text-xs font-bold shadow-sm">JOIN</a>
+                <a id="live-btn" href="#" target="_blank" class="bg-white text-red-600 px-4 py-1.5 rounded-lg text-xs font-bold">JOIN</a>
             </div>
 
-            <!-- Announcement -->
-            <div id="announce-box" class="hidden mb-6 bg-indigo-600 rounded-xl p-4 text-white shadow-lg shadow-indigo-500/30">
-                <p class="text-xs font-bold opacity-70 mb-1">NOTICE BOARD</p>
-                <p id="announce-txt" class="text-sm">...</p>
+            <!-- Notice -->
+            <div id="notice-box" class="hidden mb-6 bg-indigo-600 rounded-2xl p-5 text-white shadow-xl shadow-indigo-600/20 relative overflow-hidden">
+                <i class="fas fa-bullhorn absolute -right-2 -bottom-4 text-8xl text-white/10 rotate-[-20deg]"></i>
+                <p class="text-xs font-bold opacity-80 mb-1">ANNOUNCEMENT</p>
+                <p id="notice-text" class="text-sm font-medium leading-relaxed relative z-10">...</p>
             </div>
 
-            <!-- Tabs -->
-            <div class="flex gap-2 mb-6 overflow-x-auto no-scrollbar">
-                <button onclick="setTab('home')" id="tab-home" class="active-tab px-6 py-2 rounded-full text-sm font-bold whitespace-nowrap">Home</button>
-                <button onclick="setTab('exams')" id="tab-exams" class="inactive-tab px-6 py-2 rounded-full text-sm font-bold whitespace-nowrap">Exams</button>
-                <button onclick="setTab('profile')" id="tab-profile" class="inactive-tab px-6 py-2 rounded-full text-sm font-bold whitespace-nowrap">Profile</button>
-            </div>
-
-            <!-- Views -->
-            <div id="view-home" class="space-y-6 animate-enter">
-                <!-- Search -->
+            <!-- Tab Content -->
+            <div id="view-home" class="space-y-4 animate-enter">
                 <div class="relative">
-                    <i class="fas fa-search absolute left-4 top-3.5 text-slate-400 text-sm"></i>
-                    <input id="search-bar" onkeyup="filterNotes()" placeholder="Search notes..." class="w-full pl-10 p-3 rounded-xl border-none bg-white shadow-sm text-sm focus:ring-2 focus:ring-indigo-500">
+                    <i class="fas fa-search absolute left-4 top-3.5 text-slate-400"></i>
+                    <input id="search-bar" onkeyup="filterNotes()" placeholder="Find notes..." class="pl-10">
                 </div>
-                <!-- Notes Grid -->
-                <div id="notes-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                <div class="tab-scroll mb-2">
+                    <button class="tab-btn active-tab">All</button>
+                    <button class="tab-btn inactive-tab">Physics</button>
+                    <button class="tab-btn inactive-tab">Math</button>
+                </div>
+                <div id="notes-grid" class="grid gap-3"></div>
             </div>
 
             <div id="view-exams" class="hidden space-y-4 animate-enter">
-                 <div id="exams-grid" class="grid gap-4"></div>
+                 <h2 class="font-bold text-lg text-slate-700">Available Exams</h2>
+                 <div id="exams-grid" class="grid gap-3"></div>
             </div>
 
             <div id="view-profile" class="hidden animate-enter">
                 <div class="glass-card p-6 text-center">
-                    <div class="w-24 h-24 mx-auto rounded-full p-1 border-2 border-dashed border-indigo-300 mb-4 cursor-pointer" onclick="document.getElementById('p-upload').click()">
-                        <img id="profile-pic-lg" class="w-full h-full rounded-full object-cover">
-                        <input type="file" id="p-upload" class="hidden" onchange="uploadPhoto(this)">
-                    </div>
-                    <h2 id="p-name" class="text-xl font-bold">Student</h2>
-                    <p id="p-email" class="text-sm text-slate-500 mb-4">email@example.com</p>
-                    
-                    <!-- Stats -->
-                    <div class="grid grid-cols-3 gap-2 mb-6">
-                        <div class="bg-indigo-50 p-2 rounded-lg"><p class="text-lg font-bold text-indigo-600" id="xp-stat">0</p><p class="text-[10px] text-slate-400">XP</p></div>
-                        <div class="bg-green-50 p-2 rounded-lg"><p class="text-lg font-bold text-green-600" id="streak-stat">0</p><p class="text-[10px] text-slate-400">Streak</p></div>
-                        <div class="bg-orange-50 p-2 rounded-lg"><p class="text-lg font-bold text-orange-600" id="level-stat">1</p><p class="text-[10px] text-slate-400">Level</p></div>
-                    </div>
-
-                    <!-- Attendance -->
-                    <div class="text-left">
-                        <p class="text-xs font-bold text-slate-400 mb-2">ATTENDANCE (Current Month)</p>
-                        <div id="attendance-grid" class="grid grid-cols-7 gap-1"></div>
+                    <img id="profile-lg" class="w-24 h-24 mx-auto rounded-full mb-4 border-4 border-slate-50 shadow-sm">
+                    <h2 id="p-name" class="text-xl font-bold">User</h2>
+                    <p id="p-email" class="text-sm text-slate-500 mb-6">user@gmail.com</p>
+                    <div class="grid grid-cols-3 gap-3 mb-6">
+                        <div class="bg-indigo-50 p-3 rounded-2xl"><p id="xp-stat" class="text-xl font-bold text-indigo-600">0</p><p class="text-[10px] text-slate-400">XP</p></div>
+                        <div class="bg-green-50 p-3 rounded-2xl"><p id="streak-stat" class="text-xl font-bold text-green-600">0</p><p class="text-[10px] text-slate-400">Days</p></div>
+                        <div class="bg-orange-50 p-3 rounded-2xl"><p class="text-xl font-bold text-orange-600">1</p><p class="text-[10px] text-slate-400">Level</p></div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Mobile Bottom Nav -->
-        <div class="md:hidden fixed bottom-0 w-full bg-white border-t p-3 flex justify-around z-50">
-            <button onclick="setTab('home')" class="text-indigo-600"><i class="fas fa-home text-xl"></i></button>
-            <button onclick="setTab('exams')" class="text-slate-400 hover:text-indigo-600"><i class="fas fa-file-alt text-xl"></i></button>
-            <button onclick="setTab('profile')" class="text-slate-400 hover:text-indigo-600"><i class="fas fa-user text-xl"></i></button>
+        <div class="bottom-nav">
+            <button onclick="setTab('home')" id="btn-home" class="nav-btn active flex flex-col items-center gap-1">
+                <i class="fas fa-book text-xl"></i>
+                <span class="text-[10px] font-bold">Learn</span>
+            </button>
+            <button onclick="setTab('exams')" id="btn-exams" class="nav-btn flex flex-col items-center gap-1">
+                <i class="fas fa-clipboard-check text-xl"></i>
+                <span class="text-[10px] font-bold">Exams</span>
+            </button>
+            <button onclick="setTab('profile')" id="btn-profile" class="nav-btn flex flex-col items-center gap-1">
+                <i class="fas fa-user text-xl"></i>
+                <span class="text-[10px] font-bold">Profile</span>
+            </button>
         </div>
     </div>
 
-    <!-- PDF Viewer Modal -->
+    <!-- Viewer Modal -->
     <div id="viewer-modal" class="hidden fixed inset-0 z-[100] bg-black flex flex-col">
-        <button onclick="document.getElementById('viewer-modal').classList.add('hidden')" class="absolute top-4 right-4 text-white text-3xl z-50">&times;</button>
+        <button onclick="document.getElementById('viewer-modal').classList.add('hidden')" class="absolute top-4 right-4 text-white text-3xl z-50 bg-black/50 w-10 h-10 rounded-full">&times;</button>
         <iframe id="pdf-frame" class="w-full h-full border-none"></iframe>
     </div>
 
-    <!-- Exam Runner Modal -->
-    <div id="exam-modal" class="hidden fixed inset-0 z-[100] bg-white flex flex-col">
-        <div class="p-3 bg-slate-900 text-white flex justify-between items-center">
-            <span class="font-bold text-sm">Exam Mode</span>
+    <!-- Exam Modal -->
+    <div id="exam-runner" class="hidden fixed inset-0 z-[100] bg-white flex flex-col">
+        <div class="p-4 bg-slate-900 text-white flex justify-between items-center shadow-md">
+            <span class="font-bold text-sm">Exam In Progress</span>
             <span id="timer" class="bg-red-600 px-3 py-1 rounded text-xs font-mono font-bold">00:00</span>
         </div>
-        <div class="flex-grow flex flex-col md:flex-row h-full overflow-hidden">
-            <iframe id="exam-pdf-view" class="w-full md:w-1/2 h-1/2 md:h-full bg-slate-200"></iframe>
-            <div class="w-full md:w-1/2 h-full flex flex-col bg-white">
+        <div class="flex-grow flex flex-col lg:flex-row h-full overflow-hidden">
+            <iframe id="exam-pdf" class="w-full lg:w-1/2 h-1/2 lg:h-full bg-slate-100"></iframe>
+            <div class="w-full lg:w-1/2 h-full flex flex-col bg-white">
                 <div id="exam-qs" class="flex-grow overflow-y-auto p-4 space-y-4"></div>
-                <button onclick="submitExam()" class="m-4 bg-indigo-600 text-white py-3 rounded-xl font-bold shadow-lg">Submit</button>
+                <div class="p-4 border-t">
+                    <button onclick="finishExam()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold shadow-lg">Submit Exam</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script type="module" src="app.js"></script>
     <script>
-        // Tab Logic
         window.setTab = (t) => {
             ['home','exams','profile'].forEach(x => {
                 document.getElementById('view-'+x).classList.add('hidden');
-                const btn = document.getElementById('tab-'+x);
-                if(btn) {
-                    btn.classList.toggle('active-tab', x===t);
-                    btn.classList.toggle('inactive-tab', x!==t);
-                }
+                document.getElementById('btn-'+x).classList.remove('active');
             });
             document.getElementById('view-'+t).classList.remove('hidden');
+            document.getElementById('btn-'+t).classList.add('active');
         };
+        window.toggleTheme = () => document.body.classList.toggle('dark');
     </script>
 </body>
 </html>

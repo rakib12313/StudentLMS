@@ -2,59 +2,85 @@
 
 :root {
     --primary: #4f46e5;
-    --glass-bg: rgba(255, 255, 255, 0.85);
-    --glass-border: rgba(255, 255, 255, 0.6);
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --bg-light: #f8fafc;
 }
 
 body {
     font-family: 'Outfit', sans-serif;
-    margin: 0;
-    color: #1e293b;
-    background: #f1f5f9;
-    user-select: none; /* Piracy Protection */
-    -webkit-user-select: none;
+    background: var(--bg-light);
+    color: #0f172a;
     -webkit-tap-highlight-color: transparent;
-    padding-bottom: 90px;
+    user-select: none; /* Anti-Copy */
 }
 
-/* --- ANIMATIONS --- */
-.animate-enter { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
-@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+/* --- MATHJAX OPTIMIZATION --- */
+mjx-container { font-size: 115% !important; outline: none; margin: 5px 0; }
 
-/* --- GLASS UI --- */
-.glass-panel {
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+/* --- IMAGES & DIAGRAMS --- */
+.q-img-box {
+    text-align: center; margin: 15px 0; padding: 10px;
+    background: white; border: 1px solid #e2e8f0; border-radius: 8px;
 }
+.q-img { max-height: 250px; max-width: 100%; border-radius: 4px; display: inline-block; }
 
-/* --- COMPONENTS --- */
-.tab-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 4px; scrollbar-width: none; }
-.tab-btn { padding: 8px 16px; border-radius: 100px; font-size: 12px; font-weight: 700; transition: all 0.2s; white-space: nowrap; }
-.active-tab { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3); }
-.inactive-tab { background: white; color: #64748b; border: 1px solid #e2e8f0; }
-
-/* --- FLASHCARDS --- */
-.flashcard { perspective: 1000px; height: 180px; cursor: pointer; }
-.flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
-.flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
-.fc-front, .fc-back { position: absolute; inset: 0; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; border-radius: 16px; padding: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-.fc-front { background: white; border: 1px solid #e2e8f0; }
-.fc-back { background: var(--primary); color: white; transform: rotateY(180deg); }
-
-/* --- WATERMARK --- */
-.watermark {
-    position: absolute; inset: 0; pointer-events: none; z-index: 50;
-    display: flex; flex-wrap: wrap; overflow: hidden; opacity: 0.04;
-    font-size: 14px; font-weight: 900; color: #000;
-    align-content: space-around; justify-content: space-around;
-    transform: rotate(-15deg) scale(1.2);
+/* --- UI COMPONENTS --- */
+.card {
+    background: white; border: 1px solid #e2e8f0;
+    border-radius: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    transition: transform 0.2s;
 }
+.card:active { transform: scale(0.99); }
 
-/* --- DARK MODE --- */
-body.dark { background: #0f172a; color: #f8fafc; }
-body.dark .glass-panel { background: rgba(30, 41, 59, 0.9); border-color: rgba(255,255,255,0.1); }
-body.dark .inactive-tab { background: #1e293b; border-color: #334155; color: #94a3b8; }
-body.dark .fc-front { background: #1e293b; border-color: #334155; }
+.btn {
+    padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 13px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.2s; cursor: pointer;
+}
+.btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2); }
+.btn-outline { border: 1px solid #cbd5e1; background: white; color: #475569; }
+.btn-danger { background: #fee2e2; color: #ef4444; }
+
+/* --- EXAM OPTIONS --- */
+.option-box {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 14px; border: 2px solid #f1f5f9; border-radius: 12px;
+    cursor: pointer; transition: all 0.2s; margin-bottom: 8px;
+}
+.option-box:hover { border-color: #cbd5e1; background: #f8fafc; }
+.option-box.selected { border-color: var(--primary); background: #eef2ff; }
+.opt-id {
+    min-width: 24px; height: 24px; border-radius: 50%; border: 2px solid #cbd5e1;
+    display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #94a3b8;
+}
+.selected .opt-id { border-color: var(--primary); color: var(--primary); background: white; }
+
+/* --- QUESTION PALETTE --- */
+.p-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.p-node {
+    aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+    border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid #e2e8f0; background: white;
+}
+.p-node:hover { border-color: var(--primary); }
+.st-answered { background: var(--success); color: white; border-color: var(--success); }
+.st-review { background: var(--warning); color: white; border-color: var(--warning); }
+.st-skipped { background: var(--danger); color: white; border-color: var(--danger); }
+.st-visit { background: white; color: #64748b; }
+
+/* --- ADMIN TOGGLES --- */
+.toggle-checkbox { width: 2.5rem; height: 1.25rem; appearance: none; background: #cbd5e1; border-radius: 99px; position: relative; cursor: pointer; transition: 0.3s; }
+.toggle-checkbox:checked { background: var(--primary); }
+.toggle-checkbox::after { content: ''; position: absolute; top: 2px; left: 2px; width: 1rem; height: 1rem; background: white; border-radius: 50%; transition: 0.3s; }
+.toggle-checkbox:checked::after { transform: translateX(1.25rem); }
+
+.hidden { display: none !important; }
+.animate-enter { animation: slideUp 0.3s ease-out forwards; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Mobile Sidebar */
+@media(max-width: 768px) {
+    .exam-sidebar { position: fixed; inset: 0; z-index: 60; background: white; transform: translateX(100%); transition: transform 0.3s; }
+    .exam-sidebar.open { transform: translateX(0); }
+}

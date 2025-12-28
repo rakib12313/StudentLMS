@@ -1,39 +1,24 @@
 import { auth, db, provider } from './firebase-config.js';
 import { signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, getDoc, setDoc, updateDoc, collection, getDocs, query, orderBy, serverTimestamp, addDoc, arrayUnion, deleteDoc, where, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc, setDoc, updateDoc, collection, getDocs, query, orderBy, serverTimestamp, addDoc, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 let user = null;
-let allContent = [];
 let currentExam = null;
+let userAnswers = [];
+let currQIndex = 0;
 let timerInt = null;
 
-// Auth with Auto-Registration + Device Lock
+// Auth Logic
 onAuthStateChanged(auth, async (u) => {
     if(u) {
         const ref = doc(db, "students", u.uid);
         const snap = await getDoc(ref);
-        const did = localStorage.getItem('did') || crypto.randomUUID();
-        localStorage.setItem('did', did);
-
         if(!snap.exists()) {
-            // Auto Register
-            const newUser = { uid: u.uid, email: u.email, name: u.displayName, photo: u.photoURL, role: "student", batch: "all", deviceId: did, createdAt: serverTimestamp(), xp: 0, streak: 1 };
-            await setDoc(ref, newUser);
-            user = newUser;
-        } else {
-            const d = snap.data();
-            if(d.deviceId && d.deviceId !== did) { alert("Locked to another device."); return signOut(auth); }
-            if(!d.deviceId) await updateDoc(ref, { deviceId: did });
-            
-            const today = new Date().toDateString();
-            if(!d.attendance || !d.attendance.includes(today)) await updateDoc(ref, { attendance: arrayUnion(today), streak: (d.streak||0)+1 });
-            user = d;
-        }
+            const d = { uid: u.uid, email: u.email, name: u.displayName, photo: u.photoURL, role: "student", batch: "all", xp: 0 };
+            await setDoc(ref, d); user = d;
+        } else user = snap.data();
         initUI();
-    } else {
-        document.getElementById('login-section').classList.remove('hidden');
-        document.getElementById('dashboard-section').classList.add('hidden');
-    }
+    } else document.getElementById('login-section').classList.remove('hidden');
 });
 
 document.getElementById('google-btn').addEventListener('click', () => signInWithPopup(auth, provider));
@@ -42,150 +27,178 @@ document.getElementById('logout-btn').addEventListener('click', () => signOut(au
 async function initUI() {
     document.getElementById('login-section').classList.add('hidden');
     document.getElementById('dashboard-section').classList.remove('hidden');
+    document.getElementById('u-name').innerText = user.name;
+    document.getElementById('u-img').src = user.photo;
     
-    // Bind Profile
-    document.getElementById('nav-name').innerText = user.name;
-    document.getElementById('nav-batch').innerText = user.batch === 'all' ? 'All' : 'Class '+user.batch;
-    document.getElementById('nav-photo').src = user.photo;
-    document.getElementById('profile-lg').src = user.photo;
-    document.getElementById('p-name').innerText = user.name;
-    document.getElementById('xp-stat').innerText = user.xp || 0;
-    document.getElementById('streak-stat').innerText = user.streak || 1;
-    
-    // Gen Watermark
-    const wm = document.getElementById('watermark-layer');
-    wm.innerHTML = new Array(20).fill(`<div>${user.email}</div>`).join('');
-
-    loadContent();
-    loadExams();
-    loadTasks();
-    loadForum();
-    checkLive();
-    renderAttendance();
-}
-
-// Unified Content Loader
-async function loadContent() {
-    allContent = [];
-    const grid = document.getElementById('content-grid');
-    grid.innerHTML = "";
-
-    // Notes
-    const nS = await getDocs(query(collection(db, "notes"), orderBy("createdAt", "desc")));
-    nS.forEach(d => { if(checkBatch(d.data())) allContent.push({...d.data(), type: 'note'}); });
-
-    // Videos
-    const vS = await getDocs(query(collection(db, "videos"), orderBy("createdAt", "desc")));
-    vS.forEach(d => { if(checkBatch(d.data())) allContent.push({...d.data(), type: 'video'}); });
-
-    // Flashcards
-    const fS = await getDocs(query(collection(db, "flashcards"), orderBy("createdAt", "desc")));
-    fS.forEach(d => { allContent.push({...d.data(), type: 'flashcard'}); });
-
-    renderContent(allContent);
-}
-
-function checkBatch(item) { return item.batch === "all" || item.batch === user.batch; }
-
-function renderContent(list) {
-    const grid = document.getElementById('content-grid');
-    grid.innerHTML = list.map(i => {
-        if(i.type === 'note') return `
-        <div class="glass-panel p-4 flex items-center gap-3 cursor-pointer" onclick="openPDF('${i.url}')">
-            <div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600"><i class="fas fa-file-alt"></i></div>
-            <div class="flex-grow"><h4 class="font-bold text-sm">${i.title}</h4><span class="text-[10px] text-slate-400">PDF Note</span></div>
-            <button onclick="event.stopPropagation(); speak('${i.title}')" class="text-slate-400"><i class="fas fa-volume-up"></i></button>
-        </div>`;
-        if(i.type === 'video') return `
-        <div class="glass-panel p-2">
-            <iframe src="https://www.youtube.com/embed/${i.url.split('/').pop()}" class="w-full rounded-lg h-40 mb-2"></iframe>
-            <p class="font-bold text-xs px-2 pb-1">${i.title}</p>
-        </div>`;
-        if(i.type === 'flashcard') return `
-        <div class="flashcard" onclick="this.classList.toggle('flipped')">
-            <div class="flashcard-inner">
-                <div class="fc-front"><p class="font-bold">${i.front}</p></div>
-                <div class="fc-back"><p class="font-bold text-white">${i.back}</p></div>
-            </div>
-        </div>`;
-    }).join('');
-}
-
-window.filterType = (t) => renderContent(allContent.filter(i => i.type === t));
-window.searchContent = () => { const v = document.getElementById('search-bar').value.toLowerCase(); renderContent(allContent.filter(i => i.title?.toLowerCase().includes(v) || i.front?.toLowerCase().includes(v))); };
-window.speak = (t) => window.speechSynthesis.speak(new SpeechSynthesisUtterance(t));
-
-// Exams
-async function loadExams() {
-    const s = await getDocs(query(collection(db, "exams"), orderBy("createdAt", "desc")));
-    const g = document.getElementById('exams-grid');
-    let h = '';
-    s.forEach(d => {
-        const e = d.data();
-        if(checkBatch(e)) h += `
-        <div class="glass-panel p-4 flex justify-between items-center border-l-4 border-pink-500">
-            <div><h4 class="font-bold text-sm">${e.title}</h4><p class="text-[10px] opacity-60">${e.duration} Mins • ${e.answerKey.length} Qs</p></div>
-            <button onclick="startExam('${d.id}')" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-xs font-bold">Start</button>
-        </div>`;
-    });
-    g.innerHTML = h;
-}
-
-// Tasks & Homework
-async function loadTasks() {
-    const hw = await getDocs(collection(db,"assignments"));
-    document.getElementById('hw-list').innerHTML = hw.docs.map(d=>`<div class="glass-panel p-3 border-l-4 border-orange-500 text-xs font-bold">${d.data().title} <span class="float-right opacity-50">Due: ${d.data().date}</span></div>`).join('');
-    
-    const t = await getDocs(query(collection(db,"tasks"), where("uid","==",user.uid)));
-    document.getElementById('task-list').innerHTML = t.docs.map(d=>`<div class="flex justify-between text-xs p-2 border-b"><span>${d.data().txt}</span><button onclick="delTask('${d.id}')" class="text-red-500">&times;</button></div>`).join('');
-}
-window.addTask = async () => { const v = document.getElementById('new-task').value; if(v) await addDoc(collection(db,"tasks"),{uid:user.uid, txt:v}); loadTasks(); };
-window.delTask = async (id) => { await deleteDoc(doc(db,"tasks",id)); loadTasks(); };
-
-// Forum
-async function loadForum() {
-    const q = query(collection(db,"forum"), orderBy("createdAt", "desc"), limit(20));
+    // Load Exams
+    const q = query(collection(db, "exams"), orderBy("createdAt", "desc"));
     const s = await getDocs(q);
-    document.getElementById('chat-box').innerHTML = s.docs.reverse().map(d=> {
-        const m = d.data();
-        return `<div class="mb-2"><span class="text-[10px] font-bold text-indigo-600">${m.name}</span><div class="bg-white p-2 rounded-lg text-xs shadow-sm">${m.txt}</div></div>`;
-    }).join('');
-}
-window.sendChat = async () => { const v = document.getElementById('chat-in').value; if(v) await addDoc(collection(db,"forum"),{name:user.name, txt:v, createdAt: serverTimestamp()}); document.getElementById('chat-in').value=""; loadForum(); };
+    document.getElementById('exam-list').innerHTML = s.docs.map(d => {
+        const e = d.data();
+        if(e.batch === "all" || e.batch === user.batch) {
+            return `
+            <div class="card p-4 flex justify-between items-center border-l-4 border-indigo-500">
+                <div><h4 class="font-bold text-sm text-slate-700">${e.title}</h4><span class="text-[10px] text-slate-400 font-bold uppercase">${e.type==='native_exam'?'CBT Mode':'PDF Mode'} • ${e.duration} Mins</span></div>
+                <button onclick="startExam('${d.id}')" class="btn btn-primary text-xs">Start</button>
+            </div>`;
+        }
+    }).join('') || "<p class='text-center text-slate-400 text-sm'>No Active Exams</p>";
 
-// Anti-Cheat Exam
+    // Load History
+    const hQ = query(collection(db, "results"), where("uid","==",user.uid), orderBy("timestamp","desc"));
+    const hS = await getDocs(hQ);
+    document.getElementById('result-list').innerHTML = hS.docs.map(d => `<div class="card p-3 flex justify-between items-center" onclick="showAnalysisDoc('${d.id}')"><div><span class="font-bold text-sm block">${d.data().title}</span><span class="text-[10px] text-slate-400">View Analysis</span></div><span class="font-bold text-indigo-600">${d.data().score}</span></div>`).join('');
+}
+
+// --- CBT ENGINE ---
 window.startExam = async (id) => {
     const s = await getDoc(doc(db,"exams",id));
     currentExam = { id: s.id, ...s.data() };
-    document.getElementById('exam-runner').classList.remove('hidden');
-    document.getElementById('exam-pdf').src = currentExam.fileUrl;
     
-    let h = ''; currentExam.answerKey.forEach((k,i)=> h+=`<div class="p-3 bg-slate-50 rounded mb-2 flex justify-between"><span class="font-bold text-sm">Q${i+1}</span><div class="flex gap-3">${['A','B','C','D'].map((o,v)=>`<label><input type="radio" name="q${i}" value="${v}"> ${o}</label>`).join('')}</div></div>`);
-    document.getElementById('exam-qs').innerHTML = h;
-    
-    let t = currentExam.duration*60;
-    timerInt = setInterval(()=>{ t--; document.getElementById('timer').innerText=`${Math.floor(t/60)}:${t%60}`; if(t<=0) finishExam(); },1000);
+    // Auto-Resume
+    const saved = JSON.parse(localStorage.getItem('exam_state'));
+    if(saved && saved.eid === id && confirm("Resume previous session?")) {
+        userAnswers = saved.ans;
+        var t = saved.time;
+        if(currentExam.randomize && saved.qs) currentExam.questions = saved.qs; // Restore shuffled order
+    } else {
+        if(currentExam.randomize && currentExam.type === 'native_exam') {
+            currentExam.questions = currentExam.questions.sort(() => Math.random() - 0.5);
+        }
+        const len = currentExam.type==='native_exam' ? currentExam.questions.length : currentExam.answerKey.length;
+        userAnswers = Array(len).fill().map(() => ({ val: -1, status: 'st-visit' }));
+        var t = currentExam.duration * 60;
+    }
 
-    // Anti-Cheat
-    document.addEventListener("visibilitychange", () => {
-        if(document.hidden) { alert("WARNING: Tab switching detected! Exam will auto-submit next time."); finishExam(); }
-    });
+    // Setup Interface
+    document.getElementById('exam-runner').classList.remove('hidden');
+    document.getElementById('run-title').innerText = currentExam.title;
+    
+    if(currentExam.type === 'pdf_exam') {
+        document.getElementById('exam-pdf').src = currentExam.fileUrl;
+        document.getElementById('pdf-display').classList.remove('hidden');
+        document.getElementById('native-q-display').classList.add('hidden');
+    } else {
+        document.getElementById('pdf-display').classList.add('hidden');
+        document.getElementById('native-q-display').classList.remove('hidden');
+        document.getElementById('q-pos').innerText = currentExam.posMarks;
+        document.getElementById('q-neg').innerText = currentExam.negMarks;
+    }
+
+    renderPalette();
+    loadQuestion(0);
+    
+    timerInt = setInterval(() => {
+        t--;
+        document.getElementById('timer').innerText = `${Math.floor(t/60)}:${(t%60).toString().padStart(2,'0')}`;
+        // Save State
+        localStorage.setItem('exam_state', JSON.stringify({ eid: id, ans: userAnswers, time: t, qs: currentExam.questions }));
+        if(t<=0) finishExam();
+    }, 1000);
+    
+    try{ document.documentElement.requestFullscreen(); }catch(e){}
 };
+
+function loadQuestion(idx) {
+    currQIndex = idx;
+    if(userAnswers[idx].status === 'st-visit') { userAnswers[idx].status = 'st-skipped'; renderPaletteItem(idx); }
+    
+    if(currentExam.type === 'native_exam') {
+        const q = currentExam.questions[idx];
+        document.getElementById('q-curr-num').innerText = idx + 1;
+        document.getElementById('q-text').innerHTML = q.q; 
+        
+        const imgBox = document.getElementById('q-img-box');
+        if(q.img) { imgBox.innerHTML = `<img src="${q.img}" class="q-img">`; imgBox.classList.remove('hidden'); }
+        else imgBox.classList.add('hidden');
+
+        document.getElementById('q-options').innerHTML = q.options.map((opt, v) => `
+            <div class="option-box ${userAnswers[idx].val === v ? 'selected' : ''}" onclick="selectOption(${v})">
+                <div class="opt-id">${String.fromCharCode(65+v)}</div>
+                <span class="text-sm font-medium">${opt}</span>
+            </div>
+        `).join('');
+        
+        if(window.MathJax) MathJax.typesetPromise();
+    }
+    document.getElementById(`p-${idx}`)?.scrollIntoView({block:'nearest'});
+}
+
+window.selectOption = (v) => { userAnswers[currQIndex].val = v; userAnswers[currQIndex].status = 'st-answered'; renderPaletteItem(currQIndex); loadQuestion(currQIndex); };
+window.markReview = () => { userAnswers[currQIndex].status = 'st-review'; renderPaletteItem(currQIndex); };
+window.changeQ = (dir) => { const n = currQIndex + dir; if(n >= 0 && n < userAnswers.length) loadQuestion(n); };
+function renderPalette() { document.getElementById('palette-grid').innerHTML = userAnswers.map((_, i) => `<div id="p-${i}" class="p-node st-visit" onclick="loadQuestion(${i})">${i+1}</div>`).join(''); }
+function renderPaletteItem(i) { document.getElementById(`p-${i}`).className = `p-node ${userAnswers[i].status} ${i===currQIndex?'border-indigo-600 border-2':''}`; }
+window.submitExamCheck = () => { if(confirm("Submit Exam?")) finishExam(); };
 
 window.finishExam = async () => {
     clearInterval(timerInt);
-    let score = 0; currentExam.answerKey.forEach((k,i)=>{ const el = document.querySelector(`input[name="q${i}"]:checked`); if(el && parseInt(el.value)===k) score++; });
-    await updateDoc(doc(db,"students",user.uid),{xp:(user.xp||0)+(score*10)});
+    localStorage.removeItem('exam_state');
+    if(document.fullscreenElement) document.exitFullscreen();
+
+    let score = 0, correct = 0, wrong = 0;
+    const pos = currentExam.posMarks || 4, neg = currentExam.negMarks || 1;
+    const analysis = [];
+
+    userAnswers.forEach((ans, i) => {
+        let status = 'skipped', q = {};
+        let correctVal = 0;
+
+        if(currentExam.type === 'native_exam') {
+            q = currentExam.questions[i];
+            correctVal = q.correct;
+        } else {
+            correctVal = currentExam.answerKey[i];
+            q = { q: `Question ${i+1}`, options: ['A','B','C','D'] };
+        }
+
+        if(ans.val !== -1) {
+            if(ans.val === correctVal) { score += pos; correct++; status='correct'; }
+            else { score -= neg; wrong++; status='wrong'; }
+        }
+        analysis.push({ q: q.q, img: q.img, user: ans.val, correct: correctVal, status, sol: q.sol, opts: q.options });
+    });
+
+    const res = { uid: user.uid, examId: currentExam.id, title: currentExam.title, score, total: userAnswers.length*pos, stats: {correct, wrong, skipped: userAnswers.length-(correct+wrong)}, analysis, timestamp: serverTimestamp() };
+    await addDoc(collection(db, "results"), res);
+    
     document.getElementById('exam-runner').classList.add('hidden');
-    confetti(); alert(`Score: ${score}`); location.reload();
+    renderAnalysisData(res);
 };
 
-// Utils
-async function checkLive() { const s = await getDoc(doc(db,"settings","live")); if(s.exists()&&s.data().active) { document.getElementById('live-banner').classList.remove('hidden'); document.getElementById('live-btn').href=s.data().url; } }
-async function checkNotice() { const s = await getDoc(doc(db,"settings","announcement")); if(s.exists()) { document.getElementById('notice-box').classList.remove('hidden'); document.getElementById('notice-text').innerText=s.data().text; } }
-window.openPDF = (u) => { document.getElementById('viewer-modal').classList.remove('hidden'); document.getElementById('pdf-frame').src=u; };
-window.loadLeaderboard = async () => {
-    const s = await getDocs(query(collection(db,"students"), orderBy("xp","desc"), limit(10)));
-    document.getElementById('lb-list').innerHTML = s.docs.map((d,i)=>`<div class="flex justify-between text-xs p-2 border-b"><span>#${i+1} ${d.data().name}</span><span class="font-bold text-indigo-600">${d.data().xp} XP</span></div>`).join('');
+window.showAnalysisDoc = async(id) => { const s = await getDoc(doc(db,"results",id)); renderAnalysisData(s.data()); };
+
+function renderAnalysisData(d) {
+    document.getElementById('result-modal').classList.remove('hidden');
+    document.getElementById('res-score').innerText = d.score;
+    document.getElementById('res-acc').innerText = Math.round((d.stats.correct/(d.stats.correct+d.stats.wrong||1))*100) + "%";
+    
+    // Clear old chart
+    const chartCanvas = document.getElementById('res-chart');
+    const newCanvas = chartCanvas.cloneNode(true);
+    chartCanvas.parentNode.replaceChild(newCanvas, chartCanvas);
+
+    new Chart(newCanvas, {
+        type: 'doughnut',
+        data: { labels: ['Correct','Wrong','Skipped'], datasets: [{ data: [d.stats.correct, d.stats.wrong, d.stats.skipped], backgroundColor: ['#10b981','#ef4444','#cbd5e1'] }] }
+    });
+
+    document.getElementById('res-details').innerHTML = d.analysis.map((item, i) => `
+        <div class="card p-4 border-l-4 ${item.status==='correct'?'border-green-500':item.status==='wrong'?'border-red-500':'border-slate-300'}">
+            <p class="font-bold text-sm mb-2"><span class="text-slate-400">Q${i+1}</span> ${item.q}</p>
+            ${item.img ? `<img src="${item.img}" class="h-20 mb-2 rounded border">` : ''}
+            <div class="text-xs grid grid-cols-2 gap-2 text-slate-600 mb-2">
+                <span>You: <b>${item.user===-1?'Skipped':String.fromCharCode(65+item.user)}</b></span>
+                <span>Correct: <b>${String.fromCharCode(65+item.correct)}</b></span>
+            </div>
+            ${item.sol ? `<div class="bg-indigo-50 p-2 rounded text-xs text-indigo-800"><strong>💡 Solution:</strong> ${item.sol}</div>` : ''}
+        </div>
+    `).join('');
+    
+    if(window.MathJax) MathJax.typesetPromise();
+}
+
+window.showQP = () => {
+    const win = window.open("", "QP", "width=800,height=600");
+    win.document.write(`<html><head><title>QP</title><link rel="stylesheet" href="style.css"></head><body class="p-6">${currentExam.questions.map((q,i)=>`<div class="mb-4"><strong>Q${i+1}. ${q.q}</strong><br>${q.img?`<img src="${q.img}" style="height:100px"><br>`:''}${q.options.map((o,j)=>`(${String.fromCharCode(65+j)}) ${o} `).join('')}</div><hr>`).join('')}</body></html>`);
 };
-function renderAttendance() { const g=document.getElementById('attendance-grid'); g.innerHTML=""; for(let i=1;i<=30;i++){ const d=new Date(new Date().getFullYear(),new Date().getMonth(),i).toDateString(); g.innerHTML+=`<div class="w-6 h-6 rounded flex items-center justify-center text-[9px] ${user.attendance?.includes(d)?'bg-green-500 text-white':'bg-slate-100'}">${i}</div>`; } }

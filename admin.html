@@ -3,145 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LMS Admin</title>
+    <title>Science Exam Controller</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- MathJax for Formulas -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-slate-50 text-slate-800">
 
-    <div class="min-h-screen flex flex-col md:flex-row max-w-7xl mx-auto">
-        <!-- Sidebar -->
-        <nav class="bg-white w-full md:w-64 p-6 flex flex-col justify-between border-r sticky top-0 md:h-screen z-40">
-            <div>
-                <div class="flex items-center gap-3 mb-8">
-                    <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center font-bold text-white">A</div>
-                    <span class="font-bold text-xl">Admin Pro</span>
-                </div>
-                <div class="space-y-1">
-                    <button onclick="showSection('dashboard')" class="w-full text-left p-3 rounded-lg bg-indigo-50 text-indigo-700 font-bold text-sm"><i class="fas fa-chart-pie mr-3"></i>Dashboard</button>
-                    <button onclick="showSection('content')" class="w-full text-left p-3 rounded-lg hover:bg-slate-50 text-slate-500 font-medium text-sm"><i class="fas fa-layer-group mr-3"></i>Content</button>
-                    <button onclick="showSection('users')" class="w-full text-left p-3 rounded-lg hover:bg-slate-50 text-slate-500 font-medium text-sm"><i class="fas fa-users mr-3"></i>Students</button>
-                </div>
-            </div>
-            <button onclick="signOutAdmin()" class="mt-4 w-full bg-red-50 text-red-600 p-3 rounded-lg text-sm font-bold hover:bg-red-100">Log Out</button>
-        </nav>
-
-        <!-- Main Content -->
-        <div class="flex-grow p-4 md:p-8 space-y-6 overflow-y-auto">
-            
-            <!-- SECTION: Dashboard -->
-            <div id="sec-dashboard" class="space-y-6">
-                <!-- Live Class -->
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600 animate-pulse"><i class="fas fa-broadcast-tower"></i></div>
-                        <div>
-                            <h2 class="font-bold text-lg">Live Class</h2>
-                            <input id="live-topic" placeholder="Topic..." class="text-xs border-b border-0 p-1 w-full focus:ring-0">
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <input id="live-url" placeholder="Meet Link" class="p-2 border rounded text-xs">
-                        <input type="checkbox" id="live-toggle" onchange="toggleLive()" class="toggle-checkbox">
-                    </div>
-                </div>
-
-                <!-- Stats -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200"><p class="text-xs font-bold text-slate-400">USERS</p><h1 id="stat-users" class="text-3xl font-bold">0</h1></div>
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200"><p class="text-xs font-bold text-slate-400">NOTES</p><h1 id="stat-notes" class="text-3xl font-bold text-indigo-600">0</h1></div>
-                </div>
-                
-                <!-- Announcement -->
-                <div class="bg-indigo-600 p-6 rounded-2xl text-white">
-                    <h3 class="font-bold text-sm mb-2">BANNER MESSAGE</h3>
-                    <textarea id="announce-text" class="w-full bg-white/10 border-white/20 rounded p-2 text-white text-sm mb-2" rows="2"></textarea>
-                    <button onclick="updateAnnouncement()" class="bg-white text-indigo-700 px-4 py-2 rounded font-bold text-xs">Update</button>
-                </div>
-            </div>
-
-            <!-- SECTION: Content -->
-            <div id="sec-content" class="hidden grid md:grid-cols-2 gap-6">
-                <!-- Upload Notes -->
-                <div class="bg-white p-6 rounded-2xl border border-slate-200">
-                    <h3 class="font-bold mb-4 flex gap-2"><i class="fas fa-file-pdf text-red-500"></i> Upload PDF/Note</h3>
-                    <div class="space-y-3">
-                        <select id="note-batch" class="w-full p-2 border rounded text-sm"><option value="all">All Batches</option><option value="10">Class 10</option><option value="12">Class 12</option></select>
-                        <input id="note-title" placeholder="Title" class="w-full p-2 border rounded text-sm">
-                        <input id="note-file" type="file" class="text-xs">
-                        <button id="upload-note-btn" class="w-full bg-indigo-600 text-white py-2 rounded font-bold">Upload</button>
-                    </div>
-                </div>
-
-                <!-- Upload Video -->
-                <div class="bg-white p-6 rounded-2xl border border-slate-200">
-                    <h3 class="font-bold mb-4 flex gap-2"><i class="fab fa-youtube text-red-600"></i> Embed Video</h3>
-                    <div class="space-y-3">
-                        <select id="vid-batch" class="w-full p-2 border rounded text-sm"><option value="all">All Batches</option><option value="10">Class 10</option></select>
-                        <input id="vid-title" placeholder="Video Title" class="w-full p-2 border rounded text-sm">
-                        <input id="vid-url" placeholder="YouTube Link (e.g. youtu.be/xyz)" class="w-full p-2 border rounded text-sm">
-                        <button onclick="uploadVideo()" class="w-full bg-red-600 text-white py-2 rounded font-bold">Add Video</button>
-                    </div>
-                </div>
-                
-                <!-- Create Flashcard -->
-                <div class="bg-white p-6 rounded-2xl border border-slate-200">
-                    <h3 class="font-bold mb-4 flex gap-2"><i class="fas fa-layer-group text-green-500"></i> Add Flashcard</h3>
-                    <input id="fc-front" placeholder="Question" class="w-full p-2 border rounded text-sm mb-2">
-                    <input id="fc-back" placeholder="Answer" class="w-full p-2 border rounded text-sm mb-2">
-                    <button onclick="addFlashcard()" class="w-full bg-green-600 text-white py-2 rounded font-bold">Create Card</button>
-                </div>
-
-                <!-- Post Homework -->
-                <div class="bg-white p-6 rounded-2xl border border-slate-200">
-                    <h3 class="font-bold mb-4 flex gap-2"><i class="fas fa-tasks text-orange-500"></i> Post Homework</h3>
-                    <input id="hw-title" placeholder="Assignment Title" class="w-full p-2 border rounded text-sm mb-2">
-                    <input id="hw-date" type="date" class="w-full p-2 border rounded text-sm mb-2">
-                    <button onclick="postHW()" class="w-full bg-orange-500 text-white py-2 rounded font-bold">Assign</button>
-                </div>
-
-                <button onclick="document.getElementById('exam-modal').classList.remove('hidden')" class="w-full col-span-2 bg-pink-50 text-pink-600 py-4 rounded-xl font-bold border-2 border-pink-100 border-dashed hover:bg-pink-100">
-                    <i class="fas fa-plus-circle mr-2"></i> Create PDF Exam
-                </button>
-            </div>
-
-            <!-- SECTION: Users -->
-            <div id="sec-users" class="hidden bg-white rounded-2xl border border-slate-200 overflow-hidden">
-                <div class="p-4 border-b bg-slate-50 flex justify-between">
-                    <h3 class="font-bold text-sm">Student List</h3>
-                    <button onclick="loadUsers()" class="text-xs font-bold text-indigo-600">Refresh</button>
-                </div>
-                <div id="user-list" class="max-h-96 overflow-y-auto divide-y divide-slate-100"></div>
-            </div>
+    <!-- Header -->
+    <div class="h-16 bg-white border-b flex items-center justify-between px-6 sticky top-0 z-30 shadow-sm">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold">S</div>
+            <span class="font-bold text-lg hidden md:block">Science Admin</span>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="openExamModal()" class="btn btn-primary text-xs"><i class="fas fa-plus"></i> New Exam</button>
+            <button onclick="signOutAdmin()" class="btn btn-outline text-xs text-red-500 hover:bg-red-50"><i class="fas fa-power-off"></i></button>
         </div>
     </div>
 
-    <!-- Exam Modal (Same as before) -->
-    <div id="exam-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-md rounded-2xl p-6 h-[80vh] flex flex-col">
-            <div class="flex justify-between mb-4"><h3 class="font-bold">New Exam</h3><button onclick="document.getElementById('exam-modal').classList.add('hidden')">&times;</button></div>
-            <div class="space-y-3 flex-grow overflow-y-auto">
-                <input id="pe-title" placeholder="Title" class="w-full border p-2 rounded">
-                <div class="flex gap-2">
-                    <input id="pe-dur" type="number" placeholder="Mins" class="w-1/2 border p-2 rounded">
-                    <select id="pe-batch" class="w-1/2 border p-2 rounded"><option value="all">All</option><option value="10">Class 10</option></select>
-                </div>
-                <input id="pe-file" type="file" class="text-xs w-full">
-                <div class="flex gap-2"><input id="pe-count" type="number" placeholder="# Qs" class="w-full border p-2 rounded"><button onclick="genKeys()" class="bg-slate-800 text-white px-3 rounded text-xs">Keys</button></div>
-                <div id="pe-keys" class="grid grid-cols-4 gap-2"></div>
+    <!-- Dashboard -->
+    <div class="max-w-6xl mx-auto p-6 space-y-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="card p-4"><p class="text-[10px] font-bold text-slate-400 uppercase">Students</p><h1 id="stat-users" class="text-2xl font-bold">0</h1></div>
+            <div class="card p-4"><p class="text-[10px] font-bold text-slate-400 uppercase">Exams</p><h1 id="stat-exams" class="text-2xl font-bold">0</h1></div>
+        </div>
+
+        <div class="card overflow-hidden">
+            <div class="p-4 border-b bg-slate-50 font-bold text-sm text-slate-600">Published Assessments</div>
+            <div id="exam-list" class="divide-y divide-slate-100 max-h-[70vh] overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <!-- EXAM CREATOR MODAL -->
+    <div id="exam-modal" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-4xl rounded-2xl h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-4 border-b flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-lg">Create Exam</h3>
+                <button onclick="document.getElementById('exam-modal').classList.add('hidden')" class="text-2xl text-slate-400 hover:text-red-500">&times;</button>
             </div>
-            <button onclick="pubPDF()" class="w-full bg-indigo-600 text-white py-3 rounded font-bold mt-2">Publish</button>
+
+            <div class="flex-grow overflow-y-auto p-6 space-y-6">
+                <!-- 1. Configuration -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="col-span-2">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase">Title</label>
+                            <input id="ex-title" class="w-full p-2 border rounded-lg text-sm font-bold" placeholder="e.g. Physics: Thermodynamics">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase">Class</label>
+                            <select id="ex-batch" class="w-full p-2 border rounded-lg text-sm bg-white">
+                                <option value="all">All</option>
+                                <option value="6">Class 6</option>
+                                <option value="7">Class 7</option>
+                                <option value="8">Class 8</option>
+                                <option value="9">Class 9</option>
+                                <option value="10">Class 10</option>
+                                <option value="11">Class 11</option>
+                                <option value="12">Class 12</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase">Time (Min)</label>
+                            <input id="ex-dur" type="number" class="w-full p-2 border rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-green-600 uppercase">Correct (+)</label>
+                            <input id="ex-pos" type="number" value="4" class="w-full p-2 border rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-red-500 uppercase">Wrong (-)</label>
+                            <input id="ex-neg" type="number" value="1" class="w-full p-2 border rounded-lg text-sm">
+                        </div>
+                        <div class="col-span-2 flex items-center gap-2 bg-white p-2 rounded border">
+                            <input type="checkbox" id="ex-random" checked class="toggle-checkbox">
+                            <span class="text-xs font-bold text-indigo-700">Shuffle Questions (Unique sets)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Modes -->
+                <div class="flex gap-4 border-b">
+                    <button onclick="setMode('manual')" id="tab-manual" class="pb-2 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600">Manual Entry</button>
+                    <button onclick="setMode('bulk')" id="tab-bulk" class="pb-2 text-sm font-bold text-slate-400">⚡ Bulk JSON</button>
+                    <button onclick="setMode('pdf')" id="tab-pdf" class="pb-2 text-sm font-bold text-slate-400">PDF Upload</button>
+                </div>
+
+                <!-- Manual Mode -->
+                <div id="mode-manual" class="space-y-4">
+                    <div id="q-container" class="space-y-4"></div>
+                    <button onclick="addQuestion()" class="w-full py-3 border-2 border-dashed border-indigo-300 text-indigo-600 font-bold rounded-xl hover:bg-indigo-50">+ Add Question</button>
+                </div>
+
+                <!-- Bulk Mode -->
+                <div id="mode-bulk" class="hidden space-y-2">
+                    <p class="text-xs text-slate-500">JSON Format: [{"q":"...","img":"...","options":["..."],"correct":0,"sol":"..."}]</p>
+                    <textarea id="json-input" class="w-full h-48 p-3 border rounded-xl text-xs font-mono bg-slate-50" placeholder="Paste JSON here..."></textarea>
+                    <button onclick="parseJSON()" class="btn btn-outline w-full">Import Questions</button>
+                </div>
+
+                <!-- PDF Mode -->
+                <div id="mode-pdf" class="hidden space-y-3">
+                    <input id="ex-file" type="file" class="w-full text-xs p-2 border rounded bg-white">
+                    <div class="flex gap-2">
+                        <input id="ex-count" type="number" placeholder="Total Questions" class="w-full p-2 border rounded">
+                        <button onclick="genKeys()" class="btn btn-outline">Generate OMR</button>
+                    </div>
+                    <div id="ex-keys" class="grid grid-cols-5 gap-2 max-h-40 overflow-y-auto"></div>
+                </div>
+            </div>
+
+            <div class="p-4 border-t bg-slate-50 text-right">
+                <button onclick="publishExam()" class="btn btn-primary px-6">Publish Exam</button>
+            </div>
         </div>
     </div>
 
     <script type="module" src="admin.js"></script>
     <script>
-        function showSection(id) {
-            ['dashboard','content','users'].forEach(s => document.getElementById('sec-'+s).classList.add('hidden'));
-            document.getElementById('sec-'+id).classList.remove('hidden');
+        function setMode(m) {
+            ['manual','bulk','pdf'].forEach(x => {
+                document.getElementById('mode-'+x).classList.toggle('hidden', x!==m);
+                document.getElementById('tab-'+x).className = x===m ? "pb-2 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600" : "pb-2 text-sm font-bold text-slate-400";
+            });
+            window.examMode = m;
         }
+        window.examMode = 'manual';
     </script>
 </body>
 </html>

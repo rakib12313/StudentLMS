@@ -3,343 +3,557 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Student Portal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; user-select: none; padding-bottom: 90px; }
-        .aurora-bg { position: fixed; inset: 0; z-index: -1; background: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%); background-color: #0f172a; }
-        .glass-card { background: white; border: 1px solid #e2e8f0; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: 0.2s; overflow: hidden; }
-        .glass-card:active { transform: scale(0.98); }
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: rgba(255,255,255,0.85); backdrop-filter: blur(16px); border-top: 1px solid rgba(255,255,255,0.5); display: flex; justify-content: space-around; padding: 12px 0; z-index: 50; padding-bottom: max(12px, env(safe-area-inset-bottom)); }
-        .nav-item { color: #94a3b8; display: flex; flex-direction: column; align-items: center; font-size: 10px; font-weight: 600; transition: 0.3s; }
-        .nav-item.active { color: #6366f1; transform: translateY(-3px); }
-        .nav-item i { font-size: 20px; margin-bottom: 2px; }
-        .btn-primary { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border-radius: 12px; font-weight: bold; box-shadow: 0 4px 15px rgba(99,102,241,0.4); }
-        
-        /* Exam UI */
-        .option-box { display: flex; gap: 12px; padding: 14px; border: 2px solid #f1f5f9; border-radius: 14px; cursor: pointer; transition: 0.2s; align-items: center; }
-        .option-box.selected { border-color: #6366f1; background: #eef2ff; }
-        .opt-id { min-width: 24px; height: 24px; border-radius: 50%; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; }
-        .selected .opt-id { border-color: #6366f1; background: #6366f1; color: white; }
-        .p-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-        .p-item { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: bold; border: 1px solid #e2e8f0; font-size: 12px; }
-        .st-ans { background: #10b981; color: white; border-color: #10b981; }
-        .st-rev { background: #f59e0b; color: white; border-color: #f59e0b; }
-        
-        /* Flashcard */
-        .flashcard { perspective: 1000px; height: 180px; cursor: pointer; }
-        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
-        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
-        .fc-front, .fc-back { position: absolute; inset: 0; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; border-radius: 16px; padding: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); background: white; border: 1px solid #e2e8f0; }
-        .fc-back { background: #6366f1; color: white; transform: rotateY(180deg); }
+    <title>Student LMS Exam System</title>
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
+    <style>
+        /* --- CSS STYLES --- */
+        :root {
+            --primary: #6C63FF;
+            --accent: #00d4ff;
+            --bg-grad: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-grad);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 100px; /* Space for bottom nav */
+        }
+
+        /* Utils */
         .hidden { display: none !important; }
-        .animate-enter { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        mjx-container { margin: 5px 0 !important; font-size: 110%; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .center-flex { display: flex; justify-content: center; align-items: center; min-height: 80vh; }
+
+        /* Glass Cards */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            margin-bottom: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Inputs & Buttons */
+        h2, h3 { margin-top: 0; font-weight: 300; letter-spacing: 1px; }
+        
+        input, select {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: white;
+            box-sizing: border-box;
+            outline: none;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 12px;
+            background: var(--primary);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.4);
+        }
+
+        button:active { transform: scale(0.98); }
+        button.secondary { background: rgba(255,255,255,0.1); }
+        button.google-btn { background: #db4437; }
+        button.danger { background: #ff4444; width: auto; padding: 8px 15px; font-size: 14px; }
+
+        /* --- GLASSY BOTTOM NAV --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 500px;
+            height: 70px;
+            background: rgba(20, 20, 40, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 25px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        .nav-item {
+            color: rgba(255,255,255,0.5);
+            text-align: center;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .nav-item i { font-size: 20px; margin-bottom: 2px; }
+        .nav-item.active { color: var(--accent); transform: translateY(-5px); }
+        .nav-item.active i { text-shadow: 0 0 10px var(--accent); }
+
+        /* Specific Views */
+        .question-block {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .exam-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            color: #aaa;
+        }
+
+        img.preview { max-width: 100%; border-radius: 10px; margin-top: 10px; }
+        
+        /* Loading Spinner */
+        .loader {
+            border: 4px solid rgba(255,255,255,0.1);
+            border-left-color: var(--accent);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .container { padding-top: 50px; }
+            .bottom-nav { bottom: 30px; width: 400px; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- LOGIN -->
-    <div id="login-section" class="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
-        <div class="aurora-bg"></div>
-        <div class="glass-card w-full max-w-sm p-8 text-center animate-enter relative z-10 bg-white/90">
-            <div class="w-16 h-16 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-2xl mx-auto flex items-center justify-center text-white text-3xl font-bold mb-6 shadow-xl">🚀</div>
-            <h1 class="text-2xl font-bold mb-2 text-slate-800">Student Portal</h1>
-            <p class="text-sm text-slate-500 mb-8">Access your personalized learning hub.</p>
-            <button id="google-btn" class="w-full btn-primary py-3">Continue with Google</button>
-        </div>
-    </div>
-
-    <!-- MAIN APP -->
-    <div id="app-section" class="hidden">
-        <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-200 px-5 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <img id="u-photo" class="w-10 h-10 rounded-full border shadow-sm">
-                <div><h3 id="u-name" class="font-bold text-sm">Student</h3><span class="text-[10px] text-indigo-500 font-bold">Online</span></div>
-            </div>
-            <button id="logout-btn" class="text-red-400"><i class="fas fa-power-off"></i></button>
-        </header>
-
-        <div class="p-5 max-w-3xl mx-auto space-y-8">
+    <!-- === VIEW: LOGIN === -->
+    <div id="view-auth" class="center-flex">
+        <div class="glass-card" style="width: 100%; max-width: 350px; text-align: center;">
+            <i class="fas fa-graduation-cap" style="font-size: 50px; color: var(--accent); margin-bottom: 20px;"></i>
+            <h2 id="auth-title">Student LMS Login</h2>
             
-            <!-- TAB 1: HOME (Dashboard) -->
-            <div id="view-home" class="fade-in space-y-4">
-                <div id="live-banner" class="hidden bg-red-500 text-white p-4 rounded-xl flex justify-between items-center animate-pulse shadow-lg shadow-red-500/30">
-                    <div class="flex items-center gap-3"><span class="w-3 h-3 bg-white rounded-full animate-ping"></span><span class="font-bold">Live Class Started</span></div>
-                    <a id="live-btn" target="_blank" class="bg-white text-red-600 px-4 py-1 rounded-lg text-xs font-bold">Join Now</a>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="glass-card p-4 bg-gradient-to-br from-indigo-500 to-purple-600 text-white border-none">
-                        <div class="text-[10px] font-bold opacity-70 uppercase">Total XP</div>
-                        <div class="text-3xl font-bold mt-1" id="u-xp">0</div>
-                    </div>
-                    <div class="glass-card p-4">
-                        <div class="text-[10px] font-bold text-slate-400 uppercase">Tests Taken</div>
-                        <div class="text-3xl font-bold text-slate-800 mt-1" id="u-taken">0</div>
-                    </div>
-                </div>
-                
-                <h3 class="font-bold text-lg text-slate-700">Recent Activity</h3>
-                <div id="history-list" class="space-y-3"></div>
+            <input type="email" id="email" placeholder="Email Address">
+            <input type="password" id="password" placeholder="Password">
+            
+            <button id="btn-login" onclick="handleLogin()">Login</button>
+            <button id="btn-google" class="google-btn" onclick="handleGoogleLogin()"><i class="fab fa-google"></i> Google Login</button>
+            
+            <div id="reg-fields" class="hidden">
+                <select id="role">
+                    <option value="student">Student</option>
+                    <option value="admin">Admin</option>
+                </select>
+                <button class="secondary" onclick="handleRegister()">Create Account</button>
             </div>
 
-            <!-- TAB 2: LEARN (Content) -->
-            <div id="view-learn" class="hidden fade-in space-y-4">
-                <div class="flex gap-2">
-                    <button onclick="filterContent('note')" class="px-4 py-2 rounded-full bg-slate-800 text-white text-xs font-bold">Notes</button>
-                    <button onclick="filterContent('video')" class="px-4 py-2 rounded-full bg-white border text-xs font-bold">Videos</button>
-                </div>
-                <div id="content-grid" class="grid gap-4"></div>
-            </div>
-
-            <!-- TAB 3: EXAMS (CBT) -->
-            <div id="view-exams" class="hidden fade-in space-y-4">
-                <h3 class="font-bold text-lg text-slate-700">Available Assessments</h3>
-                <div id="exam-list" class="grid gap-4"></div>
-            </div>
-
-            <!-- TAB 4: HUB (Flashcards, Leaderboard, Forum) -->
-            <div id="view-hub" class="hidden fade-in space-y-6">
-                <div>
-                    <h3 class="font-bold text-lg mb-2">Flashcards</h3>
-                    <div id="fc-grid" class="grid grid-cols-2 gap-3"></div>
-                </div>
-                <div>
-                    <h3 class="font-bold text-lg mb-2">Leaderboard</h3>
-                    <div id="lb-list" class="space-y-2"></div>
-                </div>
-                <div>
-                    <h3 class="font-bold text-lg mb-2">Discussion Forum</h3>
-                    <div id="chat-box" class="h-40 overflow-y-auto bg-white border rounded-xl p-3 mb-2 space-y-2"></div>
-                    <div class="flex gap-2"><input id="chat-in" class="text-xs" placeholder="Ask something..."><button onclick="sendChat()" class="bg-indigo-600 text-white px-3 rounded-lg"><i class="fas fa-paper-plane"></i></button></div>
-                </div>
-            </div>
-
-            <!-- TAB 5: PROFILE -->
-            <div id="view-profile" class="hidden fade-in space-y-4">
-                <div class="glass-card p-6 text-center">
-                    <img id="p-img" class="w-24 h-24 mx-auto rounded-full object-cover border-4 border-slate-50 shadow-lg">
-                    <h2 class="text-xl font-bold mt-2" id="p-name-disp">User</h2>
-                    <div class="space-y-3 mt-6 text-left">
-                        <input id="in-name" placeholder="Name"><input id="in-phone" placeholder="Phone"><input id="in-addr" placeholder="Address">
-                        <button onclick="saveProfile()" class="w-full btn-primary py-3">Save Changes</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Navigation Bar -->
-        <nav class="nav-bar">
-            <button onclick="nav('home')" id="nav-home" class="nav-item active"><i class="fas fa-home"></i><span>Home</span></button>
-            <button onclick="nav('learn')" id="nav-learn" class="nav-item"><i class="fas fa-book-open"></i><span>Learn</span></button>
-            <div class="relative -top-5">
-                <button onclick="nav('exams')" id="nav-exams" class="w-14 h-14 bg-indigo-600 text-white rounded-full flex items-center justify-center shadow-lg shadow-indigo-500/40 transition hover:scale-110"><i class="fas fa-pen-nib text-xl"></i></button>
-            </div>
-            <button onclick="nav('hub')" id="nav-hub" class="nav-item"><i class="fas fa-layer-group"></i><span>Hub</span></button>
-            <button onclick="nav('profile')" id="nav-profile" class="nav-item"><i class="fas fa-user-circle"></i><span>Profile</span></button>
-        </nav>
-    </div>
-
-    <!-- EXAM RUNNER UI -->
-    <div id="exam-ui" class="hidden fixed inset-0 z-50 bg-white flex flex-col">
-        <div class="h-16 border-b flex justify-between items-center px-4 shadow-sm z-20">
-            <div class="flex items-center gap-2">
-                <div class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg font-mono font-bold" id="timer">00:00</div>
-                <button onclick="document.getElementById('calc-modal').classList.toggle('hidden')" class="p-2 bg-slate-100 rounded text-slate-500"><i class="fas fa-calculator"></i></button>
-                <button onclick="document.getElementById('formula-modal').classList.toggle('hidden')" class="p-2 bg-slate-100 rounded text-slate-500"><i class="fas fa-square-root-alt"></i></button>
-            </div>
-            <button onclick="document.getElementById('palette-bar').classList.toggle('translate-x-full')" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center"><i class="fas fa-th"></i></button>
-        </div>
-
-        <div class="flex-grow flex overflow-hidden relative">
-            <div class="flex-grow overflow-y-auto p-6 pb-24" id="q-area">
-                <div class="flex justify-between mb-4">
-                    <span class="text-xs font-bold text-white bg-indigo-500 px-3 py-1 rounded-full">Q <span id="q-num">1</span></span>
-                    <span class="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded border border-green-100">+<span id="q-pos">4</span></span>
-                </div>
-                <div id="q-img-wrap" class="hidden text-center mb-4"><img id="q-img" class="max-h-48 rounded-lg border inline-block"></div>
-                <p id="q-txt" class="text-lg font-medium mb-6 leading-relaxed"></p>
-                <div id="q-opts" class="space-y-3"></div>
-            </div>
-            <div id="palette-bar" class="absolute inset-y-0 right-0 w-64 bg-white border-l transform translate-x-full transition duration-300 z-30 flex flex-col">
-                <div class="p-4 font-bold border-b">Questions</div>
-                <div id="p-grid" class="p-4 grid grid-cols-5 gap-2 flex-grow overflow-y-auto content-start"></div>
-                <div class="p-4 border-t"><button onclick="submitExamCheck()" class="w-full btn-primary py-3">Submit</button></div>
-            </div>
-        </div>
-
-        <div class="fixed bottom-0 w-full bg-white border-t p-3 flex justify-between z-20">
-            <div class="flex gap-3"><button onclick="navQ(-1)" class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center"><i class="fas fa-chevron-left"></i></button><button onclick="navQ(1)" class="w-12 h-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center"><i class="fas fa-chevron-right"></i></button></div>
-            <button onclick="markRev()" class="px-6 rounded-xl border border-amber-200 text-amber-600 font-bold bg-amber-50">Review</button>
+            <p style="margin-top: 20px; font-size: 14px;">
+                <span id="toggle-text">New user?</span> 
+                <a href="#" style="color: var(--accent);" onclick="toggleAuthMode()">Click here</a>
+            </p>
         </div>
     </div>
 
-    <!-- MODALS: Calc, Formula, Result -->
-    <div id="calc-modal" class="hidden fixed bottom-20 left-4 z-[60] bg-slate-900 p-4 rounded-2xl shadow-2xl w-64 text-white">
-        <div class="flex justify-between mb-2 text-xs font-bold text-slate-400"><span>CALCULATOR</span><button onclick="document.getElementById('calc-modal').classList.add('hidden')">&times;</button></div>
-        <input id="calc-disp" class="w-full bg-black/30 border-none text-right text-xl font-mono p-2 mb-3 rounded" readonly value="0">
-        <div class="grid grid-cols-4 gap-2 text-xs font-bold text-center">
-            <button onclick="c('sin(')" class="p-2 bg-slate-700 rounded">sin</button><button onclick="c('cos(')" class="p-2 bg-slate-700 rounded">cos</button><button onclick="c('tan(')" class="p-2 bg-slate-700 rounded">tan</button><button onclick="document.getElementById('calc-disp').value='0'" class="p-2 bg-red-600 rounded">C</button>
-            <button onclick="c('7')" class="p-2 bg-slate-600 rounded">7</button><button onclick="c('8')" class="p-2 bg-slate-600 rounded">8</button><button onclick="c('9')" class="p-2 bg-slate-600 rounded">9</button><button onclick="c('/')" class="p-2 bg-indigo-600 rounded">/</button>
-            <button onclick="c('4')" class="p-2 bg-slate-600 rounded">4</button><button onclick="c('5')" class="p-2 bg-slate-600 rounded">5</button><button onclick="c('6')" class="p-2 bg-slate-600 rounded">6</button><button onclick="c('*')" class="p-2 bg-indigo-600 rounded">*</button>
-            <button onclick="c('1')" class="p-2 bg-slate-600 rounded">1</button><button onclick="c('2')" class="p-2 bg-slate-600 rounded">2</button><button onclick="c('3')" class="p-2 bg-slate-600 rounded">3</button><button onclick="c('-')" class="p-2 bg-indigo-600 rounded">-</button>
-            <button onclick="c('0')" class="p-2 bg-slate-600 rounded col-span-2">0</button><button onclick="c('.')" class="p-2 bg-slate-600 rounded">.</button><button onclick="evalC()" class="p-2 bg-green-600 rounded">=</button>
+    <!-- === VIEW: ADMIN DASHBOARD === -->
+    <div id="view-admin" class="container hidden">
+        <div class="glass-card">
+            <div class="exam-meta">
+                <h2><i class="fas fa-user-shield"></i> Admin Panel</h2>
+                <button class="danger" onclick="doLogout()">Logout</button>
+            </div>
+            <h3>Create New Exam</h3>
+            <input type="text" id="new-exam-title" placeholder="Exam Subject / Title">
+            <input type="number" id="new-exam-time" placeholder="Duration (Minutes)">
+            <hr style="border-color: var(--glass-border); margin: 20px 0;">
+            
+            <div id="builder-questions"></div>
+
+            <button class="secondary" onclick="addQuestionField()"><i class="fas fa-plus"></i> Add Question</button>
+            <button onclick="saveExam()" id="btn-save-exam" style="background: var(--accent); margin-top: 20px;">Publish Exam</button>
         </div>
     </div>
 
-    <div id="formula-modal" class="hidden fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-sm rounded-2xl p-6 relative h-[60vh] overflow-y-auto">
-            <button onclick="document.getElementById('formula-modal').classList.add('hidden')" class="absolute top-4 right-4 text-xl">&times;</button>
-            <h2 class="text-xl font-bold mb-4">Formula Sheet</h2>
-            <div class="space-y-4 text-sm">
-                <div><h3 class="font-bold text-indigo-600">Physics</h3><p>\( F = ma \), \( v = u + at \), \( E = mc^2 \)</p></div>
-                <div><h3 class="font-bold text-indigo-600">Math</h3><p>\( x = \frac{-b \pm \sqrt{b^2-4ac}}{2a} \), \( \sin^2\theta + \cos^2\theta = 1 \)</p></div>
-                <div><h3 class="font-bold text-indigo-600">Chemistry</h3><p>\( PV = nRT \), \( pH = -\log[H^+] \)</p></div>
+    <!-- === VIEW: STUDENT HOME === -->
+    <div id="view-student" class="container hidden">
+        <div class="glass-card" style="display:flex; justify-content:space-between; align-items:center;">
+            <h2><i class="fas fa-user-graduate"></i> Available Exams</h2>
+            <button class="danger" onclick="doLogout()">Logout</button>
+        </div>
+        <div id="exam-list">
+            <!-- Exams load here -->
+            <div class="loader"></div>
+        </div>
+    </div>
+
+    <!-- === VIEW: TAKING EXAM === -->
+    <div id="view-taking-exam" class="container hidden">
+        <div class="glass-card sticky-header" style="position:sticky; top:10px; z-index:900; background: rgba(15, 12, 41, 0.95); border-bottom: 2px solid var(--accent);">
+            <div style="display: flex; justify-content: space-between;">
+                <h3 id="active-exam-name">Exam</h3>
+                <h3 style="color: var(--accent);" id="timer-display">00:00</h3>
             </div>
         </div>
-    </div>
-
-    <div id="result-modal" class="hidden fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-md rounded-3xl p-6 text-center animate-enter">
-            <h2 class="text-2xl font-bold mb-1">Analysis</h2>
-            <div class="relative w-40 h-40 mx-auto my-4"><canvas id="res-chart"></canvas><div class="absolute inset-0 flex items-center justify-center flex-col"><span class="text-2xl font-bold" id="res-score">0</span></div></div>
-            <div class="grid grid-cols-3 gap-2 text-xs font-bold mb-4">
-                <div class="bg-green-50 text-green-700 p-2 rounded border">C: <span id="res-c">0</span></div>
-                <div class="bg-red-50 text-red-700 p-2 rounded border">W: <span id="res-w">0</span></div>
-                <div class="bg-slate-50 text-slate-700 p-2 rounded border">S: <span id="res-s">0</span></div>
-            </div>
-            <div id="res-solutions" class="text-left text-xs space-y-2 max-h-40 overflow-y-auto mb-4"></div>
-            <button onclick="location.reload()" class="w-full btn-primary py-3">Finish</button>
+        <div id="quiz-area" style="margin-top: 20px;"></div>
+        <div class="glass-card">
+            <button onclick="submitExam()" style="background: #00c851;">Submit Answers</button>
         </div>
     </div>
 
+    <!-- === GLASSY BOTTOM NAV (Hidden on login) === -->
+    <div id="bottom-nav" class="bottom-nav hidden">
+        <div class="nav-item active" onclick="navTo('home')">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </div>
+        <div class="nav-item" onclick="navTo('profile')">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </div>
+        <div class="nav-item" onclick="doLogout()">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </div>
+    </div>
+
+    <!-- === JAVASCRIPT === -->
     <script type="module">
-        import { auth, db, provider } from './firebase-config.js';
-        import { signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { doc, getDoc, setDoc, updateDoc, collection, getDocs, query, orderBy, serverTimestamp, addDoc, where, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        // --- CONFIGURATION ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, query, where } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-        let user=null, allExams=[], allContent=[], currExam=null, userAns=[], currIdx=0, timer=null;
+        // YOUR SPECIFIC CREDENTIALS
+        const firebaseConfig = {
+            apiKey: "AIzaSyBEMPS8vEJztGpoBPJjJIzKKInyt4IY9rQ",
+            authDomain: "studentlms-79722.firebaseapp.com",
+            projectId: "studentlms-79722",
+            storageBucket: "studentlms-79722.firebasestorage.app",
+            messagingSenderId: "1029623857004",
+            appId: "1:1029623857004:web:fa07cb3de1270990a87d49"
+        };
 
-        onAuthStateChanged(auth, async (u) => {
-            if(u) {
-                const ref = doc(db, "students", u.uid);
-                const snap = await getDoc(ref);
-                if(!snap.exists()) {
-                    const d = { uid: u.uid, email: u.email, name: u.displayName, photo: u.photoURL, role: "student", banned: false, xp:0 };
-                    await setDoc(ref, d); user = d;
-                } else user = snap.data();
-                if(user.banned) { alert("Banned."); signOut(auth); return; }
-                initApp();
-            } else document.getElementById('login-section').classList.remove('hidden');
+        // YOUR CLOUDINARY CREDENTIALS
+        const CLOUD_NAME = "dpe74ejhl"; 
+        const CLOUD_PRESET = "lms_upload"; 
+        const CLOUD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
+
+        // Initialize
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        let currentUser = null;
+        let currentExamData = null;
+        let timerInterval = null;
+
+        // --- GLOBAL FUNCTIONS (Attached to Window for HTML access) ---
+
+        // 1. Auth Logic
+        window.toggleAuthMode = () => {
+            const regFields = document.getElementById('reg-fields');
+            const isHidden = regFields.classList.contains('hidden');
+            const title = document.getElementById('auth-title');
+            const toggleText = document.getElementById('toggle-text');
+            
+            if(isHidden) {
+                regFields.classList.remove('hidden');
+                document.getElementById('btn-login').classList.add('hidden');
+                document.getElementById('btn-google').classList.add('hidden');
+                title.innerText = "Register Account";
+                toggleText.innerText = "Have an account?";
+            } else {
+                regFields.classList.add('hidden');
+                document.getElementById('btn-login').classList.remove('hidden');
+                document.getElementById('btn-google').classList.remove('hidden');
+                title.innerText = "Student Login";
+                toggleText.innerText = "New user?";
+            }
+        };
+
+        window.handleRegister = async () => {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+            try {
+                const res = await createUserWithEmailAndPassword(auth, email, pass);
+                await setDoc(doc(db, "users", res.user.uid), { email, role });
+                alert("Account created! You are logged in.");
+            } catch(e) { alert(e.message); }
+        };
+
+        window.handleLogin = async () => {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('password').value;
+            try { await signInWithEmailAndPassword(auth, email, pass); } 
+            catch(e) { alert(e.message); }
+        };
+
+        window.handleGoogleLogin = async () => {
+            try {
+                const res = await signInWithPopup(auth, googleProvider);
+                // Check if user doc exists, if not create as student
+                const userDoc = await getDoc(doc(db, "users", res.user.uid));
+                if (!userDoc.exists()) {
+                    await setDoc(doc(db, "users", res.user.uid), { email: res.user.email, role: 'student' });
+                }
+            } catch(e) { 
+                console.error(e);
+                alert("Google Login Error: " + e.message); 
+            }
+        };
+
+        window.doLogout = () => signOut(auth);
+
+        // 2. Navigation & UI Logic
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                // Get Role
+                const snap = await getDoc(doc(db, "users", user.uid));
+                const role = snap.exists() ? snap.data().role : 'student';
+                
+                document.getElementById('view-auth').classList.add('hidden');
+                document.getElementById('bottom-nav').classList.remove('hidden');
+
+                if (role === 'admin') {
+                    showView('view-admin');
+                } else {
+                    showView('view-student');
+                    loadExams();
+                }
+            } else {
+                currentUser = null;
+                showView('view-auth');
+                document.getElementById('bottom-nav').classList.add('hidden');
+            }
         });
 
-        document.getElementById('google-btn').addEventListener('click', () => signInWithPopup(auth, provider));
-        document.getElementById('logout-btn').addEventListener('click', () => signOut(auth).then(()=>location.reload()));
-
-        async function initApp() {
-            document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('app-section').classList.remove('hidden');
-            document.getElementById('u-name').innerText = user.name;
-            document.getElementById('u-photo').src = user.photo;
-            document.getElementById('p-img').src = user.photo;
-            document.getElementById('p-email').innerText = user.email;
-            document.getElementById('p-name-disp').innerText = user.name;
-            document.getElementById('in-name').value = user.name;
-            document.getElementById('in-phone').value = user.phone || "";
-            document.getElementById('in-addr').value = user.address || "";
-            document.getElementById('u-xp').innerText = user.xp || 0;
-
-            const s = await getDocs(query(collection(db, "exams"), orderBy("createdAt", "desc")));
-            allExams = []; s.forEach(d => allExams.push({id: d.id, ...d.data()}));
-            document.getElementById('exam-list').innerHTML = allExams.map(e => `<div class="glass-card p-5 relative overflow-hidden group cursor-pointer border-l-4 border-indigo-500" onclick="startExam('${e.id}')"><h3 class="font-bold text-lg">${e.title}</h3><div class="flex gap-3 text-xs font-bold text-slate-400 mt-1"><span>${e.subject||'Gen'}</span> • <span>${e.duration}m</span> • <span>${e.questions.length} Qs</span></div></div>`).join('');
-            document.getElementById('u-taken').innerText = s.size; 
-
-            // Live, History, Content, Leaderboard, Forum loaders...
-            checkLive(); loadHistory(); loadContent(); loadLeaderboard(); loadForum();
+        function showView(viewId) {
+            ['view-auth', 'view-admin', 'view-student', 'view-taking-exam'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(viewId).classList.remove('hidden');
         }
 
-        window.nav = (v) => { ['home','learn','exams','hub','profile'].forEach(x=>{document.getElementById('view-'+x).classList.add('hidden');document.getElementById('nav-'+x).classList.remove('active');}); document.getElementById('view-'+v).classList.remove('hidden'); document.getElementById('nav-'+v).classList.add('active'); };
-        
-        // --- DATA LOADERS ---
-        async function checkLive() { const s=await getDoc(doc(db,"settings","live")); if(s.exists()&&s.data().active) { document.getElementById('live-banner').classList.remove('hidden'); document.getElementById('live-btn').href=s.data().url; } }
-        async function loadHistory() { const h = await getDocs(query(collection(db, "results"), where("uid","==",user.uid), orderBy("timestamp","desc"))); document.getElementById('history-list').innerHTML = h.docs.map(d => `<div class="glass-card p-3 flex justify-between items-center text-xs border-l-4 border-green-500"><div><b>${d.data().examTitle}</b><br>Score: ${d.data().score}</div><span class="text-green-600 font-bold">${Math.round((d.data().score/d.data().totalMarks)*100)}%</span></div>`).join(''); }
-        async function loadContent() {
-            const n = await getDocs(collection(db, "notes")); n.forEach(d=>allContent.push({...d.data(), type:'note'}));
-            const v = await getDocs(collection(db, "videos")); v.forEach(d=>allContent.push({...d.data(), type:'video'}));
-            const f = await getDocs(collection(db, "flashcards")); 
-            document.getElementById('fc-grid').innerHTML = f.docs.map(d=>`<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="fc-front font-bold text-xs p-4 flex items-center justify-center">${d.data().front}</div><div class="fc-back font-bold text-xs p-4 flex items-center justify-center">${d.data().back}</div></div></div>`).join('');
-            filterContent('note');
-        }
-        window.filterContent = (t) => { document.getElementById('content-grid').innerHTML = allContent.filter(c=>c.type===t).map(c=>`<div class="glass-card p-4 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-indigo-600"><i class="fas fa-${t==='note'?'file-alt':'play'}"></i></div><div class="flex-grow"><h4 class="font-bold text-sm">${c.title}</h4><a href="${c.url}" target="_blank" class="text-[10px] text-indigo-500 font-bold">View</a></div></div>`).join(''); };
-        async function loadLeaderboard() { const s = await getDocs(query(collection(db,"results"), orderBy("score","desc"), limit(5))); document.getElementById('lb-list').innerHTML = s.docs.map((d,i) => `<div class="glass-card p-2 flex justify-between items-center text-xs"><div><span class="font-bold">#${i+1}</span> ${d.data().studentName}</div><span class="text-indigo-600 font-bold">${d.data().score}</span></div>`).join(''); }
-        async function loadForum() { const q = await getDocs(query(collection(db,"forum"), orderBy("createdAt","desc"), limit(10))); document.getElementById('chat-box').innerHTML = q.docs.reverse().map(d=>`<div class="mb-1"><span class="font-bold text-xs text-indigo-600">${d.data().name}:</span> <span class="text-xs">${d.data().msg}</span></div>`).join(''); }
-        window.sendChat = async() => { const m = document.getElementById('chat-in').value; if(m) { await addDoc(collection(db,"forum"),{name:user.name, msg:m, createdAt:serverTimestamp()}); document.getElementById('chat-in').value=""; loadForum(); } };
-
-        // --- EXAM ENGINE ---
-        window.startExam = async(id) => {
-            currExam = allExams.find(e => e.id === id);
-            const saved = JSON.parse(localStorage.getItem('ex_state'));
-            if(saved && saved.eid===id && confirm("Resume?")) { userAns=saved.ans; var t=saved.t; if(currExam.randomize) currExam.questions=saved.qs; }
-            else {
-                if(currExam.randomize) currExam.questions.sort(() => Math.random() - 0.5);
-                userAns = Array(currExam.questions.length).fill().map(() => ({ val: -1, status: 'st-visit' }));
-                var t = currExam.duration * 60;
+        window.navTo = (dest) => {
+            // Simple nav logic for bottom bar
+            if(dest === 'home') {
+                 window.location.reload(); 
             }
-            document.getElementById('exam-ui').classList.remove('hidden');
-            document.getElementById('q-pos').innerText = currExam.posMarks;
-            renderPalette(); loadQ(0);
-            timer = setInterval(() => {
-                t--; document.getElementById('timer').innerText = `${Math.floor(t/60)}:${(t%60).toString().padStart(2,'0')}`;
-                localStorage.setItem('ex_state', JSON.stringify({eid:id, ans:userAns, t:t, qs:currExam.questions}));
-                if(t<=0) submitExam();
-            }, 1000);
-            try{document.documentElement.requestFullscreen()}catch(e){}
-            document.addEventListener("visibilitychange", () => { if(document.hidden && !document.getElementById('exam-ui').classList.contains('hidden')) { alert("Don't switch tabs!"); } });
+            if(dest === 'profile') alert(`Profile:\n${currentUser.email}`);
         };
 
-        function loadQ(i) {
-            currIdx = i; document.getElementById('q-num').innerText = i+1; document.getElementById('q-txt').innerHTML = currExam.questions[i].q;
-            const q = currExam.questions[i];
-            if(q.img) { document.getElementById('q-img').src=q.img; document.getElementById('q-img-wrap').classList.remove('hidden'); } else document.getElementById('q-img-wrap').classList.add('hidden');
-            document.getElementById('q-opts').innerHTML = q.options.map((o,v) => `<div class="option-box ${userAns[i].val===v?'selected':''}" onclick="pick(${v})"><div class="opt-circle">${String.fromCharCode(65+v)}</div><span class="text-sm font-medium">${o}</span></div>`).join('');
-            if(window.MathJax) MathJax.typesetPromise();
+        // 3. Admin: Exam Creation
+        let questionCount = 0;
+        window.addQuestionField = () => {
+            questionCount++;
+            const container = document.getElementById('builder-questions');
+            const div = document.createElement('div');
+            div.className = 'question-block';
+            div.innerHTML = `
+                <h4>Question ${questionCount}</h4>
+                <input type="text" class="q-txt" placeholder="Question Text">
+                <input type="file" class="q-img" accept="image/*">
+                <input type="text" class="opt1" placeholder="Option 1">
+                <input type="text" class="opt2" placeholder="Option 2">
+                <input type="text" class="opt3" placeholder="Option 3">
+                <input type="text" class="opt4" placeholder="Option 4">
+                <select class="q-correct">
+                    <option value="0">Option 1 is Correct</option>
+                    <option value="1">Option 2 is Correct</option>
+                    <option value="2">Option 3 is Correct</option>
+                    <option value="3">Option 4 is Correct</option>
+                </select>
+            `;
+            container.appendChild(div);
+        };
+
+        window.saveExam = async () => {
+            const btn = document.getElementById('btn-save-exam');
+            const title = document.getElementById('new-exam-title').value;
+            const time = document.getElementById('new-exam-time').value;
+            const qBlocks = document.querySelectorAll('#builder-questions .question-block');
+
+            if(!title || qBlocks.length === 0) return alert("Please fill exam details");
+
+            btn.innerText = "Uploading Images...";
+            btn.disabled = true;
+
+            let questionsData = [];
+
+            for(let block of qBlocks) {
+                const text = block.querySelector('.q-txt').value;
+                const fileIn = block.querySelector('.q-img');
+                const correct = block.querySelector('.q-correct').value;
+                const opts = [
+                    block.querySelector('.opt1').value,
+                    block.querySelector('.opt2').value,
+                    block.querySelector('.opt3').value,
+                    block.querySelector('.opt4').value
+                ];
+
+                let imgUrl = "";
+                if(fileIn.files[0]) {
+                    const fd = new FormData();
+                    fd.append('file', fileIn.files[0]);
+                    fd.append('upload_preset', CLOUD_PRESET);
+                    try {
+                        const res = await fetch(CLOUD_URL, { method: 'POST', body: fd });
+                        const json = await res.json();
+                        imgUrl = json.secure_url;
+                    } catch(e) { 
+                        console.error("Img Upload Error", e);
+                        alert("Image upload failed. Check Cloudinary settings.");
+                    }
+                }
+
+                questionsData.push({ text, options: opts, correct: parseInt(correct), image: imgUrl });
+            }
+
+            try {
+                await addDoc(collection(db, "exams"), {
+                    title, time: parseInt(time), questions: questionsData, createdAt: new Date()
+                });
+                alert("Exam Published Successfully!");
+                window.location.reload();
+            } catch(e) {
+                alert("Database Error: " + e.message);
+                btn.disabled = false;
+            }
+        };
+
+        // 4. Student: Logic
+        async function loadExams() {
+            const list = document.getElementById('exam-list');
+            const snap = await getDocs(collection(db, "exams"));
+            list.innerHTML = "";
+            
+            if(snap.empty) {
+                list.innerHTML = "<p>No exams available.</p>";
+                return;
+            }
+
+            snap.forEach(d => {
+                const ex = d.data();
+                const card = document.createElement('div');
+                card.className = "glass-card";
+                card.innerHTML = `
+                    <h3>${ex.title}</h3>
+                    <p><i class="far fa-clock"></i> ${ex.time} mins | <i class="far fa-question-circle"></i> ${ex.questions.length} Questions</p>
+                    <button onclick="window.startExam('${d.id}')">Start Exam</button>
+                `;
+                list.appendChild(card);
+            });
+            // Attach exam data globally for helper access
+            window.allExams = snap.docs.map(d => ({id: d.id, ...d.data()}));
         }
 
-        window.pick = (v) => { userAns[currIdx].val = v; userAns[currIdx].status = 'st-ans'; loadQ(currIdx); renderPalette(); };
-        window.markRev = () => { userAns[currIdx].status = 'st-rev'; renderPalette(); };
-        window.navQ = (d) => { const n = currIdx + d; if(n >= 0 && n < userAns.length) loadQ(n); };
-        function renderPalette() { document.getElementById('p-grid').innerHTML = userAns.map((a, i) => `<div onclick="loadQ(${i})" class="p-item ${a.status} ${i===currIdx?'border-indigo-600 border-2':''}">${i+1}</div>`).join(''); }
-        
-        window.submitExamCheck = () => { if(confirm("Submit?")) submitExam(); };
-        window.submitExam = async () => {
-            clearInterval(timer); localStorage.removeItem('ex_state');
-            if(document.fullscreenElement) document.exitFullscreen();
-            let score=0, c=0, w=0, sols=""; const pos=currExam.posMarks, neg=currExam.negMarks;
-            userAns.forEach((a, i) => { const q=currExam.questions[i]; if(a.val!==-1){ if(a.val===q.correct){score+=pos;c++} else{score-=neg;w++} } if(q.sol) sols+=`<div class="p-2 bg-slate-50 rounded mb-1 text-xs"><b>Q${i+1}:</b> ${q.sol}</div>`; });
-            await addDoc(collection(db, "results"), { uid: user.uid, studentName: user.name, examTitle: currExam.title, score, totalMarks: userAns.length*pos, stats:{c,w,s:userAns.length-(c+w)}, timestamp: serverTimestamp() });
-            await updateDoc(doc(db,"students",user.uid), {xp:(user.xp||0)+score});
-            document.getElementById('exam-ui').classList.add('hidden');
-            document.getElementById('result-modal').classList.remove('hidden');
-            document.getElementById('res-score').innerText = score;
-            document.getElementById('res-c').innerText = c; document.getElementById('res-w').innerText = w; document.getElementById('res-s').innerText = userAns.length-(c+w);
-            document.getElementById('res-solutions').innerHTML = sols;
-            new Chart(document.getElementById('res-chart'), { type: 'doughnut', data: { labels: ['C','W','S'], datasets: [{ data: [c, w, userAns.length-(c+w)], backgroundColor: ['#22c55e', '#ef4444', '#cbd5e1'], borderWidth:0 }] }, options: {cutout:'70%', plugins:{legend:{display:false}}} });
+        window.startExam = (id) => {
+            currentExamData = window.allExams.find(e => e.id === id);
+            showView('view-taking-exam');
+            document.getElementById('active-exam-name').innerText = currentExamData.title;
+            
+            // Build UI
+            const area = document.getElementById('quiz-area');
+            area.innerHTML = "";
+            currentExamData.questions.forEach((q, idx) => {
+                let imgHTML = q.image ? `<img src="${q.image}" class="preview">` : '';
+                let optsHTML = q.options.map((opt, i) => `
+                    <div style="background:rgba(0,0,0,0.2); padding:10px; margin:5px 0; border-radius:5px;">
+                        <input type="radio" name="q${idx}" value="${i}" id="q${idx}_${i}">
+                        <label for="q${idx}_${i}" style="margin-left:10px; cursor:pointer; width:100%; display:inline-block;">${opt}</label>
+                    </div>
+                `).join('');
+
+                area.innerHTML += `
+                    <div class="question-block">
+                        <p><strong>Q${idx+1}:</strong> ${q.text}</p>
+                        ${imgHTML}
+                        ${optsHTML}
+                    </div>
+                `;
+            });
+
+            // Timer
+            let timeLeft = currentExamData.time * 60;
+            const timerDisplay = document.getElementById('timer-display');
+            timerInterval = setInterval(() => {
+                let m = Math.floor(timeLeft / 60);
+                let s = timeLeft % 60;
+                timerDisplay.innerText = `${m}:${s < 10 ? '0'+s : s}`;
+                timeLeft--;
+                if(timeLeft < 0) {
+                    clearInterval(timerInterval);
+                    alert("Time Up! Submitting automatically.");
+                    window.submitExam();
+                }
+            }, 1000);
         };
 
-        window.c = (v) => document.getElementById('calc-disp').value += v;
-        window.evalC = () => { try{ document.getElementById('calc-disp').value = eval(document.getElementById('calc-disp').value.replace('sin','Math.sin').replace('cos','Math.cos').replace('tan','Math.tan')); }catch{document.getElementById('calc-disp').value='Err'} };
-        window.saveProfile = async() => { await updateDoc(doc(db,"students",user.uid), { name:document.getElementById('in-name').value, phone:document.getElementById('in-phone').value, address:document.getElementById('in-addr').value }); alert("Saved"); };
-        
-        window.nav = window.nav; window.filterContent = window.filterContent; window.startExam = window.startExam; window.pick = window.pick; window.markRev = window.markRev; window.navQ = window.navQ; window.submitExamCheck = window.submitExamCheck; window.saveProfile = window.saveProfile; window.sendChat = window.sendChat; window.c = window.c; window.evalC = window.evalC;
+        window.submitExam = async () => {
+            clearInterval(timerInterval);
+            let score = 0;
+            currentExamData.questions.forEach((q, idx) => {
+                const sel = document.querySelector(`input[name="q${idx}"]:checked`);
+                if(sel && parseInt(sel.value) === q.correct) score++;
+            });
+
+            const percent = ((score / currentExamData.questions.length) * 100).toFixed(1);
+            
+            try {
+                await addDoc(collection(db, "results"), {
+                    uid: currentUser.uid,
+                    email: currentUser.email,
+                    examTitle: currentExamData.title,
+                    score,
+                    total: currentExamData.questions.length,
+                    date: new Date()
+                });
+                alert(`You scored ${score} out of ${currentExamData.questions.length} (${percent}%)`);
+            } catch(e) {
+                console.error(e);
+                alert("Score saved locally, but db error: " + e.message);
+            }
+            window.location.reload();
+        };
+
     </script>
 </body>
 </html>

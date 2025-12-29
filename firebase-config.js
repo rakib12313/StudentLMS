@@ -3,7 +3,6 @@ import { getAuth, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  // 🔴 REPLACE WITH YOUR EXACT KEYS FROM FIREBASE CONSOLE
   apiKey: "AIzaSyBEMPS8vEJztGpoBPJjJIzKKInyt4IY9rQ",
   authDomain: "studentlms-79722.firebaseapp.com",
   projectId: "studentlms-79722",

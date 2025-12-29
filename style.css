@@ -13,7 +13,7 @@ body {
     background: var(--bg-light);
     color: #0f172a;
     -webkit-tap-highlight-color: transparent;
-    user-select: none; /* Anti-Copy */
+    user-select: none; /* Prevents Copying */
 }
 
 /* --- MATHJAX OPTIMIZATION --- */

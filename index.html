@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NeonLMS - Complete</title>
+    <title>NeonLMS - Pro</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -12,7 +12,7 @@
         :root {
             --primary: #7000ff; --primary-glow: #bd00ff;
             --secondary: #00f7ff; --bg-dark: #050505;
-            --glass-bg: rgba(20, 20, 25, 0.97); --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-bg: rgba(20, 20, 25, 0.96); --glass-border: rgba(255, 255, 255, 0.15);
             --text-main: #ffffff; --text-muted: #a0a0a0;
             --success: #00ff9d; --danger: #ff0055; --warning: #ffb700;
         }
@@ -27,10 +27,17 @@
         .hidden { display: none !important; }
         .flex-center { display: flex; justify-content: center; align-items: center; min-height: 80vh; }
 
+        /* Modern Cards with Animation */
         .card {
             background: var(--glass-bg); border: 1px solid var(--glass-border);
             border-radius: 16px; padding: 20px; margin-bottom: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(10px);
+            animation: slideInUp 0.5s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         input, select, textarea {
@@ -49,12 +56,9 @@
         .btn-secondary { background: rgba(255,255,255,0.1); color: white; }
         .btn-danger { background: rgba(255, 0, 85, 0.2); color: var(--danger); border: 1px solid var(--danger); }
         .btn-success { background: rgba(0, 255, 157, 0.2); color: var(--success); border: 1px solid var(--success); }
-        .btn-warning { background: rgba(255, 183, 0, 0.2); color: var(--warning); border: 1px solid var(--warning); }
         .btn-sm { padding: 6px 12px; width: auto; font-size: 12px; }
 
-        .format-toolbar { display: flex; gap: 5px; margin-bottom: 5px; }
-        .format-btn { background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); padding: 5px 10px; border-radius: 4px; color: #ccc; cursor: pointer; font-size: 12px; width: auto; }
-        
+        /* Navigation */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; width: 100%;
             background: rgba(10, 10, 15, 0.98); border-top: 1px solid var(--glass-border);
@@ -64,13 +68,15 @@
             display: flex; flex-direction: column; align-items: center;
             color: var(--text-muted); font-size: 10px; cursor: pointer; transition: 0.3s;
         }
-        .nav-item.active { color: var(--secondary); }
+        .nav-item.active { color: var(--secondary); transform: translateY(-5px); }
         .nav-item i { font-size: 20px; margin-bottom: 4px; }
 
+        /* Tabs */
         .tabs { display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; }
-        .tab-btn { background: transparent; border: 1px solid var(--glass-border); color: var(--text-muted); white-space: nowrap; }
+        .tab-btn { flex:1; background: transparent; border: 1px solid var(--glass-border); color: var(--text-muted); padding: 10px; border-radius: 8px; cursor:pointer;}
         .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
+        /* Tables & Lists */
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
         th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--glass-border); }
         th { color: var(--secondary); text-transform: uppercase; font-size: 11px; }
@@ -81,19 +87,15 @@
         .status-avg { color: #ffb700; border: 1px solid #ffb700; padding: 5px 10px; border-radius: 20px; display: inline-block;}
 
         .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .rank-card { display: flex; align-items: center; padding: 10px; margin-bottom: 10px; background: rgba(255,255,255,0.03); border-radius: 10px; }
-        .rank-num { font-size: 20px; font-weight: bold; width: 40px; color: var(--warning); }
         
-        /* Review Mode Colors */
-        .opt-review-correct { border: 1px solid var(--success); background: rgba(0,255,157,0.1); color: var(--success); }
-        .opt-review-wrong { border: 1px solid var(--danger); background: rgba(255,0,85,0.1); color: var(--danger); }
+        /* Profile Image */
+        .profile-img-lg { width:100px; height:100px; border-radius:50%; object-fit:cover; border:2px solid var(--primary); }
+        .profile-upload-label { font-size:12px; color:var(--secondary); cursor:pointer; margin-top:5px; display:block;}
+
+        /* Messages */
+        .msg-card { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid var(--primary); }
         
-        /* Search Bar */
-        .search-bar { background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); padding: 10px; border-radius: 20px; width: 100%; margin-bottom: 15px; color: white; }
-
-        /* Announcement */
-        .announce-item { background: rgba(255,255,255,0.05); padding: 10px; border-left: 3px solid var(--secondary); margin-bottom: 10px; border-radius: 5px; }
-
+        /* Loader & Toast */
         #toast-box { position: fixed; top: 20px; right: 20px; z-index: 9999; }
         .toast { background: #1e1e24; border-left: 4px solid var(--primary); padding: 15px; margin-bottom: 10px; color: white; animation: slideIn 0.3s; }
         #global-loader { position: fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:99999; display:flex; justify-content:center; align-items:center; }
@@ -114,19 +116,29 @@
     <div id="global-loader"><div class="spinner"></div></div>
     <div id="toast-box"></div>
 
-    <!-- STUDENT EDIT MODAL -->
-    <div id="modal-edit-student" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000; display:flex; justify-content:center; align-items:center;">
-        <div class="card" style="width:90%; max-width:400px;">
-            <h3>Edit Student</h3>
-            <input type="hidden" id="edit-stu-uid">
-            <input type="text" id="edit-stu-name" placeholder="Name">
-            <input type="tel" id="edit-stu-phone" placeholder="Phone">
+    <!-- ADMIN: MANAGE STUDENT MODAL -->
+    <div id="modal-manage-student" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000; display:flex; justify-content:center; align-items:center;">
+        <div class="card" style="width:90%; max-width:400px; max-height:90vh; overflow-y:auto;">
+            <h3>Manage Student</h3>
+            <input type="hidden" id="mng-uid">
+            
+            <label style="font-size:12px; color:#aaa;">Personal Info</label>
+            <input type="text" id="mng-name" placeholder="Name">
+            <input type="email" id="mng-email" placeholder="Email" disabled style="opacity:0.5;">
+            <input type="tel" id="mng-phone" placeholder="Phone">
+            
             <div style="display:flex; gap:10px;">
-                <select id="edit-stu-class"><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
-                <select id="edit-stu-div"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
+                <select id="mng-class"><option value="8">Class 8</option><option value="9">Class 9</option><option value="10">Class 10</option><option value="11">Class 11</option><option value="12">Class 12</option></select>
+                <select id="mng-div"><option value="A">Div A</option><option value="B">Div B</option><option value="C">Div C</option></select>
             </div>
-            <button class="btn-primary" onclick="app.updateStudent()">Save</button>
-            <button class="btn-secondary" onclick="document.getElementById('modal-edit-student').classList.add('hidden')">Cancel</button>
+
+            <label style="font-size:12px; color:#aaa; margin-top:10px; display:block;">Send Personal Message</label>
+            <textarea id="mng-msg" rows="3" placeholder="Write a message to student..."></textarea>
+            
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <button class="btn-primary" onclick="app.adminSaveStudent()">Save & Send</button>
+                <button class="btn-secondary" onclick="document.getElementById('modal-manage-student').classList.add('hidden')">Close</button>
+            </div>
         </div>
     </div>
 
@@ -161,7 +173,7 @@
                 <input type="text" id="reg-name" placeholder="Full Name">
                 <input type="tel" id="reg-phone" placeholder="Phone Number">
                 <div style="display:flex; gap:10px;">
-                    <select id="reg-class"><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
+                    <select id="reg-class"><option value="" disabled selected>Class</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
                     <select id="reg-div"><option value="A">A</option><option value="B">B</option></select>
                 </div>
                 <input type="email" id="reg-email" placeholder="Email">
@@ -195,10 +207,9 @@
             <button class="btn-danger btn-sm" onclick="app.logout()">Logout</button>
         </div>
         
-        <!-- Announcements Input -->
         <div class="card">
             <div style="display:flex; gap:10px;">
-                <input type="text" id="ann-input" placeholder="Post Announcement..." style="margin:0;">
+                <input type="text" id="ann-input" placeholder="Global Announcement..." style="margin:0;">
                 <button class="btn-primary btn-sm" style="width:auto;" onclick="app.postAnnounce()"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
@@ -233,7 +244,7 @@
 
                 <div class="tabs">
                     <button class="tab-btn active" id="mode-manual" onclick="app.setBuilderMode('manual')">Manual</button>
-                    <button class="tab-btn" id="mode-json" onclick="app.setBuilderMode('json')">JSON Import</button>
+                    <button class="tab-btn" id="mode-json" onclick="app.setBuilderMode('json')">JSON</button>
                 </div>
 
                 <div id="builder-manual">
@@ -252,7 +263,7 @@
                 </div>
             </div>
             
-            <input type="text" class="search-bar" placeholder="Search Exams..." onkeyup="app.filterList('exam-list', this.value)">
+            <input type="text" placeholder="Search Exams..." onkeyup="app.filterList('exam-list', this.value)">
             <div id="exam-list"></div>
         </div>
 
@@ -280,8 +291,8 @@
         <!-- Admin: Students -->
         <div id="tab-students" class="hidden">
             <div class="card">
-                <h3>Students</h3>
-                <input type="text" class="search-bar" placeholder="Search Students..." onkeyup="app.filterTable('stu-table', this.value)">
+                <h3>Student Management</h3>
+                <input type="text" placeholder="Search Students..." onkeyup="app.filterTable('stu-table', this.value)">
                 <div style="overflow-x:auto;"><table id="stu-table"><thead><tr><th>Name</th><th>Class</th><th>Action</th></tr></thead><tbody></tbody></table></div>
             </div>
         </div>
@@ -292,46 +303,57 @@
         <!-- Home -->
         <div id="stu-tab-home">
             <div class="card">
-                <h2>Hello, <span id="stu-name">Student</span>!</h2>
-                <p style="color:var(--secondary)">Class <span id="stu-class">--</span></p>
+                <h2>Hi, <span id="stu-name">Student</span>!</h2>
+                <div style="display:flex; gap:15px; margin-top:10px;">
+                    <div style="text-align:center;"><b id="quick-taken" style="font-size:20px;">0</b><br><small style="color:#aaa">Taken</small></div>
+                    <div style="text-align:center;"><b id="quick-avg" style="font-size:20px; color:var(--secondary)">0%</b><br><small style="color:#aaa">Avg</small></div>
+                </div>
             </div>
+            
+            <div class="card">
+                <h3><i class="fas fa-bell"></i> Notifications</h3>
+                <div id="msg-list"><p style="color:#777">No messages.</p></div>
+            </div>
+
             <div class="card">
                 <h3>📢 Announcements</h3>
                 <div id="announcement-list"></div>
             </div>
+            
             <div class="card" id="leaderboard-card">
                 <h3>🏆 Class Leaderboard</h3>
                 <div id="leaderboard-list"><p>Loading...</p></div>
             </div>
-            <div class="card hidden" id="leaderboard-disabled">
-                <h3>🏆 Class Leaderboard</h3>
-                <p style="color:#aaa;">Hidden by Admin.</p>
-            </div>
+            <div class="card hidden" id="leaderboard-disabled"><p style="color:#aaa;">Leaderboard hidden.</p></div>
         </div>
 
         <!-- Exams -->
         <div id="stu-tab-exams" class="hidden">
             <h3>Available Exams</h3>
-            <input type="text" class="search-bar" placeholder="Search Exams..." onkeyup="app.filterList('stu-exam-list', this.value)">
             <div id="stu-exam-list"></div>
         </div>
 
         <!-- Results -->
         <div id="stu-tab-results" class="hidden">
-            <h3>My History</h3>
-            <div id="stu-history-list"></div>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="app.toggleResTabs('published', this)">Published</button>
+                <button class="tab-btn" onclick="app.toggleResTabs('pending', this)">Pending</button>
+            </div>
+            <div id="stu-res-pub"></div>
+            <div id="stu-res-pen" class="hidden"></div>
         </div>
 
         <!-- Profile -->
         <div id="stu-tab-profile" class="hidden">
             <div class="card" style="text-align:center;">
-                <div style="width:80px; height:80px; background:var(--primary); border-radius:50%; margin:0 auto 15px; display:flex; align-items:center; justify-content:center; font-size:30px;">
-                    <i class="fas fa-user"></i>
-                </div>
-                <h2 id="pro-name">Name</h2>
-                <div id="pro-status" style="margin: 10px 0;"></div>
+                <img src="" id="pro-img" class="profile-img-lg" onerror="this.src='https://via.placeholder.com/100'">
+                <label class="profile-upload-label" for="pro-file"><i class="fas fa-camera"></i> Change Photo</label>
+                <input type="file" id="pro-file" accept="image/*" style="display:none;" onchange="app.uploadProfilePhoto(this)">
                 
-                <div class="option-grid" style="margin-top:20px; text-align:left;">
+                <h2 id="pro-name-2" style="margin-top:10px;">Name</h2>
+                <p id="pro-status" style="margin-bottom:15px;"></p>
+                
+                <div class="option-grid" style="text-align:left;">
                     <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px;">
                         <small style="color:#aaa">Email</small><br><span id="pro-email" style="font-size:12px;">--</span>
                     </div>
@@ -339,10 +361,7 @@
                         <small style="color:#aaa">Phone</small><br><span id="pro-phone">--</span>
                     </div>
                     <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px;">
-                        <small style="color:#aaa">Exams Taken</small><br><span id="pro-count">0</span>
-                    </div>
-                    <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px;">
-                        <small style="color:#aaa">Avg Score</small><br><span id="pro-avg">0%</span>
+                        <small style="color:#aaa">Class</small><br><span id="pro-class">--</span>
                     </div>
                 </div>
                 <button class="btn-danger" style="margin-top:20px;" onclick="app.logout()">Logout</button>
@@ -375,6 +394,7 @@
         import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, deleteDoc, updateDoc, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
+        // CONFIGURATION
         const firebaseConfig = {
             apiKey: "AIzaSyBEMPS8vEJztGpoBPJjJIzKKInyt4IY9rQ",
             authDomain: "studentlms-79722.firebaseapp.com",
@@ -437,7 +457,7 @@
             },
             logout: () => signOut(auth),
 
-            // SEARCH UTILS
+            // UTILS
             filterList: (id, term) => {
                 const termLower = term.toLowerCase();
                 document.querySelectorAll(`#${id} .card`).forEach(el => {
@@ -462,8 +482,6 @@
                 if(t==='exams') app.loadExams();
                 if(t==='results') app.loadResList();
             },
-            
-            // ANNOUNCEMENTS
             postAnnounce: async () => {
                 const txt = document.getElementById('ann-input').value;
                 if(!txt) return;
@@ -471,19 +489,6 @@
                 document.getElementById('ann-input').value = "";
                 app.toast("Posted");
             },
-            loadAnnouncements: async () => {
-                const c = document.getElementById('announcement-list');
-                const q = query(collection(db, "announcements"), orderBy("date", "desc"), limit(5));
-                const snap = await getDocs(q);
-                c.innerHTML = "";
-                if(snap.empty) { c.innerHTML = "<p style='color:#777'>No announcements.</p>"; return; }
-                snap.forEach(d => {
-                    const date = new Date(d.data().date.seconds*1000).toLocaleDateString();
-                    c.innerHTML += `<div class="announce-item"><small style="color:var(--secondary)">${date}</small><br>${d.data().text}</div>`;
-                });
-            },
-
-            // LEADERBOARD CONFIG
             loadConfig: async () => {
                 const docSnap = await getDoc(doc(db, "system", "config"));
                 if(docSnap.exists()) {
@@ -497,17 +502,6 @@
             },
 
             // EXAM BUILDER
-            smartFormat: (textarea) => {
-                let val = textarea.value;
-                val = val.replace(/([A-Z][a-z]?)(\d+)/g, "$1<sub>$2</sub>");
-                val = val.replace(/\^(\d+)/g, "<sup>$1</sup>");
-                textarea.value = val; app.toast("Auto-Formatted!");
-            },
-            insertTag: (btn, tag) => {
-                const ta = btn.parentElement.nextElementSibling;
-                const s = ta.selectionStart, e = ta.selectionEnd, val = ta.value;
-                ta.value = val.slice(0,s) + `<${tag}>${val.slice(s,e)}</${tag}>` + val.slice(e);
-            },
             setBuilderMode: (m) => {
                 document.getElementById('builder-manual').classList.toggle('hidden', m!=='manual');
                 document.getElementById('builder-json').classList.toggle('hidden', m!=='json');
@@ -517,7 +511,6 @@
                 const div = document.createElement('div'); div.className='card q-card'; div.style.padding='15px';
                 div.innerHTML = `
                     <div style="display:flex; justify-content:space-between;"><small>MCQ</small><i class="fas fa-times" style="color:red" onclick="this.parentElement.parentElement.remove()"></i></div>
-                    <div class="format-toolbar"><button class="format-btn" onclick="app.insertTag(this,'b')">B</button><button class="format-btn" onclick="app.insertTag(this,'sup')">x²</button><button class="format-btn" onclick="app.insertTag(this,'sub')">x₂</button><button class="format-btn" onclick="app.smartFormat(this.parentElement.nextElementSibling)">🪄</button></div>
                     <textarea class="q-txt" placeholder="Question">${data?data.text:''}</textarea>
                     <div class="option-grid">
                         <input type="text" class="o0" placeholder="A" value="${data?data.options[0]:''}">
@@ -659,14 +652,12 @@
                 await updateDoc(doc(db, "results", rid), { isReleased: status });
                 const examDoc = await getDoc(doc(db, "exams", adminCurrentExamId));
                 app.viewResDetail(adminCurrentExamId, examDoc.data().title, examDoc.data().resultsReleased);
-                app.toast(status ? "Released" : "Hidden");
             },
             deleteResult: async (rid) => {
                 if(confirm("Delete result?")) {
                     await deleteDoc(doc(db, "results", rid));
                     const examDoc = await getDoc(doc(db, "exams", adminCurrentExamId));
                     app.viewResDetail(adminCurrentExamId, examDoc.data().title, examDoc.data().resultsReleased);
-                    app.toast("Deleted");
                 }
             },
             closeResDetail: () => { document.getElementById('res-detail-view').classList.add('hidden'); document.getElementById('res-list-view').classList.remove('hidden'); },
@@ -687,49 +678,109 @@
                     const u = d.data();
                     const cls = u.class ? `${u.class}-${u.division||'A'}` : 'N/A';
                     const act = u.isApproved ? `<button class="btn-danger btn-sm" onclick="app.updApp('${d.id}',false)">Block</button>` : `<button class="btn-success btn-sm" onclick="app.updApp('${d.id}',true)">Approve</button>`;
-                    t.innerHTML += `<tr><td>${u.displayName}<br>${u.email}</td><td>${cls} <i class="fas fa-edit" onclick="app.openEditStu('${d.id}','${u.displayName}','${u.phone||""}','${u.class}','${u.division}')"></i></td><td>${act}</td></tr>`;
+                    const manageBtn = `<button class="btn-secondary btn-sm" onclick="app.openManageStu('${d.id}')">Manage</button>`;
+                    t.innerHTML += `<tr><td>${u.displayName}<br>${u.email}</td><td>${cls} ${manageBtn}</td><td>${act}</td></tr>`;
                 });
             },
             updApp: async(id, s)=>{ await updateDoc(doc(db,"users",id),{isApproved:s}); app.loadStu(); },
-            openEditStu: (uid,n,ph,c,d) => {
-                document.getElementById('edit-stu-uid').value = uid;
-                document.getElementById('edit-stu-name').value = n;
-                document.getElementById('edit-stu-phone').value = ph;
-                document.getElementById('modal-edit-student').classList.remove('hidden');
+            openManageStu: async (uid) => {
+                const docSnap = await getDoc(doc(db, "users", uid));
+                const u = docSnap.data();
+                document.getElementById('mng-uid').value = uid;
+                document.getElementById('mng-name').value = u.displayName || "";
+                document.getElementById('mng-email').value = u.email || "";
+                document.getElementById('mng-phone').value = u.phone || "";
+                if(u.class) document.getElementById('mng-class').value = u.class;
+                if(u.division) document.getElementById('mng-div').value = u.division;
+                document.getElementById('modal-manage-student').classList.remove('hidden');
             },
-            updateStudent: async () => {
-                const id = document.getElementById('edit-stu-uid').value;
-                await updateDoc(doc(db,"users",id),{
-                    displayName:document.getElementById('edit-stu-name').value,
-                    phone:document.getElementById('edit-stu-phone').value,
-                    class:document.getElementById('edit-stu-class').value,
-                    division:document.getElementById('edit-stu-div').value
-                });
-                document.getElementById('modal-edit-student').classList.add('hidden'); app.loadStu();
+            adminSaveStudent: async () => {
+                const id = document.getElementById('mng-uid').value;
+                const msg = document.getElementById('mng-msg').value;
+                const data = {
+                    displayName: document.getElementById('mng-name').value,
+                    phone: document.getElementById('mng-phone').value,
+                    class: document.getElementById('mng-class').value,
+                    division: document.getElementById('mng-div').value
+                };
+                
+                await updateDoc(doc(db,"users",id), data);
+                if(msg.trim()) {
+                    await addDoc(collection(db, `users/${id}/messages`), { text: msg, date: new Date(), read: false });
+                    app.toast("Message Sent");
+                }
+                document.getElementById('modal-manage-student').classList.add('hidden');
+                document.getElementById('mng-msg').value = "";
+                app.loadStu();
             },
 
-            // STUDENT
+            // STUDENT UI
             stuNav: (t, el) => {
                 document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active')); el.classList.add('active');
                 ['home','exams','results','profile'].forEach(x=>document.getElementById(`stu-tab-${x}`).classList.add('hidden'));
                 document.getElementById(`stu-tab-${t}`).classList.remove('hidden');
-                if(t==='home') { app.loadLeaderboard(); app.loadAnnouncements(); }
+                if(t==='home') { app.loadLeaderboard(); app.loadAnnouncements(); app.loadMessages(); app.loadStuStats(); }
                 if(t==='exams') app.loadStuExams();
-                if(t==='results') app.loadStuHistory();
-                if(t==='profile') app.loadProfileStats();
+                if(t==='results') { app.loadStuHistory(); app.toggleResTabs('published', document.querySelector('.tabs .tab-btn')); }
+                if(t==='profile') app.loadProfileData();
             },
-            loadProfileStats: async () => {
+            
+            // Student Features
+            loadAnnouncements: async () => {
+                const c = document.getElementById('announcement-list');
+                const q = query(collection(db, "announcements"), orderBy("date", "desc"), limit(5));
+                const snap = await getDocs(q);
+                c.innerHTML = "";
+                if(snap.empty) { c.innerHTML = "<p style='color:#777; font-size:12px;'>No new announcements.</p>"; return; }
+                snap.forEach(d => {
+                    const date = new Date(d.data().date.seconds*1000).toLocaleDateString();
+                    c.innerHTML += `<div class="msg-card"><small style="color:var(--secondary)">${date}</small><br>${d.data().text}</div>`;
+                });
+            },
+            loadMessages: async () => {
+                const c = document.getElementById('msg-list');
+                const q = query(collection(db, `users/${user.uid}/messages`), orderBy("date", "desc"), limit(5));
+                const snap = await getDocs(q);
+                c.innerHTML = "";
+                if(snap.empty) { c.innerHTML = "<p style='color:#777; font-size:12px;'>No messages from admin.</p>"; return; }
+                snap.forEach(d => {
+                    c.innerHTML += `<div class="msg-card"><small style="color:lime">Admin Message</small><br>${d.data().text}</div>`;
+                });
+            },
+            loadStuStats: async () => {
+                const q = query(collection(db, "results"), where("uid", "==", user.uid));
+                const snap = await getDocs(q);
+                let totalExams=0, totalPct=0;
+                snap.forEach(d => { totalExams++; totalPct += (parseFloat(d.data().score)/d.data().total)*100; });
+                const avg = totalExams>0 ? (totalPct/totalExams) : 0;
+                document.getElementById('quick-taken').innerText = totalExams;
+                document.getElementById('quick-avg').innerText = avg.toFixed(0) + "%";
+            },
+            uploadProfilePhoto: async (input) => {
+                const file = input.files[0];
+                if(!file) return;
+                const fd = new FormData(); fd.append('file', file); fd.append('upload_preset', CLOUD_PRESET);
+                try {
+                    app.toast("Uploading...");
+                    const res = await (await fetch(CLOUD_URL, {method:'POST', body:fd})).json();
+                    await updateDoc(doc(db,"users",user.uid), { photoURL: res.secure_url });
+                    document.getElementById('pro-img').src = res.secure_url;
+                    app.toast("Photo Updated!");
+                } catch(e) { app.toast("Upload failed", 'error'); }
+            },
+            loadProfileData: async () => {
+                // Same logic as loadStuStats but populate profile tab
                 const q = query(collection(db, "results"), where("uid", "==", user.uid));
                 const snap = await getDocs(q);
                 let totalExams=0, totalPct=0;
                 snap.forEach(d => { totalExams++; totalPct += (parseFloat(d.data().score)/d.data().total)*100; });
                 const avg = totalExams>0 ? (totalPct/totalExams) : 0;
                 
-                let badge = `<span class="badge">New</span>`;
+                let badge = `<span class="badge">New Student</span>`;
                 if(totalExams>0) {
                     if(avg>=80) badge = `<span class="status-excellent">🏆 Excellent</span>`;
                     else if(avg>=60) badge = `<span class="status-good">🌟 Good</span>`;
-                    else badge = `<span class="status-avg">⚠️ Improve</span>`;
+                    else badge = `<span class="status-avg">⚠️ Needs Improvement</span>`;
                 }
                 document.getElementById('pro-count').innerText = totalExams;
                 document.getElementById('pro-avg').innerText = avg.toFixed(1) + "%";
@@ -737,17 +788,18 @@
             },
             loadLeaderboard: async () => {
                 const c = document.getElementById('leaderboard-list'); c.innerHTML="Loading...";
-                const disableDiv = document.getElementById('leaderboard-disabled');
-                const cardDiv = document.getElementById('leaderboard-card');
-                
                 const configSnap = await getDoc(doc(db, "system", "config"));
                 if(configSnap.exists() && configSnap.data().leaderboardVisible === false) {
-                    cardDiv.classList.add('hidden'); disableDiv.classList.remove('hidden'); return;
+                    document.getElementById('leaderboard-card').classList.add('hidden');
+                    document.getElementById('leaderboard-disabled').classList.remove('hidden');
+                    return;
                 }
-                cardDiv.classList.remove('hidden'); disableDiv.classList.add('hidden');
+                document.getElementById('leaderboard-card').classList.remove('hidden');
+                document.getElementById('leaderboard-disabled').classList.add('hidden');
 
                 const exSnap = await getDocs(query(collection(db,"exams"), where("resultsReleased","==",true)));
-                if(exSnap.empty) { c.innerHTML="<p>No results.</p>"; return; }
+                if(exSnap.empty) { c.innerHTML="<p style='color:#777; font-size:12px;'>No published results.</p>"; return; }
+                
                 const q = query(collection(db,"results"), orderBy("score", "desc"), limit(10));
                 const rSnap = await getDocs(q);
                 c.innerHTML="";
@@ -770,11 +822,23 @@
                     c.innerHTML += `<div class="card"><h3>${e.title}</h3><p>${e.time} mins | ${e.pdf?'PDF':e.questions.length+' Qs'}</p><button class="btn-primary" onclick="app.confirmTake('${d.id}')">Start</button></div>`;
                 });
             },
+            toggleResTabs: (type, btn) => {
+                document.querySelectorAll('#stu-tab-results .tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById('stu-res-pub').classList.toggle('hidden', type !== 'published');
+                document.getElementById('stu-res-pen').classList.toggle('hidden', type !== 'pending');
+            },
             loadStuHistory: async () => {
-                const c = document.getElementById('stu-history-list'); c.innerHTML="Loading...";
+                const pubC = document.getElementById('stu-res-pub');
+                const penC = document.getElementById('stu-res-pen');
+                pubC.innerHTML="Loading..."; penC.innerHTML="";
+                
                 const q = query(collection(db,"results"), where("uid","==",user.uid), orderBy("date","desc"));
                 const snap = await getDocs(q);
-                c.innerHTML="";
+                pubC.innerHTML=""; 
+                
+                if(snap.empty) { pubC.innerHTML="<p>No exams taken.</p>"; return; }
+
                 for(const d of snap.docs){
                     const r = d.data();
                     let show = r.isReleased;
@@ -782,16 +846,20 @@
                         const eSnap = await getDoc(doc(db,"exams",r.examId));
                         if(eSnap.exists() && eSnap.data().resultsReleased) show = true;
                     }
-                    const score = show ? `<b style="color:lime">${r.score}</b>` : `<span style="color:orange">Pending</span>`;
-                    const reviewBtn = show ? `<button class="btn-secondary btn-sm" style="margin-left:10px" onclick="app.reviewExam('${d.id}')">Review</button>` : '';
-                    c.innerHTML += `<div class="card"><div style="display:flex;justify-content:space-between;"><div><b>${r.examTitle}</b><br><small>${new Date(r.date.seconds*1000).toLocaleDateString()}</small></div><div>${score}</div></div>${reviewBtn}</div>`;
+                    
+                    const date = new Date(r.date.seconds*1000).toLocaleDateString();
+                    const html = `<div class="card"><div style="display:flex;justify-content:space-between;"><div><b>${r.examTitle}</b><br><small>${date}</small></div><div>${show ? `<b style="color:lime; font-size:18px;">${r.score}</b>` : `<span style="color:orange">Pending</span>`}</div></div>${show && r.details ? `<button class="btn-secondary btn-sm" style="margin-top:5px" onclick="app.reviewExam('${d.id}')">Review Answers</button>` : ''}</div>`;
+                    
+                    if(show) pubC.innerHTML += html;
+                    else penC.innerHTML += html;
                 }
+                if(pubC.innerHTML === "") pubC.innerHTML = "<p style='color:#777'>No published results.</p>";
+                if(penC.innerHTML === "") penC.innerHTML = "<p style='color:#777'>No pending results.</p>";
             },
             
             // EXAM ENGINE
             confirmTake: (id) => {
                 activeExam = exams.find(e=>e.id===id);
-                // Instruction Modal
                 const negText = activeExam.negMark > 0 ? `Negative Marking: ${activeExam.negMark} marks deducted for wrong answers.` : "No Negative Marking.";
                 document.getElementById('ins-neg').innerText = negText;
                 document.getElementById('modal-instructions').classList.remove('hidden');
@@ -862,13 +930,7 @@
                         if(val === q.correct) score += 1;
                         else score -= neg;
                     }
-                    // Save Question Text, Options, Correct Answer, and User Selected Answer for Review
-                    userAnswers.push({
-                        q: q.text,
-                        opts: q.options,
-                        correct: q.correct,
-                        selected: val
-                    });
+                    userAnswers.push({ q: q.text, opts: q.options, correct: q.correct, selected: val });
                 });
 
                 await addDoc(collection(db,"results"), { 
@@ -876,26 +938,24 @@
                     examId: activeExam.id, examTitle: activeExam.title, 
                     score: score.toFixed(2), total: questions.length, 
                     date: new Date(), isReleased: false,
-                    details: userAnswers // Saving full details for review
+                    details: userAnswers 
                 });
                 
                 alert("Exam Submitted!"); location.reload();
             },
             
-            // REVIEW MODE
             reviewExam: async (resultId) => {
                 const snap = await getDoc(doc(db, "results", resultId));
                 const r = snap.data();
-                if(!r.details) { alert("Detailed review not available for old exams."); return; }
+                if(!r.details) { alert("No review available."); return; }
                 
                 document.getElementById('view-student').classList.add('hidden');
                 document.getElementById('view-paper').classList.remove('hidden');
                 document.getElementById('paper-title').innerText = "Review: " + r.examTitle;
                 document.getElementById('paper-timer').innerText = "Score: " + r.score;
-                document.getElementById('pdf-viewer').classList.add('hidden'); // No PDF in review
-                document.querySelector('button[onclick="app.submit()"]').classList.add('hidden'); // Hide submit btn
+                document.getElementById('pdf-viewer').classList.add('hidden'); 
+                document.querySelector('button[onclick="app.submit()"]').classList.add('hidden'); 
                 
-                // Add Back Button
                 const backBtn = document.createElement('button');
                 backBtn.className = 'btn-secondary'; backBtn.innerText = "Close Review";
                 backBtn.onclick = () => location.reload();
@@ -905,18 +965,13 @@
                 r.details.forEach((q,i) => {
                     let optsHtml = "";
                     q.opts.forEach((o, idx) => {
-                        let styleClass = "";
-                        if(idx === q.correct) styleClass = "opt-review-correct";
-                        else if(idx === q.selected && idx !== q.correct) styleClass = "opt-review-wrong";
+                        let style = "padding:10px; border-radius:5px; margin:5px 0; border:1px solid #333;";
+                        if(idx === q.correct) style = "padding:10px; border-radius:5px; margin:5px 0; background:rgba(0,255,0,0.1); border:1px solid lime; color:lime;";
+                        else if(idx === q.selected && idx !== q.correct) style = "padding:10px; border-radius:5px; margin:5px 0; background:rgba(255,0,0,0.1); border:1px solid red; color:red;";
                         
-                        optsHtml += `<div style="padding:10px; border-radius:5px; margin:5px 0;" class="${styleClass}">${['A','B','C','D'][idx]}) ${o}</div>`;
+                        optsHtml += `<div style="${style}">${['A','B','C','D'][idx]}) ${o}</div>`;
                     });
-
-                    c.innerHTML += `
-                    <div class="card">
-                        <p><b>Q${i+1}:</b> ${q.q}</p>
-                        ${optsHtml}
-                    </div>`;
+                    c.innerHTML += `<div class="card"><p><b>Q${i+1}:</b> ${q.q}</p>${optsHtml}</div>`;
                 });
             }
         };
@@ -938,6 +993,8 @@
                     document.getElementById('pro-name').innerText = user.displayName;
                     document.getElementById('pro-email').innerText = user.email;
                     document.getElementById('pro-phone').innerText = user.phone || 'N/A';
+                    document.getElementById('pro-class').innerText = `Class ${user.class}-${user.division}`;
+                    document.getElementById('pro-img').src = user.photoURL || "https://via.placeholder.com/100";
                     app.stuNav('home', document.querySelector('.bottom-nav .nav-item'));
                 } else document.getElementById('view-pending').classList.remove('hidden');
             } else {

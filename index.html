@@ -12,44 +12,24 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap');
-        :root { --primary: #6366f1; --dark: #0f172a; --glass: rgba(255, 255, 255, 0.8); }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        :root { --primary: #6366f1; --dark: #0f172a; --surface: rgba(255, 255, 255, 0.9); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: var(--dark); user-select: none; padding-bottom: 80px; }
         
-        body { font-family: 'Outfit', sans-serif; background: #f8fafc; color: var(--dark); user-select: none; padding-bottom: 80px; }
+        /* Aurora BG */
+        .aurora-bg { position: fixed; inset: 0; z-index: -1; background: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%); background-color: #0f172a; }
         
-        /* Dark Mode */
-        body.dark { background: #0b0f19; color: #f1f5f9; }
-        body.dark .glass-card { background: rgba(30, 41, 59, 0.7); border-color: rgba(255,255,255,0.1); }
-        body.dark .nav-bar { background: rgba(15, 23, 42, 0.9); border-color: rgba(255,255,255,0.1); }
-        
-        /* Glass Components */
-        .glass-card {
-            background: white; border: 1px solid #e2e8f0; border-radius: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); transition: 0.2s; overflow: hidden;
-        }
+        /* Glass & Components */
+        .glass-card { background: white; border: 1px solid #e2e8f0; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); transition: 0.2s; overflow: hidden; }
         .glass-card:active { transform: scale(0.98); }
-        
-        .nav-bar {
-            position: fixed; bottom: 0; width: 100%; background: rgba(255,255,255,0.9);
-            backdrop-filter: blur(12px); border-top: 1px solid #e2e8f0;
-            display: flex; justify-content: space-around; padding: 12px; z-index: 50;
-        }
-        
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: rgba(255,255,255,0.9); backdrop-filter: blur(12px); border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around; padding: 12px; z-index: 50; }
         .btn-primary { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; border-radius: 12px; font-weight: bold; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
         
         /* Exam Options */
-        .opt-box {
-            display: flex; gap: 12px; padding: 16px; border: 2px solid #f1f5f9;
-            border-radius: 16px; cursor: pointer; transition: 0.2s; align-items: center;
-        }
-        body.dark .opt-box { border-color: #334155; }
+        .opt-box { display: flex; gap: 12px; padding: 16px; border: 2px solid #f1f5f9; border-radius: 16px; cursor: pointer; transition: 0.2s; align-items: center; }
+        .opt-box:hover { background: #f1f5f9; }
         .opt-box.selected { border-color: var(--primary); background: #eef2ff; }
-        body.dark .opt-box.selected { background: rgba(99, 102, 241, 0.1); }
-        
-        .opt-circle {
-            width: 24px; height: 24px; border-radius: 50%; border: 2px solid #cbd5e1;
-            display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;
-        }
+        .opt-circle { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; }
         .selected .opt-circle { border-color: var(--primary); background: var(--primary); color: white; }
 
         /* Palette */
@@ -61,144 +41,146 @@
         .hidden { display: none !important; }
         .animate-enter { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        mjx-container { font-size: 115% !important; margin: 5px 0 !important; outline: none; }
         
-        mjx-container { font-size: 115% !important; outline: none; }
+        /* Dark Mode */
+        body.dark { background: #0b0f19; color: #f1f5f9; }
+        body.dark .glass-card { background: rgba(30, 41, 59, 0.8); border-color: rgba(255,255,255,0.1); }
+        body.dark .nav-bar { background: rgba(15, 23, 42, 0.9); border-color: rgba(255,255,255,0.1); }
     </style>
 </head>
 <body>
 
-    <!-- Sounds -->
-    <audio id="click-snd" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
-    <audio id="success-snd" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
-
-    <!-- Login -->
-    <div id="login-section" class="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-indigo-500 to-purple-600">
-        <div class="glass-card w-full max-w-sm p-8 text-center animate-enter">
-            <div class="w-16 h-16 bg-gradient-to-tr from-indigo-500 to-pink-500 rounded-2xl mx-auto flex items-center justify-center text-white text-2xl font-bold mb-6 shadow-xl rotate-3">🚀</div>
-            <h1 class="text-2xl font-bold mb-2">Student Portal</h1>
-            <p class="text-sm text-slate-400 mb-8">Access your exams anywhere</p>
-            <button id="google-btn" class="w-full py-4 bg-white border rounded-xl font-bold flex items-center justify-center gap-3 hover:bg-slate-50 transition">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5"> Continue with Google
-            </button>
+    <!-- 1. LOGIN -->
+    <div id="login-section" class="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+        <div class="aurora-bg"></div>
+        <div class="glass-card w-full max-w-sm p-8 text-center animate-enter relative z-10 bg-white/90">
+            <div class="w-16 h-16 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-2xl mx-auto flex items-center justify-center text-white text-3xl font-bold mb-6 shadow-xl">🚀</div>
+            <h1 class="text-2xl font-bold mb-2 text-slate-800">Student Portal</h1>
+            <p class="text-sm text-slate-500 mb-8">Your exam dashboard</p>
+            <button id="google-btn" class="w-full btn-primary py-3">Continue with Google</button>
         </div>
     </div>
 
-    <!-- Main App -->
+    <!-- 2. MAIN APP -->
     <div id="app-section" class="hidden">
-        <!-- Header -->
-        <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-200 px-4 py-3 flex justify-between items-center dark:bg-slate-900/80 dark:border-slate-800">
+        <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-200 px-5 py-3 flex justify-between items-center dark:bg-slate-900/80 dark:border-slate-800">
             <div class="flex items-center gap-3">
-                <img id="u-photo" class="w-9 h-9 rounded-full bg-slate-200 border-2 border-white shadow-sm">
-                <div><h3 id="u-name" class="font-bold text-sm leading-tight">Student</h3><span class="text-[10px] font-bold text-indigo-500">Online</span></div>
+                <img id="u-photo" class="w-10 h-10 rounded-full border shadow-sm">
+                <div><h3 id="u-name" class="font-bold text-sm">Student</h3><span class="text-[10px] text-indigo-500 font-bold">Online</span></div>
             </div>
-            <button onclick="toggleTheme()" class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center dark:bg-slate-800"><i class="fas fa-moon"></i></button>
+            <button onclick="document.body.classList.toggle('dark')" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center dark:bg-slate-800"><i class="fas fa-moon"></i></button>
         </header>
 
-        <div class="p-4 max-w-3xl mx-auto space-y-6">
-            
-            <!-- Filters -->
-            <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                <button onclick="filterExams('all')" class="px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-bold whitespace-nowrap">All</button>
-                <button onclick="filterExams('Physics')" class="px-4 py-2 rounded-full bg-white border text-slate-600 text-xs font-bold whitespace-nowrap">Physics</button>
-                <button onclick="filterExams('Chemistry')" class="px-4 py-2 rounded-full bg-white border text-slate-600 text-xs font-bold whitespace-nowrap">Chemistry</button>
-                <button onclick="filterExams('Maths')" class="px-4 py-2 rounded-full bg-white border text-slate-600 text-xs font-bold whitespace-nowrap">Maths</button>
+        <div class="p-5 max-w-3xl mx-auto space-y-8">
+            <!-- EXAMS VIEW -->
+            <div id="view-exams" class="fade-in space-y-4">
+                <div class="flex justify-between items-end">
+                    <h2 class="text-2xl font-bold">Dashboard</h2>
+                    <button onclick="openLeaderboard()" class="text-indigo-500 font-bold text-xs"><i class="fas fa-trophy"></i> Top 10</button>
+                </div>
+                <div id="exam-list" class="grid gap-4"></div>
             </div>
 
-            <div id="exam-list" class="space-y-4 animate-enter"></div>
-            
-            <h3 class="font-bold text-lg opacity-70 mt-8">Recent History</h3>
-            <div id="history-list" class="space-y-3"></div>
+            <!-- PROFILE VIEW -->
+            <div id="view-profile" class="hidden fade-in space-y-4">
+                <h2 class="text-2xl font-bold">Profile</h2>
+                <div class="glass-card p-6">
+                    <input id="in-name" class="w-full p-3 border rounded-xl mb-3 bg-slate-50 dark:bg-slate-800 dark:border-slate-700" placeholder="Full Name">
+                    <input id="in-phone" class="w-full p-3 border rounded-xl mb-3 bg-slate-50 dark:bg-slate-800 dark:border-slate-700" placeholder="Phone">
+                    <input id="in-addr" class="w-full p-3 border rounded-xl mb-3 bg-slate-50 dark:bg-slate-800 dark:border-slate-700" placeholder="Address">
+                    <button onclick="saveProfile()" class="w-full btn-primary py-3">Save Profile</button>
+                </div>
+                <h3 class="font-bold opacity-70 mt-4">History</h3>
+                <div id="history-list" class="space-y-2"></div>
+            </div>
         </div>
 
-        <!-- Bottom Nav -->
         <nav class="nav-bar dark:bg-slate-900">
-            <button class="text-indigo-600 flex flex-col items-center"><i class="fas fa-home text-xl"></i></button>
-            <button class="text-slate-400 flex flex-col items-center"><i class="fas fa-chart-bar text-xl"></i></button>
-            <button id="logout-btn" class="text-slate-400 flex flex-col items-center"><i class="fas fa-sign-out-alt text-xl"></i></button>
+            <button onclick="nav('exams')" id="nav-exams" class="text-indigo-600 flex flex-col items-center"><i class="fas fa-home text-xl"></i></button>
+            <button onclick="nav('profile')" id="nav-profile" class="text-slate-400 flex flex-col items-center"><i class="fas fa-user text-xl"></i></button>
+            <button onclick="document.getElementById('logout-modal').classList.remove('hidden')" class="text-red-400 flex flex-col items-center"><i class="fas fa-sign-out-alt text-xl"></i></button>
         </nav>
     </div>
 
-    <!-- EXAM RUNNER -->
+    <!-- CBT RUNNER -->
     <div id="exam-ui" class="hidden fixed inset-0 z-50 bg-white dark:bg-slate-900 flex flex-col">
-        <div class="h-16 border-b flex justify-between items-center px-4 shadow-sm z-20 bg-white dark:bg-slate-900 dark:border-slate-800">
-            <div class="flex items-center gap-3">
-                <div class="bg-indigo-100 text-indigo-600 px-3 py-1 rounded-lg font-mono font-bold text-lg" id="timer">00:00</div>
-            </div>
-            <button onclick="togglePalette()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center dark:bg-slate-800"><i class="fas fa-th"></i></button>
+        <div class="h-16 border-b flex justify-between items-center px-4 shadow-sm z-20 dark:border-slate-800">
+            <div class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg font-mono font-bold" id="timer">00:00</div>
+            <button onclick="document.getElementById('palette-bar').classList.toggle('translate-x-full')" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center"><i class="fas fa-th"></i></button>
         </div>
 
         <div class="flex-grow flex overflow-hidden relative">
-            <!-- Questions -->
             <div class="flex-grow overflow-y-auto p-6 pb-24" id="q-area">
                 <div class="flex justify-between mb-4">
-                    <span class="text-xs font-bold text-white bg-indigo-500 px-3 py-1 rounded-full">Question <span id="q-num">1</span></span>
+                    <span class="text-xs font-bold text-white bg-indigo-500 px-3 py-1 rounded-full">Q <span id="q-num">1</span></span>
                     <span class="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded border border-green-100">+<span id="q-pos">4</span></span>
                 </div>
-                
                 <div id="q-img-wrap" class="hidden text-center mb-4"><img id="q-img" class="max-h-48 rounded-lg border inline-block"></div>
                 <p id="q-txt" class="text-lg font-medium mb-6 leading-relaxed"></p>
                 <div id="q-opts" class="space-y-3"></div>
             </div>
 
-            <!-- Sidebar -->
+            <!-- Side Palette -->
             <div id="palette-bar" class="absolute inset-y-0 right-0 w-64 bg-white border-l transform translate-x-full transition duration-300 z-30 flex flex-col dark:bg-slate-900 dark:border-slate-800">
-                <div class="p-4 border-b font-bold dark:border-slate-800">Question Palette</div>
+                <div class="p-4 font-bold border-b dark:border-slate-800">Questions</div>
                 <div id="p-grid" class="p-4 p-grid flex-grow overflow-y-auto content-start"></div>
-                <div class="p-4 border-t bg-slate-50 dark:bg-slate-800">
-                    <button onclick="submitExam()" class="w-full btn-primary py-3">Submit Exam</button>
-                </div>
+                <div class="p-4 border-t bg-slate-50 dark:bg-slate-800"><button onclick="submitExamCheck()" class="w-full btn-primary py-3">Submit</button></div>
             </div>
         </div>
 
-        <!-- Controls -->
         <div class="fixed bottom-0 w-full bg-white border-t p-3 flex justify-between z-20 dark:bg-slate-900 dark:border-slate-800">
             <div class="flex gap-3">
-                <button onclick="navQ(-1)" class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center hover:bg-slate-200 dark:bg-slate-800"><i class="fas fa-chevron-left"></i></button>
-                <button onclick="navQ(1)" class="w-12 h-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-500/30"><i class="fas fa-chevron-right"></i></button>
+                <button onclick="navQ(-1)" class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center"><i class="fas fa-chevron-left"></i></button>
+                <button onclick="navQ(1)" class="w-12 h-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center"><i class="fas fa-chevron-right"></i></button>
             </div>
-            <button onclick="markRev()" class="px-6 rounded-xl border border-amber-200 text-amber-600 font-bold text-sm bg-amber-50">Review</button>
+            <button onclick="markRev()" class="px-6 rounded-xl border border-amber-200 text-amber-600 font-bold bg-amber-50">Review</button>
         </div>
     </div>
 
-    <!-- Result Modal -->
-    <div id="result-modal" class="hidden fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-md rounded-3xl p-6 text-center animate-enter dark:bg-slate-900 dark:text-white">
-            <h2 class="text-2xl font-bold mb-1">Result Analysis</h2>
-            <p class="text-sm opacity-60 mb-6">Great effort! Here is your report.</p>
-            
-            <div class="relative w-48 h-48 mx-auto mb-6">
-                <canvas id="res-chart"></canvas>
-                <div class="absolute inset-0 flex items-center justify-center flex-col">
-                    <span class="text-3xl font-bold" id="res-score">0</span>
-                    <span class="text-[10px] uppercase font-bold opacity-50">Score</span>
-                </div>
+    <!-- MODALS: Result, Logout, Leaderboard -->
+    <div id="result-modal" class="hidden fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl p-6 text-center animate-enter dark:bg-slate-900">
+            <h2 class="text-2xl font-bold">Analysis</h2>
+            <div class="relative w-40 h-40 mx-auto my-4"><canvas id="res-chart"></canvas><div class="absolute inset-0 flex items-center justify-center flex-col"><span class="text-2xl font-bold" id="res-score">0</span></div></div>
+            <div class="grid grid-cols-3 gap-2 text-xs font-bold mb-4">
+                <div class="bg-green-50 text-green-700 p-2 rounded border">C: <span id="res-c">0</span></div>
+                <div class="bg-red-50 text-red-700 p-2 rounded border">W: <span id="res-w">0</span></div>
+                <div class="bg-slate-50 text-slate-700 p-2 rounded border">S: <span id="res-s">0</span></div>
             </div>
-            
-            <div class="grid grid-cols-3 gap-2 mb-6 text-xs font-bold">
-                <div class="bg-green-50 text-green-700 p-2 rounded-lg border border-green-100">Correct<br><span id="res-c" class="text-lg">0</span></div>
-                <div class="bg-red-50 text-red-700 p-2 rounded-lg border border-red-100">Wrong<br><span id="res-w" class="text-lg">0</span></div>
-                <div class="bg-slate-50 text-slate-700 p-2 rounded-lg border border-slate-100">Skipped<br><span id="res-s" class="text-lg">0</span></div>
-            </div>
+            <div id="res-solutions" class="text-left text-xs space-y-2 max-h-40 overflow-y-auto mb-4"></div>
+            <button onclick="location.reload()" class="w-full btn-primary py-3">Finish</button>
+        </div>
+    </div>
 
-            <button onclick="location.reload()" class="w-full btn-primary py-3">Back to Home</button>
+    <div id="logout-modal" class="hidden fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-3xl max-w-xs w-full text-center dark:bg-slate-800">
+            <h3 class="font-bold text-lg mb-2">Log Out?</h3>
+            <div class="flex gap-3"><button onclick="document.getElementById('logout-modal').classList.add('hidden')" class="flex-1 py-2 border rounded-xl">No</button><button onclick="signOutApp()" class="flex-1 py-2 bg-red-500 text-white rounded-xl">Yes</button></div>
+        </div>
+    </div>
+
+    <div id="lb-modal" class="hidden fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-6 relative dark:bg-slate-900">
+            <button onclick="document.getElementById('lb-modal').classList.add('hidden')" class="absolute top-4 right-4 text-xl">&times;</button>
+            <h2 class="text-xl font-bold mb-4 text-center">🏆 Leaderboard</h2>
+            <div id="lb-list" class="space-y-2 max-h-64 overflow-y-auto"></div>
         </div>
     </div>
 
     <script type="module">
         import { auth, db, provider } from './firebase-config.js';
         import { signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { doc, getDoc, setDoc, updateDoc, collection, getDocs, query, orderBy, serverTimestamp, addDoc, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { doc, getDoc, setDoc, updateDoc, collection, getDocs, query, orderBy, serverTimestamp, addDoc, where, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         let user=null, allExams=[], currExam=null, userAns=[], currIdx=0, timer=null;
-        const sndClick = document.getElementById('click-snd');
-        const sndSuccess = document.getElementById('success-snd');
 
         onAuthStateChanged(auth, async (u) => {
             if(u) {
                 const ref = doc(db, "students", u.uid);
                 const snap = await getDoc(ref);
                 if(!snap.exists()) {
-                    const d = { uid: u.uid, email: u.email, name: u.displayName, photo: u.photoURL, role: "student", banned: false };
+                    const d = { uid: u.uid, email: u.email, name: u.displayName, photo: u.photoURL, role: "student", banned: false, xp:0 };
                     await setDoc(ref, d); user = d;
                 } else user = snap.data();
                 
@@ -208,145 +190,103 @@
         });
 
         document.getElementById('google-btn').addEventListener('click', () => signInWithPopup(auth, provider));
-        document.getElementById('logout-btn').addEventListener('click', () => signOut(auth).then(()=>location.reload()));
 
         async function initApp() {
             document.getElementById('login-section').classList.add('hidden');
             document.getElementById('app-section').classList.remove('hidden');
             document.getElementById('u-name').innerText = user.name;
             document.getElementById('u-photo').src = user.photo;
+            document.getElementById('in-name').value = user.name;
+            document.getElementById('in-phone').value = user.phone || "";
+            document.getElementById('in-addr').value = user.address || "";
 
-            // Update Last Active
-            await updateDoc(doc(db,"students",user.uid), { lastActive: serverTimestamp() });
-
-            // Load Content
             const s = await getDocs(query(collection(db, "exams"), orderBy("createdAt", "desc")));
-            allExams = [];
-            s.forEach(d => allExams.push({id: d.id, ...d.data()}));
+            allExams = []; s.forEach(d => allExams.push({id: d.id, ...d.data()}));
             renderExams(allExams);
 
-            // Load History
             const h = await getDocs(query(collection(db, "results"), where("uid","==",user.uid), orderBy("timestamp","desc")));
-            document.getElementById('history-list').innerHTML = h.docs.map(d => `
-                <div class="glass-card p-3 flex justify-between items-center border-l-4 border-indigo-500">
-                    <div><div class="font-bold text-sm">${d.data().examTitle}</div><div class="text-[10px] opacity-60">Score: ${d.data().score}</div></div>
-                    <div class="text-xl font-bold text-indigo-600">${Math.round((d.data().score/d.data().totalMarks)*100)}%</div>
-                </div>`).join('');
+            document.getElementById('history-list').innerHTML = h.docs.map(d => `<div class="glass-card p-3 flex justify-between items-center text-xs border-l-4 border-indigo-500"><div><b>${d.data().examTitle}</b><br>Score: ${d.data().score}</div><span class="text-indigo-600 font-bold">${Math.round((d.data().score/d.data().totalMarks)*100)}%</span></div>`).join('');
         }
 
-        window.filterExams = (sub) => {
-            renderExams(sub === 'all' ? allExams : allExams.filter(e => e.subject === sub));
-        };
+        window.nav = (v) => { ['exams','profile'].forEach(x=>{document.getElementById('view-'+x).classList.add('hidden');document.getElementById('nav-'+x).classList.remove('text-indigo-600');}); document.getElementById('view-'+v).classList.remove('hidden'); document.getElementById('nav-'+v).classList.add('text-indigo-600'); };
+        window.filterExams = (sub) => renderExams(sub==='all'?allExams:allExams.filter(e=>e.subject===sub));
+        function renderExams(l) { document.getElementById('exam-list').innerHTML = l.map(e => `<div class="glass-card p-5 relative overflow-hidden group cursor-pointer border-l-4 border-indigo-500" onclick="startExam('${e.id}')"><h3 class="font-bold text-lg dark:text-white">${e.title}</h3><div class="flex gap-3 text-xs font-bold text-slate-400 mt-1"><span>${e.subject||'Gen'}</span> • <span>${e.duration}m</span> • <span>${e.questions.length} Qs</span></div></div>`).join(''); }
 
-        function renderExams(list) {
-            document.getElementById('exam-list').innerHTML = list.map(e => `
-                <div class="glass-card p-5 relative overflow-hidden group cursor-pointer" onclick="startExam('${e.id}')">
-                    <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-bl-full -mr-4 -mt-4 transition group-hover:scale-110"></div>
-                    <div class="relative z-10">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-500 bg-indigo-50 px-2 py-1 rounded">${e.subject || 'General'}</span>
-                        <h3 class="font-bold text-lg mt-2 mb-1">${e.title}</h3>
-                        <div class="flex gap-4 text-xs text-slate-500 font-bold">
-                            <span><i class="fas fa-clock"></i> ${e.duration}m</span>
-                            <span><i class="fas fa-list"></i> ${e.questions.length} Qs</span>
-                        </div>
-                    </div>
-                    <button class="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-indigo-600 text-white shadow-lg flex items-center justify-center group-hover:scale-110 transition"><i class="fas fa-play"></i></button>
-                </div>`).join('');
-        }
-
-        // --- EXAM RUNNER ---
-        window.startExam = (id) => {
+        // EXAM LOGIC
+        window.startExam = async(id) => {
             currExam = allExams.find(e => e.id === id);
             
-            // Randomize if needed
-            if(currExam.randomize) currExam.questions.sort(() => Math.random() - 0.5);
-            
-            userAns = Array(currExam.questions.length).fill().map(() => ({ val: -1, status: 'visit' }));
-            currIdx = 0;
-            
+            // Auto Resume
+            const saved = JSON.parse(localStorage.getItem('ex_state'));
+            if(saved && saved.eid===id && confirm("Resume?")) { userAns=saved.ans; var t=saved.t; if(currExam.randomize) currExam.questions=saved.qs; }
+            else {
+                if(currExam.randomize) currExam.questions.sort(() => Math.random() - 0.5);
+                userAns = Array(currExam.questions.length).fill().map(() => ({ val: -1, status: 'visit' }));
+                var t = currExam.duration * 60;
+            }
+
             document.getElementById('exam-ui').classList.remove('hidden');
             document.getElementById('q-pos').innerText = currExam.posMarks;
+            renderPalette(); loadQ(0);
             
-            renderPalette();
-            loadQ(0);
-            
-            let t = currExam.duration * 60;
             timer = setInterval(() => {
-                t--;
-                document.getElementById('timer').innerText = `${Math.floor(t/60)}:${(t%60).toString().padStart(2,'0')}`;
+                t--; document.getElementById('timer').innerText = `${Math.floor(t/60)}:${(t%60).toString().padStart(2,'0')}`;
+                localStorage.setItem('ex_state', JSON.stringify({eid:id, ans:userAns, t:t, qs:currExam.questions}));
                 if(t<=0) submitExam();
             }, 1000);
             
-            document.documentElement.requestFullscreen().catch(()=>{});
+            // Anti-Cheat
+            let v=0;
+            document.addEventListener("visibilitychange", () => { if(document.hidden && !document.getElementById('exam-ui').classList.contains('hidden')) { v++; if(v>=3) { alert("Auto-Submitting due to tab switching."); submitExam(); } else alert(`Warning ${v}/3: Don't switch tabs!`); } });
         };
 
         function loadQ(i) {
-            currIdx = i;
-            const q = currExam.questions[i];
-            
-            document.getElementById('q-num').innerText = i+1;
-            document.getElementById('q-txt').innerHTML = q.q;
-            
-            if(q.img) { document.getElementById('q-img').src = q.img; document.getElementById('q-img-wrap').classList.remove('hidden'); }
-            else document.getElementById('q-img-wrap').classList.add('hidden');
-
-            document.getElementById('q-opts').innerHTML = q.options.map((o, v) => `
-                <div class="opt-box ${userAns[i].val === v ? 'selected' : ''}" onclick="pick(${v})">
-                    <div class="opt-circle">${String.fromCharCode(65+v)}</div>
-                    <span class="text-sm font-medium">${o}</span>
-                </div>`).join('');
-                
+            currIdx = i; const q = currExam.questions[i];
+            document.getElementById('q-num').innerText = i+1; document.getElementById('q-txt').innerHTML = q.q;
+            if(q.img) { document.getElementById('q-img').src=q.img; document.getElementById('q-img-wrap').classList.remove('hidden'); } else document.getElementById('q-img-wrap').classList.add('hidden');
+            document.getElementById('q-opts').innerHTML = q.options.map((o,v) => `<div class="opt-box ${userAns[i].val===v?'selected':''}" onclick="pick(${v})"><div class="opt-circle">${String.fromCharCode(65+v)}</div><span class="text-sm font-medium">${o}</span></div>`).join('');
             if(window.MathJax) MathJax.typesetPromise();
-            sndClick.play();
         }
 
         window.pick = (v) => { userAns[currIdx].val = v; userAns[currIdx].status = 'st-ans'; loadQ(currIdx); renderPalette(); };
         window.markRev = () => { userAns[currIdx].status = 'st-rev'; renderPalette(); };
         window.navQ = (d) => { const n = currIdx + d; if(n >= 0 && n < userAns.length) loadQ(n); };
-        window.togglePalette = () => document.getElementById('palette-bar').classList.toggle('translate-x-full');
+        function renderPalette() { document.getElementById('p-grid').innerHTML = userAns.map((a, i) => `<div onclick="loadQ(${i})" class="p-item ${a.status} ${i===currIdx?'border-indigo-600 border-2':''}">${i+1}</div>`).join(''); }
         
-        function renderPalette() {
-            document.getElementById('p-grid').innerHTML = userAns.map((a, i) => `<div onclick="loadQ(${i})" class="p-item ${a.status} ${i===currIdx?'border-indigo-600 border-2':''}">${i+1}</div>`).join('');
-        }
-
+        window.submitExamCheck = () => { if(confirm("Submit Exam?")) submitExam(); };
         window.submitExam = async () => {
-            clearInterval(timer);
-            if(document.fullscreenElement) document.exitFullscreen();
-            
-            let score=0, c=0, w=0;
+            clearInterval(timer); localStorage.removeItem('ex_state');
+            let score=0, c=0, w=0, sols="";
             const pos = currExam.posMarks || 4, neg = currExam.negMarks || 1;
             
             userAns.forEach((a, i) => {
-                if(a.val !== -1) {
-                    if(a.val === currExam.questions[i].correct) { score += pos; c++; }
-                    else { score -= neg; w++; }
-                }
+                const q = currExam.questions[i];
+                if(a.val !== -1) { if(a.val === q.correct) { score+=pos; c++; } else { score-=neg; w++; } }
+                if(q.sol) sols += `<div class="p-2 bg-slate-50 rounded mb-1"><b>Q${i+1}:</b> ${q.sol}</div>`;
             });
 
-            await addDoc(collection(db, "results"), {
-                uid: user.uid, studentName: user.name, examTitle: currExam.title,
-                score, totalMarks: currExam.questions.length * pos,
-                stats: {c, w, s: userAns.length-(c+w)}, timestamp: serverTimestamp()
-            });
-
+            await addDoc(collection(db, "results"), { uid: user.uid, studentName: user.name, examTitle: currExam.title, score, totalMarks: currExam.questions.length * pos, stats: {c,w,s:userAns.length-(c+w)}, timestamp: serverTimestamp() });
+            
             document.getElementById('exam-ui').classList.add('hidden');
             document.getElementById('result-modal').classList.remove('hidden');
-            sndSuccess.play();
-            
-            // Populate Results
             document.getElementById('res-score').innerText = score;
-            document.getElementById('res-c').innerText = c;
-            document.getElementById('res-w').innerText = w;
-            document.getElementById('res-s').innerText = userAns.length - (c+w);
+            document.getElementById('res-c').innerText = c; document.getElementById('res-w').innerText = w; document.getElementById('res-s').innerText = userAns.length-(c+w);
+            document.getElementById('res-solutions').innerHTML = sols || "No solutions provided.";
             
-            new Chart(document.getElementById('res-chart'), {
-                type: 'doughnut',
-                data: { labels: ['Correct', 'Wrong', 'Skipped'], datasets: [{ data: [c, w, userAns.length-(c+w)], backgroundColor: ['#10b981', '#ef4444', '#cbd5e1'], borderWidth: 0 }] },
-                options: { cutout: '70%', plugins: { legend: { display: false } } }
-            });
+            new Chart(document.getElementById('res-chart'), { type: 'doughnut', data: { labels: ['C','W','S'], datasets: [{ data: [c, w, userAns.length-(c+w)], backgroundColor: ['#22c55e', '#ef4444', '#cbd5e1'], borderWidth:0 }] }, options: {cutout:'70%', plugins:{legend:{display:false}}} });
         };
 
-        window.toggleTheme = () => document.body.classList.toggle('dark');
+        window.openLeaderboard = async () => {
+            document.getElementById('lb-modal').classList.remove('hidden');
+            const s = await getDocs(query(collection(db,"results"), orderBy("score","desc"), limit(10)));
+            document.getElementById('lb-list').innerHTML = s.docs.map((d,i) => `<div class="flex justify-between p-2 border-b text-xs ${i==0?'bg-yellow-50':''}"><span class="font-bold">#${i+1} ${d.data().studentName}</span><span class="text-indigo-600 font-bold">${d.data().score}</span></div>`).join('');
+        };
+
+        window.saveProfile = async() => { await updateDoc(doc(db,"students",user.uid), { name:document.getElementById('in-name').value, phone:document.getElementById('in-phone').value, address:document.getElementById('in-addr').value }); alert("Saved"); location.reload(); };
+        window.signOutApp = () => signOut(auth).then(()=>location.reload());
+        
+        // Expose functions
+        window.nav = window.nav; window.filterExams = window.filterExams; window.startExam = window.startExam; window.pick = window.pick; window.markRev = window.markRev; window.navQ = window.navQ; window.submitExamCheck = window.submitExamCheck; window.openLeaderboard = window.openLeaderboard; window.saveProfile = window.saveProfile; window.signOutApp = window.signOutApp;
     </script>
 </body>
 </html>

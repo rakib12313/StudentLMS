@@ -5,7 +5,6 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBEMPS8vEJztGpoBPJjJIzKKInyt4IY9rQ",
   authDomain: "studentlms-79722.firebaseapp.com",
-  databaseURL: "https://studentlms-79722-default-rtdb.firebaseio.com",
   projectId: "studentlms-79722",
   storageBucket: "studentlms-79722.firebasestorage.app",
   messagingSenderId: "1029623857004",

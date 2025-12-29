@@ -3,390 +3,403 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NeonLMS - Pro</title>
+    <title>NeonLMS - Cyber Edition</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
-            --primary: #7000ff; --primary-glow: #bd00ff;
-            --secondary: #00f7ff; --bg-dark: #050505;
-            --glass-bg: rgba(20, 20, 25, 0.96); --glass-border: rgba(255, 255, 255, 0.15);
-            --text-main: #ffffff; --text-muted: #a0a0a0;
-            --success: #00ff9d; --danger: #ff0055; --warning: #ffb700;
+            --neon-blue: #00f3ff;
+            --neon-purple: #bc13fe;
+            --bg-dark: #050a14;
+            --glass: rgba(16, 24, 45, 0.85);
+            --glass-border: rgba(0, 243, 255, 0.2);
+            --text-main: #e0e6ed;
+            --danger: #ff2a6d;
+            --success: #05d5fa;
+            --warning: #fcee0a;
         }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            margin: 0; font-family: 'Outfit', sans-serif;
-            background: var(--bg-dark) radial-gradient(circle at 50% 0%, #1a1a2e 0%, #000 70%);
-            color: var(--text-main); min-height: 100vh; padding-bottom: 90px;
+            margin: 0; font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                linear-gradient(rgba(5, 10, 20, 0.9), rgba(5, 10, 20, 0.9)),
+                url("https://www.transparenttextures.com/patterns/cubes.png");
+            color: var(--text-main);
+            min-height: 100vh; padding-bottom: 90px;
+            overflow-x: hidden;
         }
 
-        .container { max-width: 900px; margin: 0 auto; padding: 15px; }
+        h1, h2, h3 { font-family: 'Orbitron', sans-serif; letter-spacing: 1px; margin: 0 0 10px 0; text-transform: uppercase; }
+        
+        .container { max-width: 900px; margin: 0 auto; padding: 15px; animation: fadeIn 0.5s ease; }
         .hidden { display: none !important; }
         .flex-center { display: flex; justify-content: center; align-items: center; min-height: 80vh; }
 
-        /* Modern Cards with Animation */
+        /* SCI-FI CARDS */
         .card {
-            background: var(--glass-bg); border: 1px solid var(--glass-border);
-            border-radius: 16px; padding: 20px; margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(10px);
-            animation: slideInUp 0.5s ease-out;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.05);
+            backdrop-filter: blur(12px);
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+            background: linear-gradient(to bottom, var(--neon-blue), var(--neon-purple));
         }
 
-        @keyframes slideInUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
+        /* INPUTS */
         input, select, textarea {
             width: 100%; padding: 12px; margin-bottom: 12px;
-            background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border);
-            border-radius: 8px; color: white; font-family: inherit; box-sizing: border-box;
+            background: rgba(0,0,0,0.5); border: 1px solid #333;
+            border-radius: 6px; color: var(--neon-blue);
+            font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 500;
+            transition: 0.3s;
         }
-        option { background: #111; } 
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+            outline: none;
+        }
+        option { background: #0a1020; }
 
+        /* BUTTONS */
         button {
-            width: 100%; padding: 12px; border: none; border-radius: 8px;
-            font-weight: 600; cursor: pointer; transition: 0.2s; 
-            display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%; padding: 12px; border: none; border-radius: 6px;
+            font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 700;
+            cursor: pointer; transition: 0.3s; letter-spacing: 1px;
+            text-transform: uppercase; display: flex; justify-content: center; align-items: center; gap: 8px;
         }
-        .btn-primary { background: linear-gradient(45deg, var(--primary), var(--primary-glow)); color: white; }
-        .btn-secondary { background: rgba(255,255,255,0.1); color: white; }
-        .btn-danger { background: rgba(255, 0, 85, 0.2); color: var(--danger); border: 1px solid var(--danger); }
-        .btn-success { background: rgba(0, 255, 157, 0.2); color: var(--success); border: 1px solid var(--success); }
-        .btn-sm { padding: 6px 12px; width: auto; font-size: 12px; }
+        .btn-primary { 
+            background: linear-gradient(90deg, var(--neon-purple), var(--neon-blue)); 
+            color: #000; box-shadow: 0 0 15px rgba(188, 19, 254, 0.4);
+        }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
+        .btn-danger { background: rgba(255, 42, 109, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+        .btn-sm { padding: 6px 12px; width: auto; font-size: 10px; }
 
-        /* Navigation */
+        /* NAV */
         .bottom-nav {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background: rgba(10, 10, 15, 0.98); border-top: 1px solid var(--glass-border);
-            display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000;
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px;
+            background: rgba(10, 15, 30, 0.95); border: 1px solid var(--glass-border);
+            border-radius: 30px; display: flex; justify-content: space-around;
+            padding: 12px 0; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
         .nav-item {
             display: flex; flex-direction: column; align-items: center;
-            color: var(--text-muted); font-size: 10px; cursor: pointer; transition: 0.3s;
+            color: #555; font-size: 10px; cursor: pointer; transition: 0.3s;
         }
-        .nav-item.active { color: var(--secondary); transform: translateY(-5px); }
-        .nav-item i { font-size: 20px; margin-bottom: 4px; }
+        .nav-item i { font-size: 18px; margin-bottom: 3px; }
+        .nav-item.active { color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
 
-        /* Tabs */
-        .tabs { display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; }
-        .tab-btn { flex:1; background: transparent; border: 1px solid var(--glass-border); color: var(--text-muted); padding: 10px; border-radius: 8px; cursor:pointer;}
-        .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        /* TABS */
+        .tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; background: transparent; border: 1px solid #333; color: #888; padding: 10px; border-radius: 6px; }
+        .tab-btn.active { background: rgba(0, 243, 255, 0.1); border-color: var(--neon-blue); color: var(--neon-blue); }
 
-        /* Tables & Lists */
-        table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--glass-border); }
-        th { color: var(--secondary); text-transform: uppercase; font-size: 11px; }
+        /* UTILS */
+        .badge { padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; background: #111; border: 1px solid #333; }
+        .text-neon { color: var(--neon-blue); }
+        .text-warn { color: var(--warning); }
         
-        .badge { padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; background: #333; }
-        .status-excellent { color: #00ff9d; border: 1px solid #00ff9d; padding: 5px 10px; border-radius: 20px; display: inline-block;}
-        .status-good { color: #00f7ff; border: 1px solid #00f7ff; padding: 5px 10px; border-radius: 20px; display: inline-block;}
-        .status-avg { color: #ffb700; border: 1px solid #ffb700; padding: 5px 10px; border-radius: 20px; display: inline-block;}
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #333; }
+        th { color: var(--neon-purple); font-size: 12px; }
 
-        .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        /* ANIMATIONS */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Profile Image */
-        .profile-img-lg { width:100px; height:100px; border-radius:50%; object-fit:cover; border:2px solid var(--primary); }
-        .profile-upload-label { font-size:12px; color:var(--secondary); cursor:pointer; margin-top:5px; display:block;}
+        /* SEARCH */
+        .search-box { position: relative; margin-bottom: 15px; }
+        .search-box input { padding-left: 35px; margin: 0; border-radius: 20px; }
+        .search-box i { position: absolute; left: 12px; top: 12px; color: #666; }
 
-        /* Messages */
-        .msg-card { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid var(--primary); }
-        
-        /* Loader & Toast */
-        #toast-box { position: fixed; top: 20px; right: 20px; z-index: 9999; }
-        .toast { background: #1e1e24; border-left: 4px solid var(--primary); padding: 15px; margin-bottom: 10px; color: white; animation: slideIn 0.3s; }
-        #global-loader { position: fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:99999; display:flex; justify-content:center; align-items:center; }
-        .spinner { width:40px; height:40px; border:4px solid #333; border-top-color:var(--secondary); border-radius:50%; animation:spin 1s infinite linear; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes slideIn { from{transform:translateX(100%)} to{transform:translateX(0)} }
-        
+        /* LOADER */
+        #global-loader { position: fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:99999; display:flex; justify-content:center; align-items:center; flex-direction: column;}
+        .spinner { width: 50px; height: 50px; border: 3px solid transparent; border-top-color: var(--neon-blue); border-right-color: var(--neon-purple); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* TOGGLE */
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #444; transition: .4s; border-radius: 34px; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 20px; }
         .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider { background-color: var(--neon-blue); }
         input:checked + .slider:before { transform: translateX(20px); }
     </style>
 </head>
 <body>
 
-    <div id="global-loader"><div class="spinner"></div></div>
-    <div id="toast-box"></div>
-
-    <!-- ADMIN: MANAGE STUDENT MODAL -->
-    <div id="modal-manage-student" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000; display:flex; justify-content:center; align-items:center;">
-        <div class="card" style="width:90%; max-width:400px; max-height:90vh; overflow-y:auto;">
-            <h3>Manage Student</h3>
-            <input type="hidden" id="mng-uid">
-            
-            <label style="font-size:12px; color:#aaa;">Personal Info</label>
-            <input type="text" id="mng-name" placeholder="Name">
-            <input type="email" id="mng-email" placeholder="Email" disabled style="opacity:0.5;">
-            <input type="tel" id="mng-phone" placeholder="Phone">
-            
-            <div style="display:flex; gap:10px;">
-                <select id="mng-class"><option value="8">Class 8</option><option value="9">Class 9</option><option value="10">Class 10</option><option value="11">Class 11</option><option value="12">Class 12</option></select>
-                <select id="mng-div"><option value="A">Div A</option><option value="B">Div B</option><option value="C">Div C</option></select>
-            </div>
-
-            <label style="font-size:12px; color:#aaa; margin-top:10px; display:block;">Send Personal Message</label>
-            <textarea id="mng-msg" rows="3" placeholder="Write a message to student..."></textarea>
-            
-            <div style="display:flex; gap:10px; margin-top:10px;">
-                <button class="btn-primary" onclick="app.adminSaveStudent()">Save & Send</button>
-                <button class="btn-secondary" onclick="document.getElementById('modal-manage-student').classList.add('hidden')">Close</button>
-            </div>
-        </div>
+    <div id="global-loader">
+        <div class="spinner"></div>
+        <h3 style="margin-top:20px; color:var(--neon-blue);">INITIALIZING SYSTEM...</h3>
     </div>
+    <div id="toast-box" style="position:fixed; top:20px; right:20px; z-index:9999;"></div>
 
-    <!-- EXAM INSTRUCTIONS MODAL -->
-    <div id="modal-instructions" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; display:flex; justify-content:center; align-items:center;">
-        <div class="card" style="width:90%; max-width:500px;">
-            <h3><i class="fas fa-info-circle"></i> Instructions</h3>
-            <ul style="text-align:left; line-height:1.6; color:#ccc;">
-                <li>Do not switch tabs or minimize the browser.</li>
-                <li>You have limited time to complete the exam.</li>
-                <li><b id="ins-neg" style="color:var(--danger)"></b></li>
-                <li>Once submitted, you cannot change answers.</li>
-            </ul>
-            <button class="btn-primary" onclick="app.confirmStartExam()">I Agree, Start Exam</button>
-            <button class="btn-secondary" onclick="document.getElementById('modal-instructions').classList.add('hidden')">Cancel</button>
-        </div>
-    </div>
-
-    <!-- AUTH SCREEN -->
+    <!-- === AUTH VIEW === -->
     <div id="view-auth" class="container flex-center hidden">
         <div class="card" style="width:100%; max-width:400px; text-align:center;">
-            <h1>NeonLMS</h1>
-            <p style="color:var(--secondary); font-size:12px; margin-bottom:20px;">EXAM PORTAL</p>
-            <div id="login-form">
-                <input type="email" id="email" placeholder="Email">
-                <input type="password" id="password" placeholder="Password">
-                <button class="btn-primary" onclick="app.login()">Login</button>
-                <button class="btn-secondary" onclick="app.loginGoogle()" style="margin-top:10px; background:white; color:black;"><i class="fab fa-google"></i> Google Login</button>
-                <p style="font-size:12px; margin-top:15px;">New? <a href="#" style="color:var(--secondary);" onclick="app.toggleAuth('reg')">Register</a></p>
+            <div style="width:80px; height:80px; background:var(--glass-border); border-radius:50%; margin:0 auto 20px; display:flex; align-items:center; justify-content:center;">
+                <i class="fas fa-atom" style="font-size:40px; color:var(--neon-blue);"></i>
             </div>
+            <h1 class="text-neon">NeonLMS</h1>
+            <p style="color:#888; font-size:12px; margin-bottom:20px;">ADVANCED EXAMINATION PROTOCOL</p>
+            
+            <div id="login-form">
+                <input type="email" id="email" placeholder="ACCESS ID (EMAIL)">
+                <input type="password" id="password" placeholder="PASSCODE">
+                <button class="btn-primary" onclick="app.login()">INITIALIZE LOGIN</button>
+                <button class="btn-secondary" onclick="app.loginGoogle()" style="margin-top:10px;"><i class="fab fa-google"></i> GOOGLE ACCESS</button>
+                <p style="font-size:12px; margin-top:20px; cursor:pointer; color:var(--neon-purple);" onclick="app.toggleAuth('reg')">CREATE NEW ID</p>
+            </div>
+
             <div id="reg-form" class="hidden">
-                <input type="text" id="reg-name" placeholder="Full Name">
-                <input type="tel" id="reg-phone" placeholder="Phone Number">
+                <input type="text" id="reg-name" placeholder="FULL NAME">
+                <input type="tel" id="reg-phone" placeholder="PHONE LINK">
                 <div style="display:flex; gap:10px;">
-                    <select id="reg-class"><option value="" disabled selected>Class</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
-                    <select id="reg-div"><option value="A">A</option><option value="B">B</option></select>
+                    <select id="reg-class"><option value="" disabled selected>CLASS</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
+                    <select id="reg-div"><option value="A">DIV A</option><option value="B">DIV B</option><option value="C">DIV C</option></select>
                 </div>
-                <input type="email" id="reg-email" placeholder="Email">
-                <input type="password" id="reg-pass" placeholder="Password">
-                <button class="btn-primary" onclick="app.register()">Register</button>
-                <p style="font-size:12px; margin-top:15px;"><a href="#" onclick="app.toggleAuth('login')" style="color:#aaa;">Back</a></p>
+                <input type="email" id="reg-email" placeholder="EMAIL">
+                <input type="password" id="reg-pass" placeholder="SET PASSCODE">
+                <button class="btn-primary" onclick="app.register()">REGISTER IDENTITY</button>
+                <p style="font-size:12px; margin-top:20px; cursor:pointer; color:#888;" onclick="app.toggleAuth('login')">RETURN TO LOGIN</p>
             </div>
         </div>
     </div>
 
-    <!-- PENDING SCREEN -->
+    <!-- === PENDING VIEW === -->
     <div id="view-pending" class="container flex-center hidden">
         <div class="card" style="text-align:center;">
-            <i class="fas fa-lock" style="font-size:40px; color:var(--warning);"></i>
-            <h3>Approval Pending</h3>
-            <p>Admin must approve your account.</p>
-            <button class="btn-secondary" onclick="app.logout()">Logout</button>
+            <i class="fas fa-shield-alt" style="font-size:50px; color:var(--warning); margin-bottom:20px;"></i>
+            <h2>ACCESS RESTRICTED</h2>
+            <p style="color:#aaa;">Your identity is pending Admin Verification.</p>
+            <button class="btn-danger" style="margin-top:20px;" onclick="app.logout()">TERMINATE SESSION</button>
         </div>
     </div>
 
-    <!-- ADMIN DASHBOARD -->
+    <!-- === ADMIN VIEW === -->
     <div id="view-admin" class="container hidden">
         <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-            <div>
-                <h2 style="margin:0;">Admin</h2>
-                <div style="display:flex; align-items:center; gap:10px; margin-top:5px;">
-                    <small style="color:#aaa;">Leaderboard</small>
-                    <label class="switch"><input type="checkbox" id="admin-lb-toggle" onchange="app.toggleLeaderboard()"><span class="slider"></span></label>
-                </div>
-            </div>
-            <button class="btn-danger btn-sm" onclick="app.logout()">Logout</button>
-        </div>
-        
-        <div class="card">
-            <div style="display:flex; gap:10px;">
-                <input type="text" id="ann-input" placeholder="Global Announcement..." style="margin:0;">
-                <button class="btn-primary btn-sm" style="width:auto;" onclick="app.postAnnounce()"><i class="fas fa-paper-plane"></i></button>
+            <div><h2 class="text-neon">COMMAND CENTER</h2><small style="color:#888;">Administrator Mode</small></div>
+            <div style="display:flex; align-items:center; gap:15px;">
+                <label class="switch"><input type="checkbox" id="admin-lb-toggle" onchange="app.toggleLeaderboard()"><span class="slider"></span></label>
+                <button class="btn-danger btn-sm" onclick="app.logout()"><i class="fas fa-power-off"></i></button>
             </div>
         </div>
 
         <div class="tabs">
-            <button class="tab-btn active" onclick="app.tab('exams', this)">Exams</button>
-            <button class="tab-btn" onclick="app.tab('results', this)">Results</button>
-            <button class="tab-btn" onclick="app.tab('students', this)">Students</button>
+            <button class="tab-btn active" onclick="app.tab('exams', this)">EXAMS</button>
+            <button class="tab-btn" onclick="app.tab('results', this)">RESULTS</button>
+            <button class="tab-btn" onclick="app.tab('students', this)">USERS</button>
         </div>
-        
-        <!-- Admin: Exams -->
+
+        <!-- EXAM CREATOR -->
         <div id="tab-exams">
             <div class="card" id="exam-editor">
-                <h3>Create Exam</h3>
+                <h3><i class="fas fa-plus-circle"></i> Create Protocol</h3>
                 <input type="hidden" id="edit-exam-id">
                 <div style="display:grid; grid-template-columns:2fr 1fr; gap:10px;">
                     <input type="text" id="ex-title" placeholder="Exam Title">
-                    <select id="ex-class"><option value="" disabled selected>Class</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
+                    <select id="ex-class"><option value="" disabled selected>Target Class</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
                 </div>
                 <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
                     <input type="number" id="ex-time" placeholder="Mins">
-                    <input type="number" id="ex-neg" placeholder="Neg Mark" step="0.25" value="0">
-                    <input type="text" id="ex-pin" placeholder="PIN (Opt)">
+                    <input type="number" id="ex-neg" placeholder="Neg Mark" step="0.25">
+                    <input type="text" id="ex-pin" placeholder="PIN (Optional)">
                 </div>
-                <label style="font-size:12px; margin-bottom:10px; display:block;"><input type="checkbox" id="ex-shuffle" style="width:auto;"> Shuffle Questions</label>
                 
-                <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; margin-bottom:10px;">
-                    <label style="font-size:12px; color:var(--secondary);">PDF Question (Optional)</label>
+                <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:6px; margin-bottom:10px;">
+                    <small class="text-neon"><i class="fas fa-file-pdf"></i> Attach PDF Question Paper</small>
                     <input type="file" id="ex-pdf" accept="application/pdf">
                     <input type="hidden" id="ex-pdf-url">
                 </div>
 
                 <div class="tabs">
-                    <button class="tab-btn active" id="mode-manual" onclick="app.setBuilderMode('manual')">Manual</button>
-                    <button class="tab-btn" id="mode-json" onclick="app.setBuilderMode('json')">JSON</button>
+                    <button class="tab-btn active" onclick="app.setBuilderMode('manual')">Manual Builder</button>
+                    <button class="tab-btn" onclick="app.setBuilderMode('json')">JSON Code</button>
                 </div>
 
                 <div id="builder-manual">
                     <div id="q-container"></div>
-                    <button class="btn-secondary" onclick="app.addQ()">+ Add MCQ</button>
+                    <button class="btn-secondary" onclick="app.addQ()">+ Add Question Block</button>
                 </div>
-
                 <div id="builder-json" class="hidden">
-                    <textarea id="json-input" rows="5" placeholder='[{"text":"Q?","options":["A","B","C","D"],"correct":0}]'></textarea>
-                    <button class="btn-success" onclick="app.processJSON()">Import</button>
+                    <textarea id="json-input" rows="6" placeholder='[{"text":"Q1","options":["A","B","C","D"],"correct":0}]' style="font-family:monospace; font-size:12px;"></textarea>
+                    <button class="btn-primary" onclick="app.processJSON()">Parse Code</button>
                 </div>
 
-                <div style="margin-top:20px; display:flex; gap:10px;">
-                    <button class="btn-primary" onclick="app.saveExam()" id="btn-save">Publish</button>
-                    <button class="btn-danger hidden" id="btn-cancel" onclick="app.resetEditor()">Cancel</button>
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                    <button class="btn-primary" onclick="app.saveExam()" id="btn-save">DEPLOY EXAM</button>
+                    <button class="btn-danger hidden" id="btn-cancel" onclick="app.resetEditor()">CANCEL</button>
                 </div>
             </div>
             
-            <input type="text" placeholder="Search Exams..." onkeyup="app.filterList('exam-list', this.value)">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search Database..." onkeyup="app.filterList('exam-list', this.value)">
+            </div>
             <div id="exam-list"></div>
         </div>
 
-        <!-- Admin: Results -->
+        <!-- RESULTS MANAGER -->
         <div id="tab-results" class="hidden">
             <div id="res-list-view">
-                <h3>Exam Results</h3>
+                <h3>Active Records</h3>
                 <div id="results-list"></div>
             </div>
             <div id="res-detail-view" class="hidden">
-                <button class="btn-secondary btn-sm" onclick="app.closeResDetail()">&larr; Back</button>
+                <button class="btn-secondary btn-sm" onclick="app.closeResDetail()" style="margin-bottom:10px;">&larr; Return</button>
                 <div class="card">
-                    <h3 id="res-title">Exam</h3>
-                    <div style="display:flex; gap:10px; margin-bottom:10px;">
-                        <button class="btn-primary btn-sm" onclick="app.publishAll(true)">Pub All</button>
-                        <button class="btn-warning btn-sm" onclick="app.publishAll(false)">Unpub All</button>
+                    <h3 id="res-title"></h3>
+                    <div style="display:flex; gap:10px; margin-bottom:15px;">
+                        <button class="btn-primary btn-sm" onclick="app.publishAll(true)">Publish All</button>
+                        <button class="btn-secondary btn-sm" onclick="app.publishAll(false)">Recall All</button>
                     </div>
-                    <div style="overflow-x: auto;">
-                        <table id="res-table"><thead><tr><th>Name</th><th>Score</th><th>Status</th><th>Act</th></tr></thead><tbody></tbody></table>
+                    <div style="overflow-x:auto;">
+                        <table id="res-table"><thead><tr><th>Cadet</th><th>Score</th><th>Status</th><th>Ops</th></tr></thead><tbody></tbody></table>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Admin: Students -->
+        <!-- STUDENT MANAGER -->
         <div id="tab-students" class="hidden">
             <div class="card">
-                <h3>Student Management</h3>
-                <input type="text" placeholder="Search Students..." onkeyup="app.filterTable('stu-table', this.value)">
-                <div style="overflow-x:auto;"><table id="stu-table"><thead><tr><th>Name</th><th>Class</th><th>Action</th></tr></thead><tbody></tbody></table></div>
+                <h3>Registered Users</h3>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search Users..." onkeyup="app.filterTable('stu-table', this.value)">
+                </div>
+                <div style="overflow-x:auto;"><table id="stu-table"><thead><tr><th>Identity</th><th>Class</th><th>Access</th></tr></thead><tbody></tbody></table></div>
             </div>
         </div>
     </div>
 
-    <!-- STUDENT DASHBOARD -->
+    <!-- === STUDENT VIEW === -->
     <div id="view-student" class="container hidden">
-        <!-- Home -->
+        <!-- HOME -->
         <div id="stu-tab-home">
-            <div class="card">
-                <h2>Hi, <span id="stu-name">Student</span>!</h2>
-                <div style="display:flex; gap:15px; margin-top:10px;">
-                    <div style="text-align:center;"><b id="quick-taken" style="font-size:20px;">0</b><br><small style="color:#aaa">Taken</small></div>
-                    <div style="text-align:center;"><b id="quick-avg" style="font-size:20px; color:var(--secondary)">0%</b><br><small style="color:#aaa">Avg</small></div>
+            <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <h2 id="stu-name" class="text-neon">Cadet</h2>
+                    <small id="stu-class">Class --</small>
+                </div>
+                <div id="stu-rank-badge" class="badge">UNRANKED</div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;">
+                <div class="card" style="text-align:center; padding:10px; margin:0;">
+                    <h3 id="quick-taken" style="color:white; margin:0;">0</h3>
+                    <small style="color:#888;">Missions</small>
+                </div>
+                <div class="card" style="text-align:center; padding:10px; margin:0;">
+                    <h3 id="quick-avg" style="color:var(--neon-blue); margin:0;">0%</h3>
+                    <small style="color:#888;">Accuracy</small>
                 </div>
             </div>
-            
-            <div class="card">
-                <h3><i class="fas fa-bell"></i> Notifications</h3>
-                <div id="msg-list"><p style="color:#777">No messages.</p></div>
-            </div>
 
             <div class="card">
-                <h3>📢 Announcements</h3>
+                <h3><i class="fas fa-broadcast-tower"></i> Comms Channel</h3>
                 <div id="announcement-list"></div>
+                <div id="msg-list" style="margin-top:10px;"></div>
             </div>
-            
+
             <div class="card" id="leaderboard-card">
-                <h3>🏆 Class Leaderboard</h3>
-                <div id="leaderboard-list"><p>Loading...</p></div>
+                <h3><i class="fas fa-trophy"></i> Elite Leaderboard</h3>
+                <div id="leaderboard-list"></div>
             </div>
-            <div class="card hidden" id="leaderboard-disabled"><p style="color:#aaa;">Leaderboard hidden.</p></div>
+            <div class="card hidden" id="leaderboard-disabled"><p style="color:#666;">Leaderboard Offline.</p></div>
         </div>
 
-        <!-- Exams -->
+        <!-- EXAMS -->
         <div id="stu-tab-exams" class="hidden">
-            <h3>Available Exams</h3>
+            <h3 class="text-neon">Available Missions</h3>
+            <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Find Mission..." onkeyup="app.filterList('stu-exam-list', this.value)"></div>
             <div id="stu-exam-list"></div>
         </div>
 
-        <!-- Results -->
+        <!-- RESULTS -->
         <div id="stu-tab-results" class="hidden">
             <div class="tabs">
-                <button class="tab-btn active" onclick="app.toggleResTabs('published', this)">Published</button>
+                <button class="tab-btn active" onclick="app.toggleResTabs('published', this)">Verified</button>
                 <button class="tab-btn" onclick="app.toggleResTabs('pending', this)">Pending</button>
             </div>
             <div id="stu-res-pub"></div>
             <div id="stu-res-pen" class="hidden"></div>
         </div>
 
-        <!-- Profile -->
+        <!-- PROFILE -->
         <div id="stu-tab-profile" class="hidden">
             <div class="card" style="text-align:center;">
-                <img src="" id="pro-img" class="profile-img-lg" onerror="this.src='https://via.placeholder.com/100'">
-                <label class="profile-upload-label" for="pro-file"><i class="fas fa-camera"></i> Change Photo</label>
-                <input type="file" id="pro-file" accept="image/*" style="display:none;" onchange="app.uploadProfilePhoto(this)">
+                <img src="" id="pro-img" style="width:100px; height:100px; border-radius:50%; border:2px solid var(--neon-blue); object-fit:cover;">
+                <label for="pro-file" style="display:block; margin-top:5px; color:var(--neon-purple); cursor:pointer; font-size:10px;">CHANGE AVATAR</label>
+                <input type="file" id="pro-file" hidden accept="image/*" onchange="app.uploadPhoto(this)">
                 
-                <h2 id="pro-name-2" style="margin-top:10px;">Name</h2>
-                <p id="pro-status" style="margin-bottom:15px;"></p>
+                <h2 id="pro-name-2" style="margin-top:10px;">User</h2>
+                <div id="pro-status-badge"></div>
                 
-                <div class="option-grid" style="text-align:left;">
-                    <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px;">
-                        <small style="color:#aaa">Email</small><br><span id="pro-email" style="font-size:12px;">--</span>
-                    </div>
-                    <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px;">
-                        <small style="color:#aaa">Phone</small><br><span id="pro-phone">--</span>
-                    </div>
-                    <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px;">
-                        <small style="color:#aaa">Class</small><br><span id="pro-class">--</span>
-                    </div>
+                <div style="text-align:left; margin-top:20px; background:rgba(0,0,0,0.3); padding:15px; border-radius:8px;">
+                    <p style="margin:5px 0;"><i class="fas fa-envelope" style="width:20px; color:#666;"></i> <span id="pro-email">--</span></p>
+                    <p style="margin:5px 0;"><i class="fas fa-phone" style="width:20px; color:#666;"></i> <span id="pro-phone">--</span></p>
+                    <p style="margin:5px 0;"><i class="fas fa-id-badge" style="width:20px; color:#666;"></i> <span id="pro-class-2">--</span></p>
                 </div>
-                <button class="btn-danger" style="margin-top:20px;" onclick="app.logout()">Logout</button>
+                
+                <button class="btn-danger" style="margin-top:20px;" onclick="app.logout()">TERMINATE SESSION</button>
             </div>
         </div>
 
         <div class="bottom-nav">
-            <div class="nav-item active" onclick="app.stuNav('home', this)"><i class="fas fa-home"></i><span>Home</span></div>
-            <div class="nav-item" onclick="app.stuNav('exams', this)"><i class="fas fa-file-alt"></i><span>Exams</span></div>
-            <div class="nav-item" onclick="app.stuNav('results', this)"><i class="fas fa-chart-bar"></i><span>Results</span></div>
-            <div class="nav-item" onclick="app.stuNav('profile', this)"><i class="fas fa-user"></i><span>Profile</span></div>
+            <div class="nav-item active" onclick="app.stuNav('home', this)"><i class="fas fa-home"></i><span>HUB</span></div>
+            <div class="nav-item" onclick="app.stuNav('exams', this)"><i class="fas fa-crosshairs"></i><span>EXAMS</span></div>
+            <div class="nav-item" onclick="app.stuNav('results', this)"><i class="fas fa-chart-pie"></i><span>LOGS</span></div>
+            <div class="nav-item" onclick="app.stuNav('profile', this)"><i class="fas fa-user-astronaut"></i><span>ID</span></div>
         </div>
     </div>
 
-    <!-- EXAM TAKING VIEW -->
-    <div id="view-paper" class="container hidden">
-        <div class="card" style="position:sticky; top:10px; z-index:100; display:flex; justify-content:space-between; border-bottom:2px solid var(--primary);">
-            <span id="paper-title" style="font-weight:bold;">Exam</span>
-            <span id="paper-timer" style="color:var(--danger); font-weight:bold;">00:00</span>
+    <!-- === EXAM ENGINE === -->
+    <div id="view-paper" class="container hidden" style="max-width:100%; height:100vh; padding:0; background:var(--bg-dark);">
+        <div style="position:fixed; top:0; width:100%; background:rgba(0,0,0,0.95); padding:10px 20px; z-index:2000; border-bottom:1px solid var(--neon-blue); display:flex; justify-content:space-between; align-items:center;">
+            <span id="paper-title" style="color:white; font-weight:bold;">PROTOCOL</span>
+            <span id="paper-timer" style="color:var(--neon-blue); font-family:'Orbitron'; font-size:18px;">00:00</span>
         </div>
-        <div id="pdf-viewer" class="hidden card" style="height:400px; padding:0;">
-            <iframe id="pdf-frame" style="width:100%; height:100%; border:none; border-radius:16px;"></iframe>
+        <div id="pdf-viewer" class="hidden" style="margin-top:50px; height:40vh; overflow:hidden;"><iframe id="pdf-frame" style="width:100%; height:100%; border:none;"></iframe></div>
+        <div id="paper-qs" style="margin-top:60px; padding:20px; padding-bottom:80px;"></div>
+        <div style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); width:90%; z-index:2000;">
+            <button class="btn-primary" onclick="app.submit()">COMPLETE MISSION</button>
         </div>
-        <div id="paper-qs"></div>
-        <button class="btn-primary" onclick="app.submit()">Submit Exam</button>
+    </div>
+
+    <!-- === ADMIN: EDIT STUDENT MODAL === -->
+    <div id="modal-edit-student" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:3000; display:flex; justify-content:center; align-items:center;">
+        <div class="card" style="width:90%; max-width:400px;">
+            <h3>Modify Identity</h3>
+            <input type="hidden" id="edt-uid">
+            <input type="text" id="edt-name" placeholder="Name">
+            <input type="tel" id="edt-phone" placeholder="Phone">
+            <div style="display:flex; gap:10px;">
+                <select id="edt-class"><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
+                <select id="edt-div"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
+            </div>
+            <textarea id="edt-msg" rows="2" placeholder="Send Personal Message..."></textarea>
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <button class="btn-primary" onclick="app.saveStudentEdit()">Update</button>
+                <button class="btn-secondary" onclick="document.getElementById('modal-edit-student').classList.add('hidden')">Cancel</button>
+            </div>
+        </div>
     </div>
 
     <script type="module">
@@ -394,7 +407,6 @@
         import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, deleteDoc, updateDoc, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-        // CONFIGURATION
         const firebaseConfig = {
             apiKey: "AIzaSyBEMPS8vEJztGpoBPJjJIzKKInyt4IY9rQ",
             authDomain: "studentlms-79722.firebaseapp.com",
@@ -419,11 +431,11 @@
         window.app = {
             toast: (m, t='success') => {
                 const b=document.getElementById('toast-box'), d=document.createElement('div');
-                d.className='toast'; d.style.borderColor=t==='error'?'red':'lime'; d.innerText=m;
+                d.className='toast'; d.style.borderLeftColor=t==='error'?var(--danger):var(--success); d.innerText=m;
                 b.appendChild(d); setTimeout(()=>d.remove(),3000);
             },
             
-            // AUTH
+            // --- AUTH ---
             toggleAuth: (mode) => {
                 document.getElementById('login-form').classList.toggle('hidden', mode==='reg');
                 document.getElementById('reg-form').classList.toggle('hidden', mode!=='reg');
@@ -451,28 +463,23 @@
                 try {
                     const res = await createUserWithEmailAndPassword(auth, e, p);
                     const role = e===ADMIN_EMAIL?'admin':'student';
-                    await setDoc(doc(db,"users",res.user.uid), { email:e, displayName:n, phone:ph||"N/A", role, class:c, division:d, isApproved:role==='admin' });
-                    if(role!=='admin') app.toast('Registered! Wait for approval.');
+                    await setDoc(doc(db,"users",res.user.uid), { email:e, displayName:n, phone:ph||"N/A", role, class:c, division:d, isApproved:role==='admin', photoURL: "" });
+                    if(role!=='admin') app.toast('Identity Created. Pending Approval.');
                 } catch(err){ app.toast(err.message,'error'); }
             },
             logout: () => signOut(auth),
 
-            // UTILS
+            // --- UTILS ---
             filterList: (id, term) => {
                 const termLower = term.toLowerCase();
-                document.querySelectorAll(`#${id} .card`).forEach(el => {
-                    const txt = el.innerText.toLowerCase();
-                    el.style.display = txt.includes(termLower) ? 'flex' : 'none';
-                });
+                document.querySelectorAll(`#${id} .card`).forEach(el => el.style.display = el.innerText.toLowerCase().includes(termLower) ? 'block' : 'none');
             },
             filterTable: (id, term) => {
                 const termLower = term.toLowerCase();
-                document.querySelectorAll(`#${id} tbody tr`).forEach(row => {
-                    row.style.display = row.innerText.toLowerCase().includes(termLower) ? 'table-row' : 'none';
-                });
+                document.querySelectorAll(`#${id} tbody tr`).forEach(row => row.style.display = row.innerText.toLowerCase().includes(termLower) ? 'table-row' : 'none');
             },
 
-            // ADMIN
+            // --- ADMIN ---
             tab: (t, el) => {
                 document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active');
                 document.getElementById('tab-exams').classList.toggle('hidden', t!=='exams');
@@ -486,19 +493,16 @@
                 const txt = document.getElementById('ann-input').value;
                 if(!txt) return;
                 await addDoc(collection(db, "announcements"), { text: txt, date: new Date() });
-                document.getElementById('ann-input').value = "";
-                app.toast("Posted");
+                document.getElementById('ann-input').value = ""; app.toast("Broadcast Sent");
             },
-            loadConfig: async () => {
-                const docSnap = await getDoc(doc(db, "system", "config"));
-                if(docSnap.exists()) {
-                    document.getElementById('admin-lb-toggle').checked = docSnap.data().leaderboardVisible;
-                }
+            deleteAnnounce: async (id, el) => {
+                if(confirm("Delete?")) { await deleteDoc(doc(db, "announcements", id)); el.parentElement.remove(); }
             },
+            
+            // CONFIG
             toggleLeaderboard: async () => {
                 const status = document.getElementById('admin-lb-toggle').checked;
                 await setDoc(doc(db, "system", "config"), { leaderboardVisible: status }, {merge: true});
-                app.toast(status ? "Leaderboard Visible" : "Leaderboard Hidden");
             },
 
             // EXAM BUILDER
@@ -506,11 +510,17 @@
                 document.getElementById('builder-manual').classList.toggle('hidden', m!=='manual');
                 document.getElementById('builder-json').classList.toggle('hidden', m!=='json');
             },
+            insertTag: (btn, tag) => {
+                const ta = btn.parentElement.nextElementSibling;
+                const s = ta.selectionStart, e = ta.selectionEnd, val = ta.value;
+                ta.value = val.slice(0,s) + `<${tag}>${val.slice(s,e)}</${tag}>` + val.slice(e);
+            },
             addQ: (data=null) => {
                 const c = document.getElementById('q-container');
                 const div = document.createElement('div'); div.className='card q-card'; div.style.padding='15px';
                 div.innerHTML = `
-                    <div style="display:flex; justify-content:space-between;"><small>MCQ</small><i class="fas fa-times" style="color:red" onclick="this.parentElement.parentElement.remove()"></i></div>
+                    <div style="display:flex; justify-content:space-between;"><small>MCQ</small><i class="fas fa-times" style="color:var(--danger)" onclick="this.parentElement.parentElement.remove()"></i></div>
+                    <div style="margin-bottom:5px;"><button class="btn-sm btn-secondary" onclick="app.insertTag(this,'b')">B</button> <button class="btn-sm btn-secondary" onclick="app.insertTag(this,'sup')">^</button> <button class="btn-sm btn-secondary" onclick="app.insertTag(this,'sub')">_</button></div>
                     <textarea class="q-txt" placeholder="Question">${data?data.text:''}</textarea>
                     <div class="option-grid">
                         <input type="text" class="o0" placeholder="A" value="${data?data.options[0]:''}">
@@ -542,7 +552,6 @@
                 const time = document.getElementById('ex-time').value;
                 const neg = document.getElementById('ex-neg').value || 0;
                 const pin = document.getElementById('ex-pin').value;
-                const shuffle = document.getElementById('ex-shuffle').checked;
                 const pdfFile = document.getElementById('ex-pdf').files[0];
                 const editId = document.getElementById('edit-exam-id').value;
                 const qCards = document.querySelectorAll('.q-card');
@@ -565,17 +574,14 @@
                     });
                 });
 
-                const data = { 
-                    title, targetClass:cls, time:parseInt(time), negMark:parseFloat(neg), pin, shuffle,
-                    pdf: pdfUrl, questions: qList, updatedAt: new Date(), resultsReleased: false 
-                };
+                const data = { title, targetClass:cls, time:parseInt(time), negMark:parseFloat(neg), pin, pdf: pdfUrl, questions: qList, updatedAt: new Date(), resultsReleased: false };
 
                 try {
                     if(editId) { delete data.resultsReleased; await updateDoc(doc(db, "exams", editId), data); }
                     else { data.createdAt = new Date(); await addDoc(collection(db, "exams"), data); }
-                    app.toast("Exam Saved"); app.resetEditor(); app.loadExams();
+                    app.toast("Protocol Saved"); app.resetEditor(); app.loadExams();
                 } catch(e){ app.toast(e.message, 'error'); }
-                btn.disabled=false; btn.innerText="Publish";
+                btn.disabled=false; btn.innerText="DEPLOY EXAM";
             },
             loadExams: async () => {
                 const d = document.getElementById('exam-list'); d.innerHTML = "";
@@ -584,7 +590,7 @@
                     const e = doc.data();
                     d.innerHTML += `
                         <div class="card" style="display:flex; justify-content:space-between;">
-                            <div><b>${e.title}</b> <span class="badge badge-active">${e.targetClass}</span><br><small>Neg: ${e.negMark||0}</small></div>
+                            <div><b>${e.title}</b> <span class="badge" style="color:var(--neon-blue)">${e.targetClass}</span><br><small>PIN: ${e.pin||'None'}</small></div>
                             <div>
                                 <button class="btn-secondary btn-sm" onclick="app.editExam('${doc.id}')"><i class="fas fa-edit"></i></button>
                                 <button class="btn-danger btn-sm" onclick="app.delExam('${doc.id}')"><i class="fas fa-trash"></i></button>
@@ -601,7 +607,6 @@
                 document.getElementById('ex-time').value = e.time;
                 document.getElementById('ex-neg').value = e.negMark || 0;
                 document.getElementById('ex-pin').value = e.pin || "";
-                document.getElementById('ex-shuffle').checked = e.shuffle || false;
                 document.getElementById('ex-pdf-url').value = e.pdf || "";
                 document.getElementById('q-container').innerHTML = "";
                 e.questions.forEach(q => app.addQ(q));
@@ -616,14 +621,15 @@
             },
             delExam: async (id) => { if(confirm("Delete?")) { await deleteDoc(doc(db,"exams",id)); app.loadExams(); }},
 
-            // RESULT MANAGEMENT
+            // --- RESULT MANAGEMENT ---
             loadResList: async () => {
                 const list = document.getElementById('results-list'); list.innerHTML = "Loading...";
                 const snap = await getDocs(collection(db, "exams"));
                 list.innerHTML = "";
                 snap.forEach(d => {
                     const e = d.data();
-                    list.innerHTML += `<div class="card" style="display:flex; justify-content:space-between;"><div><b>${e.title}</b><br>${e.resultsReleased?'Released':'Hidden'}</div><button class="btn-secondary btn-sm" onclick="app.viewResDetail('${d.id}','${e.title}',${e.resultsReleased})">View</button></div>`;
+                    const st = e.resultsReleased ? '<span style="color:lime">LIVE</span>' : '<span style="color:#aaa">HIDDEN</span>';
+                    list.innerHTML += `<div class="card" style="display:flex; justify-content:space-between;"><div><b>${e.title}</b><br>${st}</div><button class="btn-secondary btn-sm" onclick="app.viewResDetail('${d.id}','${e.title}',${e.resultsReleased})">View Data</button></div>`;
                 });
             },
             viewResDetail: async (eid, title, rel) => {
@@ -631,21 +637,20 @@
                 document.getElementById('res-list-view').classList.add('hidden');
                 document.getElementById('res-detail-view').classList.remove('hidden');
                 document.getElementById('res-title').innerText = title;
-                const tbody = document.querySelector('#res-table tbody'); tbody.innerHTML = "<tr><td>Loading...</td></tr>";
+                const tbody = document.querySelector('#res-table tbody'); tbody.innerHTML = "<tr><td>Fetching...</td></tr>";
                 const snap = await getDocs(query(collection(db,"results"), where("examId","==",eid)));
                 tbody.innerHTML = "";
                 snap.forEach(d => {
                     const r = d.data();
                     const isPub = (r.isReleased === true || rel === true);
-                    const status = isPub ? '<span style="color:lime">Pub</span>' : '<span style="color:orange">Hid</span>';
+                    const status = isPub ? '<i class="fas fa-eye text-neon"></i>' : '<i class="fas fa-eye-slash text-warn"></i>';
+                    const icon = isPub ? 'fa-eye-slash text-warn' : 'fa-eye text-neon';
+                    const act = isPub ? false : true; 
                     
-                    const toggleBtn = isPub 
-                        ? `<i class="fas fa-eye-slash" style="cursor:pointer; color:orange; margin-right:15px;" onclick="app.toggleResult('${d.id}', false)"></i>` 
-                        : `<i class="fas fa-eye" style="cursor:pointer; color:lime; margin-right:15px;" onclick="app.toggleResult('${d.id}', true)"></i>`;
-                    
-                    const delBtn = `<i class="fas fa-trash" style="cursor:pointer; color:red;" onclick="app.deleteResult('${d.id}')"></i>`;
-
-                    tbody.innerHTML += `<tr><td>${r.studentName}</td><td>${r.score}</td><td>${status}</td><td>${toggleBtn}${delBtn}</td></tr>`;
+                    tbody.innerHTML += `<tr><td>${r.studentName}</td><td>${r.score}</td><td>${status}</td><td>
+                        <i class="fas ${icon}" style="cursor:pointer; margin-right:10px;" onclick="app.toggleResult('${d.id}', ${act})"></i>
+                        <i class="fas fa-trash" style="cursor:pointer; color:red;" onclick="app.deleteResult('${d.id}')"></i>
+                    </td></tr>`;
                 });
             },
             toggleResult: async (rid, status) => {
@@ -654,7 +659,7 @@
                 app.viewResDetail(adminCurrentExamId, examDoc.data().title, examDoc.data().resultsReleased);
             },
             deleteResult: async (rid) => {
-                if(confirm("Delete result?")) {
+                if(confirm("Purge record?")) {
                     await deleteDoc(doc(db, "results", rid));
                     const examDoc = await getDoc(doc(db, "exams", adminCurrentExamId));
                     app.viewResDetail(adminCurrentExamId, examDoc.data().title, examDoc.data().resultsReleased);
@@ -662,14 +667,13 @@
             },
             closeResDetail: () => { document.getElementById('res-detail-view').classList.add('hidden'); document.getElementById('res-list-view').classList.remove('hidden'); },
             publishAll: async (status) => {
-                if(confirm(status ? "Publish ALL?" : "Unpublish ALL?")) { 
+                if(confirm(status ? "Publish All?" : "Recall All?")) { 
                     await updateDoc(doc(db,"exams",adminCurrentExamId),{resultsReleased:status}); 
                     app.viewResDetail(adminCurrentExamId, document.getElementById('res-title').innerText, status);
-                    app.toast("Updated All"); 
                 }
             },
             
-            // ADMIN STUDENTS
+            // --- ADMIN STUDENTS ---
             loadStu: async () => {
                 const t = document.querySelector('#stu-table tbody'); t.innerHTML='<tr><td>Loading...</td></tr>';
                 const snap = await getDocs(query(collection(db,"users"), where("role","==","student")));
@@ -677,64 +681,55 @@
                 snap.forEach(d => {
                     const u = d.data();
                     const cls = u.class ? `${u.class}-${u.division||'A'}` : 'N/A';
-                    const act = u.isApproved ? `<button class="btn-danger btn-sm" onclick="app.updApp('${d.id}',false)">Block</button>` : `<button class="btn-success btn-sm" onclick="app.updApp('${d.id}',true)">Approve</button>`;
-                    const manageBtn = `<button class="btn-secondary btn-sm" onclick="app.openManageStu('${d.id}')">Manage</button>`;
-                    t.innerHTML += `<tr><td>${u.displayName}<br>${u.email}</td><td>${cls} ${manageBtn}</td><td>${act}</td></tr>`;
+                    const act = u.isApproved ? `<i class="fas fa-ban text-warn" onclick="app.updApp('${d.id}',false)"></i>` : `<i class="fas fa-check text-neon" onclick="app.updApp('${d.id}',true)"></i>`;
+                    t.innerHTML += `<tr><td>${u.displayName}<br><small>${u.email}</small></td><td>${cls}</td><td>${act} <i class="fas fa-cog" style="margin-left:10px; cursor:pointer;" onclick="app.openEditStu('${d.id}')"></i></td></tr>`;
                 });
             },
             updApp: async(id, s)=>{ await updateDoc(doc(db,"users",id),{isApproved:s}); app.loadStu(); },
-            openManageStu: async (uid) => {
+            openEditStu: async (uid) => {
                 const docSnap = await getDoc(doc(db, "users", uid));
                 const u = docSnap.data();
-                document.getElementById('mng-uid').value = uid;
-                document.getElementById('mng-name').value = u.displayName || "";
-                document.getElementById('mng-email').value = u.email || "";
-                document.getElementById('mng-phone').value = u.phone || "";
-                if(u.class) document.getElementById('mng-class').value = u.class;
-                if(u.division) document.getElementById('mng-div').value = u.division;
-                document.getElementById('modal-manage-student').classList.remove('hidden');
+                document.getElementById('edt-uid').value = uid;
+                document.getElementById('edt-name').value = u.displayName || "";
+                document.getElementById('edt-phone').value = u.phone || "";
+                document.getElementById('edt-class').value = u.class || "9";
+                document.getElementById('edt-div').value = u.division || "A";
+                document.getElementById('modal-edit-student').classList.remove('hidden');
             },
-            adminSaveStudent: async () => {
-                const id = document.getElementById('mng-uid').value;
-                const msg = document.getElementById('mng-msg').value;
-                const data = {
-                    displayName: document.getElementById('mng-name').value,
-                    phone: document.getElementById('mng-phone').value,
-                    class: document.getElementById('mng-class').value,
-                    division: document.getElementById('mng-div').value
-                };
-                
-                await updateDoc(doc(db,"users",id), data);
-                if(msg.trim()) {
-                    await addDoc(collection(db, `users/${id}/messages`), { text: msg, date: new Date(), read: false });
-                    app.toast("Message Sent");
-                }
-                document.getElementById('modal-manage-student').classList.add('hidden');
-                document.getElementById('mng-msg').value = "";
-                app.loadStu();
+            saveStudentEdit: async () => {
+                const id = document.getElementById('edt-uid').value;
+                const msg = document.getElementById('edt-msg').value;
+                await updateDoc(doc(db,"users",id),{
+                    displayName:document.getElementById('edt-name').value,
+                    phone:document.getElementById('edt-phone').value,
+                    class:document.getElementById('edt-class').value,
+                    division:document.getElementById('edt-div').value
+                });
+                if(msg.trim()) { await addDoc(collection(db, `users/${id}/messages`), { text: msg, date: new Date() }); }
+                document.getElementById('modal-edit-student').classList.add('hidden'); app.loadStu(); app.toast("Updated");
             },
 
-            // STUDENT UI
+            // --- STUDENT UI ---
             stuNav: (t, el) => {
                 document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active')); el.classList.add('active');
                 ['home','exams','results','profile'].forEach(x=>document.getElementById(`stu-tab-${x}`).classList.add('hidden'));
                 document.getElementById(`stu-tab-${t}`).classList.remove('hidden');
-                if(t==='home') { app.loadLeaderboard(); app.loadAnnouncements(); app.loadMessages(); app.loadStuStats(); }
+                if(t==='home') { app.loadLeaderboard(); app.loadAnnouncements(); app.loadMessages(); }
                 if(t==='exams') app.loadStuExams();
-                if(t==='results') { app.loadStuHistory(); app.toggleResTabs('published', document.querySelector('.tabs .tab-btn')); }
-                if(t==='profile') app.loadProfileData();
+                if(t==='results') app.loadStuHistory();
+                if(t==='profile') app.loadProfileStats();
             },
             
-            // Student Features
+            // STUDENT DATA
             loadAnnouncements: async () => {
                 const c = document.getElementById('announcement-list');
                 const q = query(collection(db, "announcements"), orderBy("date", "desc"), limit(5));
                 const snap = await getDocs(q);
                 c.innerHTML = "";
-                if(snap.empty) { c.innerHTML = "<p style='color:#777; font-size:12px;'>No new announcements.</p>"; return; }
+                if(snap.empty) { c.innerHTML = "<small>No announcements.</small>"; return; }
                 snap.forEach(d => {
                     const date = new Date(d.data().date.seconds*1000).toLocaleDateString();
-                    c.innerHTML += `<div class="msg-card"><small style="color:var(--secondary)">${date}</small><br>${d.data().text}</div>`;
+                    c.innerHTML += `<div class="card" style="padding:10px; margin-bottom:10px; border-left:3px solid var(--neon-blue);"><small style="color:#aaa">${date}</small><br>${d.data().text}</div>`;
                 });
             },
             loadMessages: async () => {
@@ -742,21 +737,11 @@
                 const q = query(collection(db, `users/${user.uid}/messages`), orderBy("date", "desc"), limit(5));
                 const snap = await getDocs(q);
                 c.innerHTML = "";
-                if(snap.empty) { c.innerHTML = "<p style='color:#777; font-size:12px;'>No messages from admin.</p>"; return; }
                 snap.forEach(d => {
-                    c.innerHTML += `<div class="msg-card"><small style="color:lime">Admin Message</small><br>${d.data().text}</div>`;
+                    c.innerHTML += `<div class="card" style="padding:10px; margin-bottom:10px; border-left:3px solid var(--neon-purple);"><small style="color:var(--neon-purple)">ADMIN MESSAGE</small><br>${d.data().text}</div>`;
                 });
             },
-            loadStuStats: async () => {
-                const q = query(collection(db, "results"), where("uid", "==", user.uid));
-                const snap = await getDocs(q);
-                let totalExams=0, totalPct=0;
-                snap.forEach(d => { totalExams++; totalPct += (parseFloat(d.data().score)/d.data().total)*100; });
-                const avg = totalExams>0 ? (totalPct/totalExams) : 0;
-                document.getElementById('quick-taken').innerText = totalExams;
-                document.getElementById('quick-avg').innerText = avg.toFixed(0) + "%";
-            },
-            uploadProfilePhoto: async (input) => {
+            uploadPhoto: async (input) => {
                 const file = input.files[0];
                 if(!file) return;
                 const fd = new FormData(); fd.append('file', file); fd.append('upload_preset', CLOUD_PRESET);
@@ -765,26 +750,28 @@
                     const res = await (await fetch(CLOUD_URL, {method:'POST', body:fd})).json();
                     await updateDoc(doc(db,"users",user.uid), { photoURL: res.secure_url });
                     document.getElementById('pro-img').src = res.secure_url;
-                    app.toast("Photo Updated!");
+                    app.toast("Avatar Updated");
                 } catch(e) { app.toast("Upload failed", 'error'); }
             },
-            loadProfileData: async () => {
-                // Same logic as loadStuStats but populate profile tab
+            loadProfileStats: async () => {
                 const q = query(collection(db, "results"), where("uid", "==", user.uid));
                 const snap = await getDocs(q);
                 let totalExams=0, totalPct=0;
                 snap.forEach(d => { totalExams++; totalPct += (parseFloat(d.data().score)/d.data().total)*100; });
                 const avg = totalExams>0 ? (totalPct/totalExams) : 0;
                 
-                let badge = `<span class="badge">New Student</span>`;
-                if(totalExams>0) {
-                    if(avg>=80) badge = `<span class="status-excellent">🏆 Excellent</span>`;
-                    else if(avg>=60) badge = `<span class="status-good">🌟 Good</span>`;
-                    else badge = `<span class="status-avg">⚠️ Needs Improvement</span>`;
-                }
+                let badge = "";
+                if(totalExams===0) badge = `<span class="badge">Recruit</span>`;
+                else if(avg>=80) badge = `<span class="badge" style="color:lime; border-color:lime;">Elite</span>`;
+                else if(avg>=60) badge = `<span class="badge" style="color:#00f7ff; border-color:#00f7ff;">Soldier</span>`;
+                else badge = `<span class="badge" style="color:orange; border-color:orange;">Rookie</span>`;
+
                 document.getElementById('pro-count').innerText = totalExams;
-                document.getElementById('pro-avg').innerText = avg.toFixed(1) + "%";
-                document.getElementById('pro-status').innerHTML = badge;
+                document.getElementById('pro-avg').innerText = avg.toFixed(0) + "%";
+                document.getElementById('pro-status-badge').innerHTML = badge;
+                // Quick stats on home
+                document.getElementById('quick-taken').innerText = totalExams;
+                document.getElementById('quick-avg').innerText = avg.toFixed(0) + "%";
             },
             loadLeaderboard: async () => {
                 const c = document.getElementById('leaderboard-list'); c.innerHTML="Loading...";
@@ -798,16 +785,15 @@
                 document.getElementById('leaderboard-disabled').classList.add('hidden');
 
                 const exSnap = await getDocs(query(collection(db,"exams"), where("resultsReleased","==",true)));
-                if(exSnap.empty) { c.innerHTML="<p style='color:#777; font-size:12px;'>No published results.</p>"; return; }
-                
-                const q = query(collection(db,"results"), orderBy("score", "desc"), limit(10));
+                if(exSnap.empty) { c.innerHTML="<small>No data.</small>"; return; }
+                const q = query(collection(db,"results"), orderBy("score", "desc"), limit(5));
                 const rSnap = await getDocs(q);
                 c.innerHTML="";
                 let rank=1;
                 rSnap.forEach(d => {
                     const r = d.data();
                     if(exSnap.docs.find(e=>e.id===r.examId)) {
-                        c.innerHTML += `<div class="rank-card"><div class="rank-num">#${rank++}</div><div><b>${r.studentName}</b><br><small>${r.examTitle}: ${r.score}</small></div></div>`;
+                        c.innerHTML += `<div class="card" style="padding:10px; margin-bottom:5px; display:flex; align-items:center;"><b style="color:var(--warning); margin-right:10px; font-size:18px;">#${rank++}</b> <div><b>${r.studentName}</b><br><small style="color:#888">${r.examTitle}: ${r.score}</small></div></div>`;
                     }
                 });
             },
@@ -815,11 +801,11 @@
                 const c = document.getElementById('stu-exam-list'); c.innerHTML = "Loading...";
                 const q = query(collection(db,"exams"), where("targetClass","==",user.class));
                 const snap = await getDocs(q);
-                c.innerHTML=""; exams=[];
-                if(snap.empty) c.innerHTML = "<p>No exams.</p>";
+                c.innerHTML=""; 
+                if(snap.empty) c.innerHTML = "<p>No missions available.</p>";
                 snap.forEach(d => {
-                    const e = d.data(); exams.push({id:d.id, ...e});
-                    c.innerHTML += `<div class="card"><h3>${e.title}</h3><p>${e.time} mins | ${e.pdf?'PDF':e.questions.length+' Qs'}</p><button class="btn-primary" onclick="app.confirmTake('${d.id}')">Start</button></div>`;
+                    const e = d.data(); 
+                    c.innerHTML += `<div class="card"><h3>${e.title}</h3><p>${e.time} mins | ${e.questions.length} Qs</p><button class="btn-primary" onclick="app.take('${d.id}')">ACCEPT MISSION</button></div>`;
                 });
             },
             toggleResTabs: (type, btn) => {
@@ -837,8 +823,6 @@
                 const snap = await getDocs(q);
                 pubC.innerHTML=""; 
                 
-                if(snap.empty) { pubC.innerHTML="<p>No exams taken.</p>"; return; }
-
                 for(const d of snap.docs){
                     const r = d.data();
                     let show = r.isReleased;
@@ -846,71 +830,59 @@
                         const eSnap = await getDoc(doc(db,"exams",r.examId));
                         if(eSnap.exists() && eSnap.data().resultsReleased) show = true;
                     }
-                    
                     const date = new Date(r.date.seconds*1000).toLocaleDateString();
-                    const html = `<div class="card"><div style="display:flex;justify-content:space-between;"><div><b>${r.examTitle}</b><br><small>${date}</small></div><div>${show ? `<b style="color:lime; font-size:18px;">${r.score}</b>` : `<span style="color:orange">Pending</span>`}</div></div>${show && r.details ? `<button class="btn-secondary btn-sm" style="margin-top:5px" onclick="app.reviewExam('${d.id}')">Review Answers</button>` : ''}</div>`;
-                    
-                    if(show) pubC.innerHTML += html;
-                    else penC.innerHTML += html;
+                    const html = `<div class="card"><div style="display:flex;justify-content:space-between;"><div><b>${r.examTitle}</b><br><small>${date}</small></div><div>${show ? `<b style="color:lime; font-size:18px;">${r.score}</b>` : `<span style="color:orange">Analyizing</span>`}</div></div>${show && r.details ? `<button class="btn-secondary btn-sm" style="margin-top:10px" onclick="app.reviewExam('${d.id}')">Review</button>` : ''}</div>`;
+                    if(show) pubC.innerHTML += html; else penC.innerHTML += html;
                 }
-                if(pubC.innerHTML === "") pubC.innerHTML = "<p style='color:#777'>No published results.</p>";
-                if(penC.innerHTML === "") penC.innerHTML = "<p style='color:#777'>No pending results.</p>";
+                if(pubC.innerHTML === "") pubC.innerHTML = "<small>No records.</small>";
+                if(penC.innerHTML === "") penC.innerHTML = "<small>No pending.</small>";
             },
             
             // EXAM ENGINE
-            confirmTake: (id) => {
-                activeExam = exams.find(e=>e.id===id);
-                const negText = activeExam.negMark > 0 ? `Negative Marking: ${activeExam.negMark} marks deducted for wrong answers.` : "No Negative Marking.";
-                document.getElementById('ins-neg').innerText = negText;
-                document.getElementById('modal-instructions').classList.remove('hidden');
-            },
-            confirmStartExam: () => {
-                document.getElementById('modal-instructions').classList.add('hidden');
-                if(activeExam.pin) {
-                    const entered = prompt("Enter Exam PIN:");
-                    if(entered !== activeExam.pin) { app.toast("Wrong PIN", 'error'); return; }
-                }
-                app.take();
-            },
-            take: () => {
-                document.getElementById('view-student').classList.add('hidden');
-                document.getElementById('view-paper').classList.remove('hidden');
-                document.getElementById('paper-title').innerText = activeExam.title;
-                if(activeExam.pdf) {
-                    document.getElementById('pdf-viewer').classList.remove('hidden');
-                    document.getElementById('pdf-frame').src = activeExam.pdf; 
-                } else document.getElementById('pdf-viewer').classList.add('hidden');
+            take: (id) => {
+                activeExam = exams.find(e=>e.id===id) || {id}; 
+                // Quick fetch if not in list
+                getDoc(doc(db, "exams", id)).then(snap => {
+                    activeExam = {id: snap.id, ...snap.data()};
+                    if(activeExam.pin) {
+                        const entered = prompt("Enter Protocol PIN:");
+                        if(entered !== activeExam.pin) { app.toast("Access Denied", 'error'); return; }
+                    }
+                    document.getElementById('view-student').classList.add('hidden');
+                    document.getElementById('view-paper').classList.remove('hidden');
+                    document.getElementById('paper-title').innerText = activeExam.title;
+                    if(activeExam.pdf) {
+                        document.getElementById('pdf-viewer').classList.remove('hidden');
+                        document.getElementById('pdf-frame').src = activeExam.pdf; 
+                    } else document.getElementById('pdf-viewer').classList.add('hidden');
 
-                let questionsToRender = [...activeExam.questions];
-                if(activeExam.shuffle) { questionsToRender = questionsToRender.sort(() => Math.random() - 0.5); }
-                activeExam._shuffled = questionsToRender;
-
-                const c = document.getElementById('paper-qs'); c.innerHTML="";
-                questionsToRender.forEach((q,i) => {
-                    c.innerHTML += `
-                    <div class="card">
-                        <p><b>Q${i+1}:</b> ${q.text}</p>
-                        <div class="option-grid">
-                            ${q.options.map((o,idx)=>`<label><input type="radio" name="q${i}" value="${idx}"> ${['A','B','C','D'][idx]}) ${o}</label>`).join('')}
-                        </div>
-                    </div>`;
+                    const c = document.getElementById('paper-qs'); c.innerHTML="";
+                    activeExam.questions.forEach((q,i) => {
+                        c.innerHTML += `
+                        <div class="card">
+                            <p><b>Q${i+1}:</b> ${q.text}</p>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                                ${q.options.map((o,idx)=>`<label style="background:rgba(0,0,0,0.3); padding:10px; border-radius:5px;"><input type="radio" name="q${i}" value="${idx}"> ${['A','B','C','D'][idx]}) ${o}</label>`).join('')}
+                            </div>
+                        </div>`;
+                    });
+                    
+                    warningCount = 0;
+                    document.addEventListener("visibilitychange", app.handleVisibility);
+                    
+                    let t = activeExam.time*60;
+                    timer = setInterval(()=>{
+                        let m=Math.floor(t/60), s=t%60;
+                        document.getElementById('paper-timer').innerText = `${m}:${s<10?'0'+s:s}`;
+                        if(t-- < 0) app.submit();
+                    }, 1000);
                 });
-                
-                warningCount = 0;
-                document.addEventListener("visibilitychange", app.handleVisibility);
-                
-                let t = activeExam.time*60;
-                timer = setInterval(()=>{
-                    let m=Math.floor(t/60), s=t%60;
-                    document.getElementById('paper-timer').innerText = `${m}:${s<10?'0'+s:s}`;
-                    if(t-- < 0) app.submit();
-                }, 1000);
             },
             handleVisibility: () => {
                 if(document.hidden) {
                     warningCount++;
-                    alert(`WARNING: Switching tabs is not allowed! Warning ${warningCount}/3`);
-                    if(warningCount >= 3) { alert("Max warnings reached. Auto-submitting."); app.submit(); }
+                    alert(`SECURITY ALERT: Focus Lost! Warning ${warningCount}/3`);
+                    if(warningCount >= 3) { alert("Security Breach. Auto-submitting."); app.submit(); }
                 }
             },
             submit: async () => {
@@ -919,10 +891,9 @@
                 
                 let score=0;
                 const neg = activeExam.negMark || 0;
-                const questions = activeExam._shuffled || activeExam.questions;
                 let userAnswers = [];
 
-                questions.forEach((q,i) => {
+                activeExam.questions.forEach((q,i) => {
                     const sel = document.querySelector(`input[name="q${i}"]:checked`);
                     let val = -1;
                     if(sel) {
@@ -936,23 +907,18 @@
                 await addDoc(collection(db,"results"), { 
                     uid: user.uid, studentName: user.displayName, studentEmail: user.email,
                     examId: activeExam.id, examTitle: activeExam.title, 
-                    score: score.toFixed(2), total: questions.length, 
-                    date: new Date(), isReleased: false,
-                    details: userAnswers 
+                    score: score.toFixed(2), total: activeExam.questions.length, 
+                    date: new Date(), isReleased: false, details: userAnswers 
                 });
                 
-                alert("Exam Submitted!"); location.reload();
+                alert("Mission Complete."); location.reload();
             },
-            
             reviewExam: async (resultId) => {
                 const snap = await getDoc(doc(db, "results", resultId));
                 const r = snap.data();
-                if(!r.details) { alert("No review available."); return; }
-                
                 document.getElementById('view-student').classList.add('hidden');
                 document.getElementById('view-paper').classList.remove('hidden');
-                document.getElementById('paper-title').innerText = "Review: " + r.examTitle;
-                document.getElementById('paper-timer').innerText = "Score: " + r.score;
+                document.getElementById('paper-title').innerText = "REVIEW: " + r.examTitle;
                 document.getElementById('pdf-viewer').classList.add('hidden'); 
                 document.querySelector('button[onclick="app.submit()"]').classList.add('hidden'); 
                 
@@ -968,7 +934,6 @@
                         let style = "padding:10px; border-radius:5px; margin:5px 0; border:1px solid #333;";
                         if(idx === q.correct) style = "padding:10px; border-radius:5px; margin:5px 0; background:rgba(0,255,0,0.1); border:1px solid lime; color:lime;";
                         else if(idx === q.selected && idx !== q.correct) style = "padding:10px; border-radius:5px; margin:5px 0; background:rgba(255,0,0,0.1); border:1px solid red; color:red;";
-                        
                         optsHtml += `<div style="${style}">${['A','B','C','D'][idx]}) ${o}</div>`;
                     });
                     c.innerHTML += `<div class="card"><p><b>Q${i+1}:</b> ${q.q}</p>${optsHtml}</div>`;
@@ -983,18 +948,19 @@
                 document.getElementById('view-auth').classList.add('hidden');
                 if(user.role==='admin') {
                     document.getElementById('view-admin').classList.remove('hidden');
-                    document.getElementById('admin-name').innerText = user.displayName;
                     app.loadExams();
-                    app.loadConfig(); 
+                    // Load Config
+                    const cfg = await getDoc(doc(db,"system","config"));
+                    if(cfg.exists()) document.getElementById('admin-lb-toggle').checked = cfg.data().leaderboardVisible;
                 } else if(user.isApproved) {
                     document.getElementById('view-student').classList.remove('hidden');
                     document.getElementById('stu-name').innerText = user.displayName;
                     document.getElementById('stu-class').innerText = `${user.class}-${user.division}`;
-                    document.getElementById('pro-name').innerText = user.displayName;
+                    document.getElementById('pro-name-2').innerText = user.displayName;
                     document.getElementById('pro-email').innerText = user.email;
                     document.getElementById('pro-phone').innerText = user.phone || 'N/A';
-                    document.getElementById('pro-class').innerText = `Class ${user.class}-${user.division}`;
-                    document.getElementById('pro-img').src = user.photoURL || "https://via.placeholder.com/100";
+                    document.getElementById('pro-class-2').innerText = `Class ${user.class}-${user.division}`;
+                    if(user.photoURL) document.getElementById('pro-img').src = user.photoURL;
                     app.stuNav('home', document.querySelector('.bottom-nav .nav-item'));
                 } else document.getElementById('view-pending').classList.remove('hidden');
             } else {

@@ -3,209 +3,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NeonLMS - Student Examination System</title>
+    <title>NeonLMS - Secure Approval System</title>
     
-    <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* --- THEME & CSS --- */
+        /* --- THEME --- */
         :root {
             --primary: #7000ff;
             --primary-glow: #bd00ff;
             --secondary: #00f7ff;
             --bg-dark: #050505;
-            --glass-bg: rgba(20, 20, 25, 0.85);
+            --glass-bg: rgba(20, 20, 25, 0.95);
             --glass-border: rgba(255, 255, 255, 0.1);
             --text-main: #ffffff;
             --text-muted: #a0a0a0;
             --success: #00ff9d;
             --danger: #ff0055;
-            --radius: 16px;
+            --warning: #ffb700;
         }
 
         body {
-            margin: 0;
-            font-family: 'Outfit', sans-serif;
+            margin: 0; font-family: 'Outfit', sans-serif;
             background-color: var(--bg-dark);
             background-image: radial-gradient(circle at 50% 0%, #1a1a2e 0%, #000 70%);
-            color: var(--text-main);
-            min-height: 100vh;
-            padding-bottom: 80px;
+            color: var(--text-main); min-height: 100vh; padding-bottom: 80px;
         }
 
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
         .hidden { display: none !important; }
         .flex-center { display: flex; justify-content: center; align-items: center; min-height: 80vh; }
 
-        /* Modern Glass Card */
+        /* Components */
         .card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius);
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            backdrop-filter: blur(10px);
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 16px; padding: 25px; margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(10px);
         }
 
-        /* Inputs & Buttons */
         input, select {
             width: 100%; padding: 14px; margin-bottom: 12px;
             background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
-            border-radius: 10px; color: white; font-family: inherit;
-            box-sizing: border-box;
+            border-radius: 10px; color: white; font-family: inherit; box-sizing: border-box;
         }
+        option { background: #111; color: white; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--glass-border); }
+        th { color: var(--secondary); text-transform: uppercase; font-size: 11px; }
         
         button {
             width: 100%; padding: 14px; border: none; border-radius: 10px;
-            font-weight: 600; font-size: 16px; cursor: pointer;
-            transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
+            font-weight: 600; cursor: pointer; transition: 0.2s; 
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-
         .btn-primary { background: linear-gradient(45deg, var(--primary), var(--primary-glow)); color: white; }
         .btn-secondary { background: rgba(255,255,255,0.1); color: white; }
         .btn-danger { background: rgba(255, 0, 85, 0.15); color: var(--danger); border: 1px solid var(--danger); }
-        .btn-google { background: white; color: #333; margin-top: 10px; }
+        .btn-success { background: rgba(0, 255, 157, 0.15); color: var(--success); border: 1px solid var(--success); }
+        .btn-sm { padding: 6px 12px; width: auto; font-size: 12px; }
 
-        /* Toast */
-        #toast-box { position: fixed; top: 20px; right: 20px; z-index: 9999; }
-        .toast {
-            background: #1e1e24; border-left: 4px solid var(--primary);
-            padding: 15px 20px; margin-bottom: 10px; border-radius: 5px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3); animation: slideIn 0.3s;
-            display: flex; align-items: center; gap: 10px; font-size: 14px;
-        }
-        .toast.error { border-color: var(--danger); }
-        @keyframes slideIn { from{transform:translateX(100%)} to{transform:translateX(0)} }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; background: #333; }
+        .badge-pending { background: rgba(255, 183, 0, 0.15); color: var(--warning); border: 1px solid var(--warning); }
+        .badge-active { background: rgba(0, 255, 157, 0.15); color: var(--success); border: 1px solid var(--success); }
 
-        /* Loader */
-        #global-loader {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: #000; z-index: 99999; display: flex;
-            flex-direction: column; justify-content: center; align-items: center;
-        }
-        .spinner {
-            width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1);
-            border-top-color: var(--secondary); border-radius: 50%;
-            animation: spin 1s infinite linear; margin-bottom: 15px;
-        }
+        /* Loader & Toast */
+        #global-loader { position: fixed; top:0; left:0; width:100%; height:100%; background: #000; z-index: 99999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+        .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--secondary); border-radius: 50%; animation: spin 1s infinite linear; margin-bottom: 15px; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* Nav */
-        .bottom-nav {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(30,30,40,0.9); border: 1px solid var(--glass-border);
-            border-radius: 30px; padding: 15px 30px; display: flex; gap: 40px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 1000;
-        }
-        .nav-icon { font-size: 22px; color: var(--text-muted); cursor: pointer; transition: 0.3s; }
-        .nav-icon.active { color: var(--secondary); transform: translateY(-3px); text-shadow: 0 0 10px var(--secondary); }
-
-        /* Exam Qs */
-        .q-box { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
-        .opt-label { display: flex; padding: 10px; background: rgba(0,0,0,0.2); margin: 5px 0; border-radius: 8px; cursor: pointer; }
-        input[type="radio"]:checked + span { color: var(--success); font-weight: bold; }
+        #toast-box { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+        .toast { background: #1e1e24; border-left: 4px solid var(--primary); padding: 15px; margin-bottom: 10px; color: white; animation: slideIn 0.3s; }
+        @keyframes slideIn { from{transform:translateX(100%)} to{transform:translateX(0)} }
+        
+        /* Modal & Tabs */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; justify-content: center; align-items: center; }
+        .modal-box { width: 90%; max-width: 400px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { background: transparent; border: 1px solid var(--glass-border); color: var(--text-muted); }
+        .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
     </style>
 </head>
 <body>
 
-    <!-- SYSTEM LOADER -->
     <div id="global-loader">
         <div class="spinner"></div>
-        <div style="color: #888; font-size: 14px;">Connecting to System...</div>
+        <div style="color:#888;">Checking Access...</div>
     </div>
-
-    <!-- TOAST NOTIFICATIONS -->
     <div id="toast-box"></div>
 
-    <!-- === VIEW: LOGIN === -->
+    <!-- LOGOUT CONFIRMATION -->
+    <div id="modal-logout" class="modal-overlay hidden">
+        <div class="card modal-box" style="text-align: center;">
+            <i class="fas fa-sign-out-alt" style="font-size: 30px; color: var(--danger); margin-bottom:10px;"></i>
+            <h3>Logout?</h3>
+            <p style="color:#aaa; margin-bottom:20px;">You will need to login again.</p>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-secondary" onclick="document.getElementById('modal-logout').classList.add('hidden')">Cancel</button>
+                <button class="btn-danger" onclick="app.performLogout()">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PENDING APPROVAL SCREEN -->
+    <div id="view-pending" class="container flex-center hidden">
+        <div class="card" style="text-align: center; max-width: 400px;">
+            <i class="fas fa-hourglass-half" style="font-size: 50px; color: var(--warning); margin-bottom: 20px;"></i>
+            <h2>Approval Pending</h2>
+            <p style="color: #ccc; line-height: 1.6;">
+                Your registration has been submitted. 
+                <br>Please wait for the <strong>Admin</strong> to verify your details and approve your account.
+            </p>
+            <p style="font-size: 12px; color: var(--text-muted);">You will be able to access exams once approved.</p>
+            <button class="btn-secondary" onclick="app.showLogout()" style="margin-top: 20px;">Logout</button>
+        </div>
+    </div>
+
+    <!-- VIEW: AUTH -->
     <div id="view-auth" class="container flex-center hidden">
-        <div class="card" style="width: 100%; text-align: center;">
-            <i class="fas fa-atom" style="font-size: 40px; color: var(--primary); margin-bottom: 15px;"></i>
-            <h2 style="margin: 0 0 5px 0;">Neon LMS</h2>
-            <p style="color: #888; margin-bottom: 25px;">Secure Examination Portal</p>
-            
+        <div class="card" style="width: 100%; max-width: 400px; text-align: center;">
+            <i class="fas fa-school" style="font-size: 40px; color: var(--primary); margin-bottom: 15px;"></i>
+            <h2>NeonLMS</h2>
             <div id="login-form">
                 <input type="email" id="email" placeholder="Email">
                 <input type="password" id="password" placeholder="Password">
                 <button class="btn-primary" onclick="app.login()">Login</button>
-                <button class="btn-google" onclick="app.loginGoogle()"><i class="fab fa-google"></i> Google Login</button>
-                <p style="margin-top: 15px; font-size: 13px;">
-                    New? <a href="#" style="color: var(--secondary);" onclick="document.getElementById('login-form').classList.add('hidden'); document.getElementById('reg-form').classList.remove('hidden');">Create Account</a>
-                </p>
+                <button class="btn-secondary" onclick="app.loginGoogle()" style="margin-top:10px; background:white; color:black;"><i class="fab fa-google"></i> Google Login</button>
+                <p style="margin-top: 15px; font-size: 13px;">New? <a href="#" style="color: var(--secondary);" onclick="app.toggleAuth('reg')">Register</a></p>
             </div>
-
             <div id="reg-form" class="hidden">
-                <h3 style="margin-top:0;">Register</h3>
-                <input type="email" id="reg-email" placeholder="New Email">
-                <input type="password" id="reg-pass" placeholder="Create Password (6+ chars)">
-                <button class="btn-primary" onclick="app.register()">Create Account</button>
-                <p style="margin-top: 15px; font-size: 13px;">
-                    <a href="#" style="color: #888;" onclick="document.getElementById('reg-form').classList.add('hidden'); document.getElementById('login-form').classList.remove('hidden');">Back to Login</a>
-                </p>
+                <h3>Registration</h3>
+                <input type="text" id="reg-name" placeholder="Full Name">
+                <input type="tel" id="reg-phone" placeholder="Phone Number">
+                <div style="display: flex; gap: 10px;">
+                    <select id="reg-class">
+                        <option value="" disabled selected>Class</option>
+                        <option value="8">Class 8</option>
+                        <option value="9">Class 9</option>
+                        <option value="10">Class 10</option>
+                    </select>
+                    <select id="reg-div">
+                        <option value="A">Div A</option>
+                        <option value="B">Div B</option>
+                    </select>
+                </div>
+                <input type="email" id="reg-email" placeholder="Email">
+                <input type="password" id="reg-pass" placeholder="Password (6+ chars)">
+                <button class="btn-primary" onclick="app.register()">Submit for Approval</button>
+                <p style="margin-top: 15px;"><a href="#" style="color: #888;" onclick="app.toggleAuth('login')">Back</a></p>
             </div>
         </div>
     </div>
 
-    <!-- === VIEW: ADMIN === -->
+    <!-- VIEW: ADMIN -->
     <div id="view-admin" class="container hidden">
         <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-            <div>
-                <h2 style="margin:0; color: var(--secondary);">Admin Panel</h2>
-                <small>Manage Exams</small>
-            </div>
-            <button class="btn-danger" style="width: auto; padding: 8px 15px;" onclick="app.logout()">Logout</button>
+            <div><h2 style="margin:0;">Admin</h2><small id="admin-welcome">Welcome</small></div>
+            <button class="btn-danger btn-sm" onclick="app.showLogout()">Logout</button>
         </div>
-
-        <div class="card">
-            <h3>Create Exam</h3>
-            <input type="text" id="exam-title" placeholder="Exam Title">
-            <input type="number" id="exam-time" placeholder="Duration (minutes)">
-            <div id="q-builder"></div>
-            <button class="btn-secondary" onclick="app.addQField()" style="margin-bottom:10px;">+ Add Question</button>
-            <button class="btn-primary" onclick="app.saveExam()" id="btn-pub">Publish Exam</button>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="app.switchAdminTab('exams', this)">Exams</button>
+            <button class="tab-btn" onclick="app.switchAdminTab('students', this)">Students & Approvals</button>
         </div>
         
-        <h3>Existing Exams</h3>
-        <div id="admin-list"></div>
+        <!-- Tab: Exams -->
+        <div id="tab-exams">
+            <div class="card" id="exam-editor-card">
+                <h3>Create Exam</h3>
+                <input type="hidden" id="edit-exam-id">
+                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:10px;">
+                    <input type="text" id="exam-title" placeholder="Title">
+                    <select id="exam-target-class"><option value="" disabled selected>Class</option><option value="8">Class 8</option><option value="9">Class 9</option><option value="10">Class 10</option></select>
+                </div>
+                <input type="number" id="exam-time" placeholder="Mins">
+                <div id="q-builder"></div>
+                <button class="btn-secondary" onclick="app.addQField()" style="margin-bottom:10px;">+ Add Question</button>
+                <button class="btn-primary" onclick="app.saveExam()" id="btn-pub">Publish</button>
+                <button class="btn-secondary hidden" id="btn-cancel-edit" onclick="app.resetEditor()">Cancel</button>
+            </div>
+            <div id="admin-exam-list"></div>
+        </div>
+
+        <!-- Tab: Students -->
+        <div id="tab-students" class="hidden">
+            <div class="card">
+                <h3>Student Management</h3>
+                <div style="overflow-x:auto;">
+                    <table id="students-table">
+                        <thead><tr><th>Name</th><th>Class</th><th>Status</th><th>Action</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- === VIEW: STUDENT === -->
+    <!-- VIEW: STUDENT -->
     <div id="view-student" class="container hidden">
         <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-            <h2 style="margin:0;">Dashboard</h2>
-            <button class="btn-danger" style="width: auto; padding: 8px 15px;" onclick="app.logout()"><i class="fas fa-power-off"></i></button>
+            <div><h2 style="margin:0;">Dashboard</h2><span class="badge" style="background:var(--primary);" id="student-class-badge">Class --</span></div>
+            <button class="btn-danger btn-sm" onclick="app.showLogout()">Logout</button>
         </div>
         <div id="student-content"></div>
     </div>
 
-    <!-- === VIEW: EXAM === -->
+    <!-- VIEW: EXAM -->
     <div id="view-exam" class="container hidden">
         <div class="card" style="position:sticky; top:10px; z-index:100; display:flex; justify-content:space-between;">
             <span id="exam-name-display" style="font-weight:bold;">Exam</span>
-            <span id="timer" style="color:var(--danger); font-weight:bold; font-family:monospace; font-size:18px;">00:00</span>
+            <span id="timer" style="color:var(--danger); font-weight:bold;">00:00</span>
         </div>
         <div id="quiz-ui"></div>
-        <button class="btn-primary" onclick="app.submitExam()">Submit Exam</button>
+        <button class="btn-primary" onclick="app.submitExam()">Submit</button>
     </div>
 
-    <!-- NAV (Student Only) -->
-    <div id="nav-bar" class="bottom-nav hidden">
-        <i class="fas fa-home nav-icon active" onclick="app.nav('home', this)"></i>
-        <i class="fas fa-history nav-icon" onclick="app.nav('history', this)"></i>
-        <i class="fas fa-user nav-icon" onclick="app.nav('profile', this)"></i>
-    </div>
-
-    <!-- LOGIC -->
+    <!-- JS -->
     <script type="module">
-        // 1. IMPORTS
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, deleteDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, deleteDoc, updateDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-        // 2. CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyBEMPS8vEJztGpoBPJjJIzKKInyt4IY9rQ",
             authDomain: "studentlms-79722.firebaseapp.com",
@@ -214,220 +231,230 @@
             messagingSenderId: "1029623857004",
             appId: "1:1029623857004:web:fa07cb3de1270990a87d49"
         };
-
         const CLOUD_URL = "https://api.cloudinary.com/v1_1/dpe74ejhl/image/upload";
         const CLOUD_PRESET = "lms_upload";
         const ADMIN_EMAIL = "rakibk155@gmail.com";
 
-        // 3. INITIALIZE
-        let auth, db, user, timerInt;
-        let allExams = [];
-        let currentExam = null;
+        const appInit = initializeApp(firebaseConfig);
+        const auth = getAuth(appInit);
+        const db = getFirestore(appInit);
+        let currentUser, timerInt, allExams=[], currentExam=null;
 
-        try {
-            const app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-            // Hide Loader once init is done
-            document.getElementById('global-loader').style.display = 'none';
-        } catch (e) {
-            alert("Firebase Init Failed: " + e.message);
-        }
-
-        // 4. HELPERS (Global Access)
-        const app = {
+        window.app = {
             toast: (msg, type='success') => {
                 const b = document.getElementById('toast-box');
                 const t = document.createElement('div');
-                t.className = `toast ${type}`;
-                t.innerHTML = msg;
-                b.appendChild(t);
-                setTimeout(()=>t.remove(), 3000);
+                t.className = 'toast'; t.style.borderColor = type==='error'?'var(--danger)':'var(--success)';
+                t.innerHTML = msg; b.appendChild(t); setTimeout(()=>t.remove(), 3000);
             },
 
-            // --- AUTH ---
-            login: async () => {
-                const e = document.getElementById('email').value;
-                const p = document.getElementById('password').value;
-                try {
-                    await signInWithEmailAndPassword(auth, e, p);
-                } catch(err) { app.toast(err.message, 'error'); }
+            toggleAuth: (mode) => {
+                document.getElementById('login-form').classList.toggle('hidden', mode==='reg');
+                document.getElementById('reg-form').classList.toggle('hidden', mode!=='reg');
             },
-            
+
+            login: async () => {
+                try { await signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value); }
+                catch(e) { app.toast(e.message, 'error'); }
+            },
+
             loginGoogle: async () => {
                 try {
-                    const provider = new GoogleAuthProvider();
-                    const res = await signInWithPopup(auth, provider);
-                    // Create user doc if new
+                    const res = await signInWithPopup(auth, new GoogleAuthProvider());
                     const ref = doc(db, "users", res.user.uid);
                     const snap = await getDoc(ref);
                     if(!snap.exists()) {
-                        const role = (res.user.email.toLowerCase() === ADMIN_EMAIL) ? 'admin' : 'student';
-                        await setDoc(ref, { email: res.user.email, role });
+                        // Google users default to Pending and Class 9-A (Admin must change class later if needed)
+                        const role = (res.user.email === ADMIN_EMAIL) ? 'admin' : 'student';
+                        const isApproved = (role === 'admin'); 
+                        await setDoc(ref, { 
+                            email: res.user.email, displayName: res.user.displayName, 
+                            role, class: '9', division: 'A', isApproved, joinedAt: new Date() 
+                        });
                     }
-                } catch(err) { 
-                    app.toast("Google Login Failed. Check Authorized Domains in Firebase Console.", 'error');
-                    console.error(err);
-                }
+                } catch(e) { app.toast(e.message, 'error'); }
             },
 
             register: async () => {
-                const e = document.getElementById('reg-email').value;
-                const p = document.getElementById('reg-pass').value;
-                if(p.length < 6) return app.toast("Password must be 6+ chars", 'error');
+                const name = document.getElementById('reg-name').value;
+                const cls = document.getElementById('reg-class').value;
+                const div = document.getElementById('reg-div').value;
+                const email = document.getElementById('reg-email').value;
+                const pass = document.getElementById('reg-pass').value;
+
+                if(!name || !cls || !div) return app.toast("All details required", 'error');
+
                 try {
-                    const res = await createUserWithEmailAndPassword(auth, e, p);
-                    const role = (e.toLowerCase() === ADMIN_EMAIL) ? 'admin' : 'student';
-                    await setDoc(doc(db, "users", res.user.uid), { email: e, role });
-                    app.toast("Registered!");
-                } catch(err) { app.toast(err.message, 'error'); }
+                    const res = await createUserWithEmailAndPassword(auth, email, pass);
+                    const role = (email === ADMIN_EMAIL) ? 'admin' : 'student';
+                    const isApproved = (role === 'admin'); // Auto approve admin, others Pending
+                    
+                    await setDoc(doc(db, "users", res.user.uid), { 
+                        email, displayName: name, role, class: cls, division: div, 
+                        isApproved: isApproved, joinedAt: new Date() 
+                    });
+                    
+                    if(!isApproved) app.toast("Registered! Waiting for approval.");
+                } catch(e) { app.toast(e.message, 'error'); }
             },
 
-            logout: () => signOut(auth),
+            showLogout: () => document.getElementById('modal-logout').classList.remove('hidden'),
+            performLogout: () => { document.getElementById('modal-logout').classList.add('hidden'); signOut(auth); },
 
             // --- ADMIN ---
-            addQField: () => {
-                const d = document.createElement('div');
-                d.className = 'q-box';
-                d.innerHTML = `
-                    <input type="text" class="q-txt" placeholder="Question Text">
-                    <input type="file" class="q-img" accept="image/*">
-                    <input type="text" class="o1" placeholder="Option 1">
-                    <input type="text" class="o2" placeholder="Option 2">
-                    <select class="cor"><option value="0">Opt 1 Correct</option><option value="1">Opt 2 Correct</option></select>
-                    <button class="btn-danger" style="width:auto; margin-top:5px;" onclick="this.parentElement.remove()">Remove</button>
+            switchAdminTab: (tab, el) => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                el.classList.add('active');
+                document.getElementById('tab-exams').classList.toggle('hidden', tab!=='exams');
+                document.getElementById('tab-students').classList.toggle('hidden', tab!=='students');
+                if(tab==='students') app.loadStudents();
+                if(tab==='exams') app.loadAdminExams();
+            },
+
+            loadStudents: async () => {
+                const tbody = document.querySelector('#students-table tbody');
+                tbody.innerHTML = "<tr><td colspan='4'>Loading...</td></tr>";
+                const snap = await getDocs(query(collection(db, "users"), where("role", "==", "student")));
+                tbody.innerHTML = "";
+                if(snap.empty) tbody.innerHTML = "<tr><td colspan='4'>No students.</td></tr>";
+
+                snap.forEach(d => {
+                    const u = d.data();
+                    const statusBadge = u.isApproved 
+                        ? `<span class="badge badge-active">Active</span>` 
+                        : `<span class="badge badge-pending">Pending</span>`;
+                    
+                    const btn = u.isApproved 
+                        ? `<button class="btn-danger btn-sm" onclick="app.toggleApprove('${d.id}', false)">Revoke</button>` 
+                        : `<button class="btn-success btn-sm" onclick="app.toggleApprove('${d.id}', true)">Approve</button>`;
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${u.displayName}<br><small>${u.email}</small></td>
+                            <td>${u.class}-${u.division}</td>
+                            <td>${statusBadge}</td>
+                            <td>${btn}</td>
+                        </tr>`;
+                });
+            },
+
+            toggleApprove: async (uid, status) => {
+                try {
+                    await updateDoc(doc(db, "users", uid), { isApproved: status });
+                    app.toast(status ? "User Approved" : "User Revoked");
+                    app.loadStudents();
+                } catch(e) { app.toast(e.message, 'error'); }
+            },
+
+            addQField: (data=null) => {
+                const div = document.createElement('div'); div.className='card'; div.style.padding='10px';
+                div.innerHTML = `
+                    <div style="display:flex; justify-content:space-between;"><small>Question</small><i class="fas fa-times" style="color:red;cursor:pointer;" onclick="this.parentElement.parentElement.remove()"></i></div>
+                    <input type="text" class="q-txt" placeholder="Question" value="${data?data.text:''}">
+                    <input type="file" class="q-img">
+                    <input type="text" class="o1" placeholder="Opt 1" value="${data?data.options[0]:''}">
+                    <input type="text" class="o2" placeholder="Opt 2" value="${data?data.options[1]:''}">
+                    <select class="cor"><option value="0" ${data?.correct==0?'selected':''}>Opt 1 Correct</option><option value="1" ${data?.correct==1?'selected':''}>Opt 2 Correct</option></select>
                 `;
-                document.getElementById('q-builder').appendChild(d);
+                document.getElementById('q-builder').appendChild(div);
             },
 
             saveExam: async () => {
+                // ... (Same exam saving logic as before)
                 const btn = document.getElementById('btn-pub');
                 const title = document.getElementById('exam-title').value;
+                const targetClass = document.getElementById('exam-target-class').value;
                 const time = document.getElementById('exam-time').value;
-                const qs = document.querySelectorAll('.q-box');
+                const qs = document.querySelectorAll('#q-builder .card');
+                const editId = document.getElementById('edit-exam-id').value;
 
-                if(!title || qs.length === 0) return app.toast("Fill details", 'error');
-                
-                btn.innerText = "Uploading...";
-                btn.disabled = true;
+                if(!title || !targetClass || qs.length === 0) return app.toast("Details missing", 'error');
+                btn.innerText = "Uploading..."; btn.disabled = true;
 
                 let qList = [];
                 for(let q of qs) {
                     const txt = q.querySelector('.q-txt').value;
                     const file = q.querySelector('.q-img').files[0];
-                    let url = "";
-                    
+                    let url = ""; 
                     if(file) {
-                        const fd = new FormData();
-                        fd.append('file', file);
-                        fd.append('upload_preset', CLOUD_PRESET);
-                        try {
-                            const req = await fetch(CLOUD_URL, {method:'POST', body:fd});
-                            const res = await req.json();
-                            url = res.secure_url;
-                        } catch(e) { console.error(e); }
+                        const fd = new FormData(); fd.append('file', file); fd.append('upload_preset', CLOUD_PRESET);
+                        try { const res = await (await fetch(CLOUD_URL, {method:'POST', body:fd})).json(); url = res.secure_url; } catch(e){}
                     }
-
-                    qList.push({
-                        text: txt,
-                        image: url,
-                        options: [q.querySelector('.o1').value, q.querySelector('.o2').value],
-                        correct: parseInt(q.querySelector('.cor').value)
-                    });
+                    qList.push({ text: txt, image: url, options: [q.querySelector('.o1').value, q.querySelector('.o2').value], correct: parseInt(q.querySelector('.cor').value) });
                 }
 
+                const data = { title, targetClass, time: parseInt(time), questions: qList, updatedAt: new Date() };
                 try {
-                    await addDoc(collection(db, "exams"), {
-                        title, time: parseInt(time), questions: qList, createdAt: new Date()
-                    });
-                    app.toast("Published!");
-                    setTimeout(()=> location.reload(), 1500);
-                } catch(e) { app.toast(e.message, 'error'); btn.disabled=false; }
+                    if(editId) await updateDoc(doc(db, "exams", editId), data);
+                    else { data.createdAt = new Date(); await addDoc(collection(db, "exams"), data); }
+                    app.toast("Published!"); app.resetEditor(); app.loadAdminExams();
+                } catch(e) { app.toast(e.message, 'error'); }
+                btn.disabled = false; btn.innerText = "Publish";
             },
 
-            deleteExam: async (id) => {
-                if(!confirm("Delete?")) return;
-                await deleteDoc(doc(db, "exams", id));
-                app.loadAdmin();
+            loadAdminExams: async () => {
+                const d = document.getElementById('admin-exam-list'); d.innerHTML = "";
+                const snap = await getDocs(collection(db, "exams"));
+                snap.forEach(doc => {
+                    const e = doc.data();
+                    d.innerHTML += `
+                        <div class="card" style="display:flex; justify-content:space-between;">
+                            <div><b>${e.title}</b><br><span class="badge">Class ${e.targetClass}</span></div>
+                            <div><button class="btn-secondary btn-sm" onclick="app.editExam('${doc.id}')"><i class="fas fa-edit"></i></button><button class="btn-danger btn-sm" onclick="app.deleteExam('${doc.id}')"><i class="fas fa-trash"></i></button></div>
+                        </div>`;
+                });
+                window.adminExams = snap.docs.map(x => ({id:x.id, ...x.data()}));
             },
+
+            editExam: (id) => {
+                const e = window.adminExams.find(x => x.id === id);
+                document.getElementById('edit-exam-id').value = id;
+                document.getElementById('exam-title').value = e.title;
+                document.getElementById('exam-target-class').value = e.targetClass;
+                document.getElementById('exam-time').value = e.time;
+                document.getElementById('q-builder').innerHTML = "";
+                e.questions.forEach(q => app.addQField(q));
+                document.getElementById('btn-cancel-edit').classList.remove('hidden');
+                document.querySelector('.tabs').scrollIntoView();
+            },
+
+            resetEditor: () => {
+                document.getElementById('edit-exam-id').value = "";
+                document.getElementById('q-builder').innerHTML = "";
+                document.getElementById('exam-title').value = "";
+                document.getElementById('btn-cancel-edit').classList.add('hidden');
+            },
+            
+            deleteExam: async (id) => { if(confirm("Delete?")) { await deleteDoc(doc(db, "exams", id)); app.loadAdminExams(); } },
 
             // --- STUDENT ---
-            nav: (tab, el) => {
-                document.querySelectorAll('.nav-icon').forEach(i=>i.classList.remove('active'));
-                if(el) el.classList.add('active');
-                if(tab === 'home') app.loadStudentHome();
-                if(tab === 'history') app.loadHistory();
-                if(tab === 'profile') app.loadProfile();
-            },
-
             loadStudentHome: async () => {
-                const c = document.getElementById('student-content');
-                c.innerHTML = "Loading...";
-                const snap = await getDocs(collection(db, "exams"));
-                c.innerHTML = "";
-                allExams = [];
-                snap.forEach(d => {
-                    const ex = d.data();
-                    allExams.push({id: d.id, ...ex});
-                    c.innerHTML += `
-                        <div class="card">
-                            <h3>${ex.title}</h3>
-                            <p>${ex.time} mins | ${ex.questions.length} Questions</p>
-                            <button class="btn-primary" onclick="app.startExam('${d.id}')">Start</button>
-                        </div>
-                    `;
-                });
-                if(snap.empty) c.innerHTML = "<p>No exams.</p>";
-            },
-
-            loadHistory: async () => {
-                const c = document.getElementById('student-content');
-                c.innerHTML = "<h3>History</h3>";
-                const q = query(collection(db, "results"), where("uid", "==", user.uid));
+                const c = document.getElementById('student-content'); c.innerHTML = "Loading...";
+                const q = query(collection(db, "exams"), where("targetClass", "==", currentUser.class));
                 const snap = await getDocs(q);
+                c.innerHTML = ""; allExams = [];
+                if(snap.empty) c.innerHTML = "<p>No exams for your class.</p>";
                 snap.forEach(d => {
-                    const r = d.data();
-                    c.innerHTML += `<div class="card"><b>${r.examTitle}</b><br>Score: ${r.score}/${r.total}</div>`;
+                    const e = d.data(); allExams.push({id:d.id, ...e});
+                    c.innerHTML += `<div class="card"><h3>${e.title}</h3><p>${e.time} mins</p><button class="btn-primary" onclick="app.startExam('${d.id}')">Start</button></div>`;
                 });
             },
 
-            loadProfile: () => {
-                document.getElementById('student-content').innerHTML = `<div class="card" style="text-align:center;"><h3>${user.email}</h3><div class="badge">Student</div></div>`;
-            },
-
-            // --- EXAM ENGINE ---
             startExam: (id) => {
                 currentExam = allExams.find(e => e.id === id);
                 document.getElementById('view-student').classList.add('hidden');
-                document.getElementById('nav-bar').classList.add('hidden');
                 document.getElementById('view-exam').classList.remove('hidden');
                 document.getElementById('exam-name-display').innerText = currentExam.title;
-
-                const ui = document.getElementById('quiz-ui');
-                ui.innerHTML = "";
+                const ui = document.getElementById('quiz-ui'); ui.innerHTML = "";
                 currentExam.questions.forEach((q, i) => {
-                    let img = q.image ? `<img src="${q.image}" style="max-width:100%; border-radius:10px; margin-top:10px;">` : '';
-                    ui.innerHTML += `
-                        <div class="q-box">
-                            <p><b>Q${i+1}</b>: ${q.text}</p>
-                            ${img}
-                            ${q.options.map((opt, oid) => `
-                                <label class="opt-label">
-                                    <input type="radio" name="q${i}" value="${oid}">
-                                    <span style="margin-left:10px;">${opt}</span>
-                                </label>
-                            `).join('')}
-                        </div>
-                    `;
+                    let img = q.image ? `<img src="${q.image}" style="max-width:100%; border-radius:10px; margin:10px 0;">` : '';
+                    ui.innerHTML += `<div class="card"><p><b>Q${i+1}:</b> ${q.text}</p>${img}${q.options.map((o, idx)=>`<div style="margin:5px 0;"><input type="radio" name="q${i}" value="${idx}"> ${o}</div>`).join('')}</div>`;
                 });
-
-                let time = currentExam.time * 60;
+                let t = currentExam.time * 60;
                 timerInt = setInterval(() => {
-                    let m = Math.floor(time/60);
-                    let s = time%60;
+                    let m = Math.floor(t/60), s = t%60;
                     document.getElementById('timer').innerText = `${m}:${s<10?'0'+s:s}`;
-                    time--;
-                    if(time < 0) app.submitExam();
+                    if(t-- < 0) app.submitExam();
                 }, 1000);
             },
 
@@ -435,63 +462,44 @@
                 clearInterval(timerInt);
                 let score = 0;
                 currentExam.questions.forEach((q, i) => {
-                    const sel = document.querySelector(`input[name="q${i}"]:checked`);
-                    if(sel && parseInt(sel.value) === q.correct) score++;
+                    const s = document.querySelector(`input[name="q${i}"]:checked`);
+                    if(s && parseInt(s.value) === q.correct) score++;
                 });
-
-                await addDoc(collection(db, "results"), {
-                    uid: user.uid, email: user.email, examTitle: currentExam.title,
-                    score, total: currentExam.questions.length, date: new Date()
-                });
-
-                alert(`Finished! Score: ${score}/${currentExam.questions.length}`);
-                location.reload();
-            },
-
-            // --- ADMIN LOAD ---
-            loadAdmin: async () => {
-                const div = document.getElementById('admin-list');
-                const snap = await getDocs(collection(db, "exams"));
-                div.innerHTML = "";
-                snap.forEach(d => {
-                    div.innerHTML += `
-                        <div class="card" style="display:flex; justify-content:space-between;">
-                            ${d.data().title}
-                            <button class="btn-danger" style="width:auto; padding:5px 10px;" onclick="app.deleteExam('${d.id}')">Del</button>
-                        </div>
-                    `;
-                });
+                await addDoc(collection(db, "results"), { uid: currentUser.uid, examTitle: currentExam.title, score, total: currentExam.questions.length, date: new Date() });
+                alert(`Score: ${score}`); location.reload();
             }
         };
 
-        // 5. EXPOSE TO WINDOW
-        window.app = app;
-
-        // 6. AUTH STATE LISTENER
         onAuthStateChanged(auth, async (u) => {
-            user = u;
-            document.querySelectorAll('.container').forEach(e => e.classList.add('hidden'));
-            
-            if (user) {
-                // Determine Role
-                let role = 'student';
-                if(user.email.toLowerCase() === ADMIN_EMAIL) role = 'admin';
-                else {
-                    const snap = await getDoc(doc(db, "users", user.uid));
-                    if(snap.exists()) role = snap.data().role;
-                }
+            const loader = document.getElementById('global-loader');
+            if (u) {
+                const snap = await getDoc(doc(db, "users", u.uid));
+                currentUser = { uid: u.uid, ...snap.data() };
+                document.getElementById('view-auth').classList.add('hidden');
 
-                if(role === 'admin') {
+                if(currentUser.role === 'admin') {
+                    loader.style.display = 'none';
                     document.getElementById('view-admin').classList.remove('hidden');
-                    app.loadAdmin();
+                    document.getElementById('admin-welcome').innerText = `Hello, ${currentUser.displayName}`;
+                    app.loadAdminExams();
                 } else {
-                    document.getElementById('view-student').classList.remove('hidden');
-                    document.getElementById('nav-bar').classList.remove('hidden');
-                    app.loadStudentHome();
+                    // STUDENT LOGIC - CHECK APPROVAL
+                    if (currentUser.isApproved === true) {
+                        loader.style.display = 'none';
+                        document.getElementById('view-student').classList.remove('hidden');
+                        document.getElementById('student-class-badge').innerText = `Class ${currentUser.class} - ${currentUser.division}`;
+                        app.loadStudentHome();
+                    } else {
+                        // NOT APPROVED
+                        loader.style.display = 'none';
+                        document.getElementById('view-pending').classList.remove('hidden');
+                    }
                 }
             } else {
+                currentUser = null;
+                loader.style.display = 'none';
+                document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
                 document.getElementById('view-auth').classList.remove('hidden');
-                document.getElementById('nav-bar').classList.add('hidden');
             }
         });
     </script>

@@ -10,72 +10,166 @@
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
-        body { font-family: 'Outfit', sans-serif; background: #f1f5f9; color: #0f172a; user-select: none; }
-        .glass { background: white; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .btn-primary { background: #4f46e5; color: white; border-radius: 10px; font-weight: bold; box-shadow: 0 4px 10px rgba(79,70,229,0.3); }
-        .option-box { display: flex; gap: 12px; padding: 14px; border: 2px solid #f1f5f9; border-radius: 12px; cursor: pointer; transition: 0.2s; align-items: center; }
-        .option-box.selected { border-color: #4f46e5; background: #eef2ff; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; user-select: none; padding-bottom: 90px; }
+        .aurora-bg { position: fixed; inset: 0; z-index: -1; background: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%); background-color: #0f172a; }
+        .glass-card { background: white; border: 1px solid #e2e8f0; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: 0.2s; overflow: hidden; }
+        .glass-card:active { transform: scale(0.98); }
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: rgba(255,255,255,0.85); backdrop-filter: blur(16px); border-top: 1px solid rgba(255,255,255,0.5); display: flex; justify-content: space-around; padding: 12px 0; z-index: 50; padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+        .nav-item { color: #94a3b8; display: flex; flex-direction: column; align-items: center; font-size: 10px; font-weight: 600; transition: 0.3s; }
+        .nav-item.active { color: #6366f1; transform: translateY(-3px); }
+        .nav-item i { font-size: 20px; margin-bottom: 2px; }
+        .btn-primary { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border-radius: 12px; font-weight: bold; box-shadow: 0 4px 15px rgba(99,102,241,0.4); }
+        
+        /* Exam UI */
+        .option-box { display: flex; gap: 12px; padding: 14px; border: 2px solid #f1f5f9; border-radius: 14px; cursor: pointer; transition: 0.2s; align-items: center; }
+        .option-box.selected { border-color: #6366f1; background: #eef2ff; }
         .opt-id { min-width: 24px; height: 24px; border-radius: 50%; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; }
-        .selected .opt-id { border-color: #4f46e5; background: #4f46e5; color: white; }
+        .selected .opt-id { border-color: #6366f1; background: #6366f1; color: white; }
+        .p-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .p-item { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: bold; border: 1px solid #e2e8f0; font-size: 12px; }
+        .st-ans { background: #10b981; color: white; border-color: #10b981; }
+        .st-rev { background: #f59e0b; color: white; border-color: #f59e0b; }
+        
+        /* Flashcard */
+        .flashcard { perspective: 1000px; height: 180px; cursor: pointer; }
+        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .fc-front, .fc-back { position: absolute; inset: 0; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; border-radius: 16px; padding: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); background: white; border: 1px solid #e2e8f0; }
+        .fc-back { background: #6366f1; color: white; transform: rotateY(180deg); }
+
         .hidden { display: none !important; }
-        .animate-enter { animation: slideUp 0.3s ease-out forwards; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        mjx-container { font-size: 115% !important; margin: 5px 0 !important; outline: none; }
+        .animate-enter { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        mjx-container { margin: 5px 0 !important; font-size: 110%; }
     </style>
 </head>
 <body>
 
-    <!-- Login -->
-    <div id="login-section" class="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-indigo-500 to-purple-600">
-        <div class="glass w-full max-w-sm p-8 text-center animate-enter">
-            <h1 class="text-2xl font-bold mb-6 text-slate-800">Student Portal</h1>
+    <!-- LOGIN -->
+    <div id="login-section" class="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+        <div class="aurora-bg"></div>
+        <div class="glass-card w-full max-w-sm p-8 text-center animate-enter relative z-10 bg-white/90">
+            <div class="w-16 h-16 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-2xl mx-auto flex items-center justify-center text-white text-3xl font-bold mb-6 shadow-xl">🚀</div>
+            <h1 class="text-2xl font-bold mb-2 text-slate-800">Student Portal</h1>
+            <p class="text-sm text-slate-500 mb-8">Access your personalized learning hub.</p>
             <button id="google-btn" class="w-full btn-primary py-3">Continue with Google</button>
         </div>
     </div>
 
-    <!-- Dashboard -->
-    <div id="dashboard-section" class="hidden min-h-screen pb-20">
-        <div class="bg-white border-b px-4 py-3 flex justify-between items-center sticky top-0 z-30 shadow-sm">
+    <!-- MAIN APP -->
+    <div id="app-section" class="hidden">
+        <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-200 px-5 py-3 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <img id="u-img" class="w-9 h-9 rounded-full bg-slate-200">
-                <div><h3 id="u-name" class="font-bold text-sm">Student</h3></div>
+                <img id="u-photo" class="w-10 h-10 rounded-full border shadow-sm">
+                <div><h3 id="u-name" class="font-bold text-sm">Student</h3><span class="text-[10px] text-indigo-500 font-bold">Online</span></div>
             </div>
-            <button id="logout-btn" class="text-slate-400 hover:text-red-500"><i class="fas fa-power-off"></i></button>
+            <button id="logout-btn" class="text-red-400"><i class="fas fa-power-off"></i></button>
+        </header>
+
+        <div class="p-5 max-w-3xl mx-auto space-y-8">
+            
+            <!-- TAB 1: HOME (Dashboard) -->
+            <div id="view-home" class="fade-in space-y-4">
+                <div id="live-banner" class="hidden bg-red-500 text-white p-4 rounded-xl flex justify-between items-center animate-pulse shadow-lg shadow-red-500/30">
+                    <div class="flex items-center gap-3"><span class="w-3 h-3 bg-white rounded-full animate-ping"></span><span class="font-bold">Live Class Started</span></div>
+                    <a id="live-btn" target="_blank" class="bg-white text-red-600 px-4 py-1 rounded-lg text-xs font-bold">Join Now</a>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="glass-card p-4 bg-gradient-to-br from-indigo-500 to-purple-600 text-white border-none">
+                        <div class="text-[10px] font-bold opacity-70 uppercase">Total XP</div>
+                        <div class="text-3xl font-bold mt-1" id="u-xp">0</div>
+                    </div>
+                    <div class="glass-card p-4">
+                        <div class="text-[10px] font-bold text-slate-400 uppercase">Tests Taken</div>
+                        <div class="text-3xl font-bold text-slate-800 mt-1" id="u-taken">0</div>
+                    </div>
+                </div>
+                
+                <h3 class="font-bold text-lg text-slate-700">Recent Activity</h3>
+                <div id="history-list" class="space-y-3"></div>
+            </div>
+
+            <!-- TAB 2: LEARN (Content) -->
+            <div id="view-learn" class="hidden fade-in space-y-4">
+                <div class="flex gap-2">
+                    <button onclick="filterContent('note')" class="px-4 py-2 rounded-full bg-slate-800 text-white text-xs font-bold">Notes</button>
+                    <button onclick="filterContent('video')" class="px-4 py-2 rounded-full bg-white border text-xs font-bold">Videos</button>
+                </div>
+                <div id="content-grid" class="grid gap-4"></div>
+            </div>
+
+            <!-- TAB 3: EXAMS (CBT) -->
+            <div id="view-exams" class="hidden fade-in space-y-4">
+                <h3 class="font-bold text-lg text-slate-700">Available Assessments</h3>
+                <div id="exam-list" class="grid gap-4"></div>
+            </div>
+
+            <!-- TAB 4: HUB (Flashcards, Leaderboard, Forum) -->
+            <div id="view-hub" class="hidden fade-in space-y-6">
+                <div>
+                    <h3 class="font-bold text-lg mb-2">Flashcards</h3>
+                    <div id="fc-grid" class="grid grid-cols-2 gap-3"></div>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-2">Leaderboard</h3>
+                    <div id="lb-list" class="space-y-2"></div>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-2">Discussion Forum</h3>
+                    <div id="chat-box" class="h-40 overflow-y-auto bg-white border rounded-xl p-3 mb-2 space-y-2"></div>
+                    <div class="flex gap-2"><input id="chat-in" class="text-xs" placeholder="Ask something..."><button onclick="sendChat()" class="bg-indigo-600 text-white px-3 rounded-lg"><i class="fas fa-paper-plane"></i></button></div>
+                </div>
+            </div>
+
+            <!-- TAB 5: PROFILE -->
+            <div id="view-profile" class="hidden fade-in space-y-4">
+                <div class="glass-card p-6 text-center">
+                    <img id="p-img" class="w-24 h-24 mx-auto rounded-full object-cover border-4 border-slate-50 shadow-lg">
+                    <h2 class="text-xl font-bold mt-2" id="p-name-disp">User</h2>
+                    <div class="space-y-3 mt-6 text-left">
+                        <input id="in-name" placeholder="Name"><input id="in-phone" placeholder="Phone"><input id="in-addr" placeholder="Address">
+                        <button onclick="saveProfile()" class="w-full btn-primary py-3">Save Changes</button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="max-w-4xl mx-auto p-4 space-y-6">
-            <h2 class="font-bold text-lg text-slate-700">Available Exams</h2>
-            <div id="exam-list" class="grid gap-3"></div>
-            <h2 class="font-bold text-lg text-slate-700 mt-6">Attempt History</h2>
-            <div id="result-list" class="grid gap-3"></div>
-        </div>
+
+        <!-- Navigation Bar -->
+        <nav class="nav-bar">
+            <button onclick="nav('home')" id="nav-home" class="nav-item active"><i class="fas fa-home"></i><span>Home</span></button>
+            <button onclick="nav('learn')" id="nav-learn" class="nav-item"><i class="fas fa-book-open"></i><span>Learn</span></button>
+            <div class="relative -top-5">
+                <button onclick="nav('exams')" id="nav-exams" class="w-14 h-14 bg-indigo-600 text-white rounded-full flex items-center justify-center shadow-lg shadow-indigo-500/40 transition hover:scale-110"><i class="fas fa-pen-nib text-xl"></i></button>
+            </div>
+            <button onclick="nav('hub')" id="nav-hub" class="nav-item"><i class="fas fa-layer-group"></i><span>Hub</span></button>
+            <button onclick="nav('profile')" id="nav-profile" class="nav-item"><i class="fas fa-user-circle"></i><span>Profile</span></button>
+        </nav>
     </div>
 
-    <!-- EXAM RUNNER -->
-    <div id="exam-runner" class="hidden fixed inset-0 z-50 bg-white flex flex-col h-full">
-        <div class="h-14 bg-white border-b flex justify-between items-center px-4 flex-shrink-0 shadow-sm z-10">
+    <!-- EXAM RUNNER UI -->
+    <div id="exam-ui" class="hidden fixed inset-0 z-50 bg-white flex flex-col">
+        <div class="h-16 border-b flex justify-between items-center px-4 shadow-sm z-20">
             <div class="flex items-center gap-2">
                 <div class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg font-mono font-bold" id="timer">00:00</div>
-                <button onclick="document.getElementById('calc-modal').classList.toggle('hidden')" class="p-2 bg-slate-100 rounded hover:bg-slate-200" title="Calculator"><i class="fas fa-calculator"></i></button>
-                <button onclick="document.getElementById('formula-modal').classList.toggle('hidden')" class="p-2 bg-slate-100 rounded hover:bg-slate-200" title="Formulas"><i class="fas fa-square-root-alt"></i></button>
+                <button onclick="document.getElementById('calc-modal').classList.toggle('hidden')" class="p-2 bg-slate-100 rounded text-slate-500"><i class="fas fa-calculator"></i></button>
+                <button onclick="document.getElementById('formula-modal').classList.toggle('hidden')" class="p-2 bg-slate-100 rounded text-slate-500"><i class="fas fa-square-root-alt"></i></button>
             </div>
-            <button onclick="document.getElementById('palette-bar').classList.toggle('translate-x-full')" class="text-slate-600"><i class="fas fa-th text-xl"></i></button>
+            <button onclick="document.getElementById('palette-bar').classList.toggle('translate-x-full')" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center"><i class="fas fa-th"></i></button>
         </div>
 
         <div class="flex-grow flex overflow-hidden relative">
-            <div class="flex-grow overflow-y-auto p-6 pb-24 w-full md:w-3/4" id="q-area">
-                <div class="flex justify-between mb-4 border-b pb-2">
-                    <span class="text-xs font-bold text-white bg-indigo-600 px-3 py-1 rounded-full">Q <span id="q-num">1</span></span>
-                    <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded border border-green-100">+<span id="q-pos">4</span></span>
+            <div class="flex-grow overflow-y-auto p-6 pb-24" id="q-area">
+                <div class="flex justify-between mb-4">
+                    <span class="text-xs font-bold text-white bg-indigo-500 px-3 py-1 rounded-full">Q <span id="q-num">1</span></span>
+                    <span class="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded border border-green-100">+<span id="q-pos">4</span></span>
                 </div>
                 <div id="q-img-wrap" class="hidden text-center mb-4"><img id="q-img" class="max-h-48 rounded-lg border inline-block"></div>
-                <iframe id="exam-pdf" class="hidden w-full h-96 border rounded-xl mb-4"></iframe>
                 <p id="q-txt" class="text-lg font-medium mb-6 leading-relaxed"></p>
                 <div id="q-opts" class="space-y-3"></div>
             </div>
-
             <div id="palette-bar" class="absolute inset-y-0 right-0 w-64 bg-white border-l transform translate-x-full transition duration-300 z-30 flex flex-col">
                 <div class="p-4 font-bold border-b">Questions</div>
                 <div id="p-grid" class="p-4 grid grid-cols-5 gap-2 flex-grow overflow-y-auto content-start"></div>
@@ -83,47 +177,45 @@
             </div>
         </div>
 
-        <div class="fixed bottom-0 w-full bg-white border-t p-3 flex justify-between z-20 md:w-3/4">
+        <div class="fixed bottom-0 w-full bg-white border-t p-3 flex justify-between z-20">
             <div class="flex gap-3"><button onclick="navQ(-1)" class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center"><i class="fas fa-chevron-left"></i></button><button onclick="navQ(1)" class="w-12 h-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center"><i class="fas fa-chevron-right"></i></button></div>
             <button onclick="markRev()" class="px-6 rounded-xl border border-amber-200 text-amber-600 font-bold bg-amber-50">Review</button>
         </div>
     </div>
 
-    <!-- CALCULATOR MODAL -->
-    <div id="calc-modal" class="hidden fixed bottom-20 left-4 z-[60] bg-slate-900 p-4 rounded-2xl shadow-2xl w-64 text-white animate-enter">
-        <div class="flex justify-between mb-2"><span class="text-xs font-bold text-slate-400">SCIENTIFIC</span><button onclick="document.getElementById('calc-modal').classList.add('hidden')" class="text-red-400">&times;</button></div>
+    <!-- MODALS: Calc, Formula, Result -->
+    <div id="calc-modal" class="hidden fixed bottom-20 left-4 z-[60] bg-slate-900 p-4 rounded-2xl shadow-2xl w-64 text-white">
+        <div class="flex justify-between mb-2 text-xs font-bold text-slate-400"><span>CALCULATOR</span><button onclick="document.getElementById('calc-modal').classList.add('hidden')">&times;</button></div>
         <input id="calc-disp" class="w-full bg-black/30 border-none text-right text-xl font-mono p-2 mb-3 rounded" readonly value="0">
-        <div class="grid grid-cols-4 gap-2 text-xs font-bold">
-            <button onclick="calc('sin(')" class="p-2 bg-slate-700 rounded">sin</button><button onclick="calc('cos(')" class="p-2 bg-slate-700 rounded">cos</button><button onclick="calc('tan(')" class="p-2 bg-slate-700 rounded">tan</button><button onclick="calcClr()" class="p-2 bg-red-600 rounded">C</button>
-            <button onclick="calc('7')" class="p-2 bg-slate-600 rounded">7</button><button onclick="calc('8')" class="p-2 bg-slate-600 rounded">8</button><button onclick="calc('9')" class="p-2 bg-slate-600 rounded">9</button><button onclick="calc('/')" class="p-2 bg-indigo-600 rounded">/</button>
-            <button onclick="calc('4')" class="p-2 bg-slate-600 rounded">4</button><button onclick="calc('5')" class="p-2 bg-slate-600 rounded">5</button><button onclick="calc('6')" class="p-2 bg-slate-600 rounded">6</button><button onclick="calc('*')" class="p-2 bg-indigo-600 rounded">*</button>
-            <button onclick="calc('1')" class="p-2 bg-slate-600 rounded">1</button><button onclick="calc('2')" class="p-2 bg-slate-600 rounded">2</button><button onclick="calc('3')" class="p-2 bg-slate-600 rounded">3</button><button onclick="calc('-')" class="p-2 bg-indigo-600 rounded">-</button>
-            <button onclick="calc('0')" class="p-2 bg-slate-600 rounded col-span-2">0</button><button onclick="calc('.')" class="p-2 bg-slate-600 rounded">.</button><button onclick="calcExec()" class="p-2 bg-green-600 rounded">=</button>
+        <div class="grid grid-cols-4 gap-2 text-xs font-bold text-center">
+            <button onclick="c('sin(')" class="p-2 bg-slate-700 rounded">sin</button><button onclick="c('cos(')" class="p-2 bg-slate-700 rounded">cos</button><button onclick="c('tan(')" class="p-2 bg-slate-700 rounded">tan</button><button onclick="document.getElementById('calc-disp').value='0'" class="p-2 bg-red-600 rounded">C</button>
+            <button onclick="c('7')" class="p-2 bg-slate-600 rounded">7</button><button onclick="c('8')" class="p-2 bg-slate-600 rounded">8</button><button onclick="c('9')" class="p-2 bg-slate-600 rounded">9</button><button onclick="c('/')" class="p-2 bg-indigo-600 rounded">/</button>
+            <button onclick="c('4')" class="p-2 bg-slate-600 rounded">4</button><button onclick="c('5')" class="p-2 bg-slate-600 rounded">5</button><button onclick="c('6')" class="p-2 bg-slate-600 rounded">6</button><button onclick="c('*')" class="p-2 bg-indigo-600 rounded">*</button>
+            <button onclick="c('1')" class="p-2 bg-slate-600 rounded">1</button><button onclick="c('2')" class="p-2 bg-slate-600 rounded">2</button><button onclick="c('3')" class="p-2 bg-slate-600 rounded">3</button><button onclick="c('-')" class="p-2 bg-indigo-600 rounded">-</button>
+            <button onclick="c('0')" class="p-2 bg-slate-600 rounded col-span-2">0</button><button onclick="c('.')" class="p-2 bg-slate-600 rounded">.</button><button onclick="evalC()" class="p-2 bg-green-600 rounded">=</button>
         </div>
     </div>
 
-    <!-- FORMULA SHEET -->
     <div id="formula-modal" class="hidden fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-lg rounded-2xl p-6 relative h-[80vh] overflow-y-auto">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-6 relative h-[60vh] overflow-y-auto">
             <button onclick="document.getElementById('formula-modal').classList.add('hidden')" class="absolute top-4 right-4 text-xl">&times;</button>
-            <h2 class="text-xl font-bold mb-4 border-b pb-2">Formula Sheet</h2>
+            <h2 class="text-xl font-bold mb-4">Formula Sheet</h2>
             <div class="space-y-4 text-sm">
-                <div><h3 class="font-bold text-indigo-600">Physics</h3><p>\( F = ma \), \( E = mc^2 \), \( v = u + at \)</p></div>
+                <div><h3 class="font-bold text-indigo-600">Physics</h3><p>\( F = ma \), \( v = u + at \), \( E = mc^2 \)</p></div>
                 <div><h3 class="font-bold text-indigo-600">Math</h3><p>\( x = \frac{-b \pm \sqrt{b^2-4ac}}{2a} \), \( \sin^2\theta + \cos^2\theta = 1 \)</p></div>
                 <div><h3 class="font-bold text-indigo-600">Chemistry</h3><p>\( PV = nRT \), \( pH = -\log[H^+] \)</p></div>
             </div>
         </div>
     </div>
 
-    <!-- RESULT MODAL -->
-    <div id="result-modal" class="hidden fixed inset-0 z-[70] bg-black/90 flex items-center justify-center p-4">
+    <div id="result-modal" class="hidden fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white w-full max-w-md rounded-3xl p-6 text-center animate-enter">
             <h2 class="text-2xl font-bold mb-1">Analysis</h2>
             <div class="relative w-40 h-40 mx-auto my-4"><canvas id="res-chart"></canvas><div class="absolute inset-0 flex items-center justify-center flex-col"><span class="text-2xl font-bold" id="res-score">0</span></div></div>
             <div class="grid grid-cols-3 gap-2 text-xs font-bold mb-4">
-                <div class="bg-green-50 text-green-700 p-2 rounded">C: <span id="res-c">0</span></div>
-                <div class="bg-red-50 text-red-700 p-2 rounded">W: <span id="res-w">0</span></div>
-                <div class="bg-slate-50 text-slate-700 p-2 rounded">S: <span id="res-s">0</span></div>
+                <div class="bg-green-50 text-green-700 p-2 rounded border">C: <span id="res-c">0</span></div>
+                <div class="bg-red-50 text-red-700 p-2 rounded border">W: <span id="res-w">0</span></div>
+                <div class="bg-slate-50 text-slate-700 p-2 rounded border">S: <span id="res-s">0</span></div>
             </div>
             <div id="res-solutions" class="text-left text-xs space-y-2 max-h-40 overflow-y-auto mb-4"></div>
             <button onclick="location.reload()" class="w-full btn-primary py-3">Finish</button>
@@ -133,18 +225,19 @@
     <script type="module">
         import { auth, db, provider } from './firebase-config.js';
         import { signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { doc, getDoc, setDoc, updateDoc, collection, getDocs, query, orderBy, serverTimestamp, addDoc, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { doc, getDoc, setDoc, updateDoc, collection, getDocs, query, orderBy, serverTimestamp, addDoc, where, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        let user=null, allExams=[], currExam=null, userAns=[], currIdx=0, timer=null;
+        let user=null, allExams=[], allContent=[], currExam=null, userAns=[], currIdx=0, timer=null;
 
         onAuthStateChanged(auth, async (u) => {
             if(u) {
                 const ref = doc(db, "students", u.uid);
                 const snap = await getDoc(ref);
                 if(!snap.exists()) {
-                    await setDoc(ref, { uid: u.uid, email: u.email, name: u.displayName, photo: u.photoURL, role: "student", xp:0 });
-                    user = { uid: u.uid, name: u.displayName, photo: u.photoURL, batch: "all" };
+                    const d = { uid: u.uid, email: u.email, name: u.displayName, photo: u.photoURL, role: "student", banned: false, xp:0 };
+                    await setDoc(ref, d); user = d;
                 } else user = snap.data();
+                if(user.banned) { alert("Banned."); signOut(auth); return; }
                 initApp();
             } else document.getElementById('login-section').classList.remove('hidden');
         });
@@ -154,107 +247,99 @@
 
         async function initApp() {
             document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('dashboard-section').classList.remove('hidden');
+            document.getElementById('app-section').classList.remove('hidden');
             document.getElementById('u-name').innerText = user.name;
-            document.getElementById('u-img').src = user.photo;
+            document.getElementById('u-photo').src = user.photo;
+            document.getElementById('p-img').src = user.photo;
+            document.getElementById('p-email').innerText = user.email;
+            document.getElementById('p-name-disp').innerText = user.name;
+            document.getElementById('in-name').value = user.name;
+            document.getElementById('in-phone').value = user.phone || "";
+            document.getElementById('in-addr').value = user.address || "";
+            document.getElementById('u-xp').innerText = user.xp || 0;
 
             const s = await getDocs(query(collection(db, "exams"), orderBy("createdAt", "desc")));
             allExams = []; s.forEach(d => allExams.push({id: d.id, ...d.data()}));
-            document.getElementById('exam-list').innerHTML = allExams.map(e => `<div class="glass p-4 flex justify-between items-center border-l-4 border-indigo-500"><div><h3 class="font-bold text-sm">${e.title}</h3><span class="text-xs text-slate-400">${e.duration}m • ${e.type==='pdf_exam'?'PDF':'CBT'}</span></div><button onclick="startExam('${e.id}')" class="btn-primary px-4 py-1 text-xs">Start</button></div>`).join('');
+            document.getElementById('exam-list').innerHTML = allExams.map(e => `<div class="glass-card p-5 relative overflow-hidden group cursor-pointer border-l-4 border-indigo-500" onclick="startExam('${e.id}')"><h3 class="font-bold text-lg">${e.title}</h3><div class="flex gap-3 text-xs font-bold text-slate-400 mt-1"><span>${e.subject||'Gen'}</span> • <span>${e.duration}m</span> • <span>${e.questions.length} Qs</span></div></div>`).join('');
+            document.getElementById('u-taken').innerText = s.size; 
 
-            const h = await getDocs(query(collection(db, "results"), where("uid","==",user.uid), orderBy("timestamp","desc")));
-            document.getElementById('result-list').innerHTML = h.docs.map(d => `<div class="glass p-3 flex justify-between items-center text-xs"><div><b>${d.data().examTitle}</b><br>Score: ${d.data().score}</div></div>`).join('');
+            // Live, History, Content, Leaderboard, Forum loaders...
+            checkLive(); loadHistory(); loadContent(); loadLeaderboard(); loadForum();
         }
 
-        window.startExam = (id) => {
+        window.nav = (v) => { ['home','learn','exams','hub','profile'].forEach(x=>{document.getElementById('view-'+x).classList.add('hidden');document.getElementById('nav-'+x).classList.remove('active');}); document.getElementById('view-'+v).classList.remove('hidden'); document.getElementById('nav-'+v).classList.add('active'); };
+        
+        // --- DATA LOADERS ---
+        async function checkLive() { const s=await getDoc(doc(db,"settings","live")); if(s.exists()&&s.data().active) { document.getElementById('live-banner').classList.remove('hidden'); document.getElementById('live-btn').href=s.data().url; } }
+        async function loadHistory() { const h = await getDocs(query(collection(db, "results"), where("uid","==",user.uid), orderBy("timestamp","desc"))); document.getElementById('history-list').innerHTML = h.docs.map(d => `<div class="glass-card p-3 flex justify-between items-center text-xs border-l-4 border-green-500"><div><b>${d.data().examTitle}</b><br>Score: ${d.data().score}</div><span class="text-green-600 font-bold">${Math.round((d.data().score/d.data().totalMarks)*100)}%</span></div>`).join(''); }
+        async function loadContent() {
+            const n = await getDocs(collection(db, "notes")); n.forEach(d=>allContent.push({...d.data(), type:'note'}));
+            const v = await getDocs(collection(db, "videos")); v.forEach(d=>allContent.push({...d.data(), type:'video'}));
+            const f = await getDocs(collection(db, "flashcards")); 
+            document.getElementById('fc-grid').innerHTML = f.docs.map(d=>`<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="fc-front font-bold text-xs p-4 flex items-center justify-center">${d.data().front}</div><div class="fc-back font-bold text-xs p-4 flex items-center justify-center">${d.data().back}</div></div></div>`).join('');
+            filterContent('note');
+        }
+        window.filterContent = (t) => { document.getElementById('content-grid').innerHTML = allContent.filter(c=>c.type===t).map(c=>`<div class="glass-card p-4 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-indigo-600"><i class="fas fa-${t==='note'?'file-alt':'play'}"></i></div><div class="flex-grow"><h4 class="font-bold text-sm">${c.title}</h4><a href="${c.url}" target="_blank" class="text-[10px] text-indigo-500 font-bold">View</a></div></div>`).join(''); };
+        async function loadLeaderboard() { const s = await getDocs(query(collection(db,"results"), orderBy("score","desc"), limit(5))); document.getElementById('lb-list').innerHTML = s.docs.map((d,i) => `<div class="glass-card p-2 flex justify-between items-center text-xs"><div><span class="font-bold">#${i+1}</span> ${d.data().studentName}</div><span class="text-indigo-600 font-bold">${d.data().score}</span></div>`).join(''); }
+        async function loadForum() { const q = await getDocs(query(collection(db,"forum"), orderBy("createdAt","desc"), limit(10))); document.getElementById('chat-box').innerHTML = q.docs.reverse().map(d=>`<div class="mb-1"><span class="font-bold text-xs text-indigo-600">${d.data().name}:</span> <span class="text-xs">${d.data().msg}</span></div>`).join(''); }
+        window.sendChat = async() => { const m = document.getElementById('chat-in').value; if(m) { await addDoc(collection(db,"forum"),{name:user.name, msg:m, createdAt:serverTimestamp()}); document.getElementById('chat-in').value=""; loadForum(); } };
+
+        // --- EXAM ENGINE ---
+        window.startExam = async(id) => {
             currExam = allExams.find(e => e.id === id);
-            
             const saved = JSON.parse(localStorage.getItem('ex_state'));
             if(saved && saved.eid===id && confirm("Resume?")) { userAns=saved.ans; var t=saved.t; if(currExam.randomize) currExam.questions=saved.qs; }
             else {
-                if(currExam.randomize && currExam.type==='native_exam') currExam.questions.sort(() => Math.random() - 0.5);
-                const len = currExam.type==='native_exam' ? currExam.questions.length : currExam.answerKey.length;
-                userAns = Array(len).fill().map(() => ({ val: -1, status: 'bg-white text-slate-400 border' }));
+                if(currExam.randomize) currExam.questions.sort(() => Math.random() - 0.5);
+                userAns = Array(currExam.questions.length).fill().map(() => ({ val: -1, status: 'st-visit' }));
                 var t = currExam.duration * 60;
             }
-
             document.getElementById('exam-ui').classList.remove('hidden');
             document.getElementById('q-pos').innerText = currExam.posMarks;
-            
-            if(currExam.type === 'pdf_exam') {
-                document.getElementById('exam-pdf').src = currExam.fileUrl;
-                document.getElementById('exam-pdf').classList.remove('hidden');
-                document.getElementById('q-txt').classList.add('hidden');
-                document.getElementById('q-opts').classList.add('hidden');
-            } else {
-                document.getElementById('exam-pdf').classList.add('hidden');
-                document.getElementById('q-txt').classList.remove('hidden');
-                document.getElementById('q-opts').classList.remove('hidden');
-            }
-
             renderPalette(); loadQ(0);
-            
             timer = setInterval(() => {
                 t--; document.getElementById('timer').innerText = `${Math.floor(t/60)}:${(t%60).toString().padStart(2,'0')}`;
                 localStorage.setItem('ex_state', JSON.stringify({eid:id, ans:userAns, t:t, qs:currExam.questions}));
                 if(t<=0) submitExam();
             }, 1000);
-            
             try{document.documentElement.requestFullscreen()}catch(e){}
+            document.addEventListener("visibilitychange", () => { if(document.hidden && !document.getElementById('exam-ui').classList.contains('hidden')) { alert("Don't switch tabs!"); } });
         };
 
         function loadQ(i) {
-            currIdx = i; document.getElementById('q-num').innerText = i+1;
-            
-            if(currExam.type === 'native_exam') {
-                const q = currExam.questions[i];
-                document.getElementById('q-txt').innerHTML = q.q;
-                if(q.img) { document.getElementById('q-img').src=q.img; document.getElementById('q-img-wrap').classList.remove('hidden'); } else document.getElementById('q-img-wrap').classList.add('hidden');
-                document.getElementById('q-opts').innerHTML = q.options.map((o,v) => `<div class="option-box ${userAns[i].val===v?'selected':''}" onclick="pick(${v})"><div class="opt-id">${String.fromCharCode(65+v)}</div><span class="text-sm font-medium">${o}</span></div>`).join('');
-                if(window.MathJax) MathJax.typesetPromise();
-            } else {
-                document.getElementById('q-opts').innerHTML = ['A','B','C','D'].map((o,v) => `<div class="option-box ${userAns[i].val===v?'selected':''}" onclick="pick(${v})"><div class="opt-id">${o}</div></div>`).join('');
-            }
+            currIdx = i; document.getElementById('q-num').innerText = i+1; document.getElementById('q-txt').innerHTML = currExam.questions[i].q;
+            const q = currExam.questions[i];
+            if(q.img) { document.getElementById('q-img').src=q.img; document.getElementById('q-img-wrap').classList.remove('hidden'); } else document.getElementById('q-img-wrap').classList.add('hidden');
+            document.getElementById('q-opts').innerHTML = q.options.map((o,v) => `<div class="option-box ${userAns[i].val===v?'selected':''}" onclick="pick(${v})"><div class="opt-circle">${String.fromCharCode(65+v)}</div><span class="text-sm font-medium">${o}</span></div>`).join('');
+            if(window.MathJax) MathJax.typesetPromise();
         }
 
-        window.pick = (v) => { userAns[currIdx].val = v; userAns[currIdx].status = 'bg-green-500 text-white border-green-500'; loadQ(currIdx); renderPalette(); };
-        window.markRev = () => { userAns[currIdx].status = 'bg-amber-500 text-white border-amber-500'; renderPalette(); };
+        window.pick = (v) => { userAns[currIdx].val = v; userAns[currIdx].status = 'st-ans'; loadQ(currIdx); renderPalette(); };
+        window.markRev = () => { userAns[currIdx].status = 'st-rev'; renderPalette(); };
         window.navQ = (d) => { const n = currIdx + d; if(n >= 0 && n < userAns.length) loadQ(n); };
-        function renderPalette() { document.getElementById('p-grid').innerHTML = userAns.map((a, i) => `<div onclick="loadQ(${i})" class="aspect-square flex items-center justify-center rounded text-xs font-bold border cursor-pointer ${a.status} ${i===currIdx?'border-indigo-600 border-2':''}">${i+1}</div>`).join(''); }
+        function renderPalette() { document.getElementById('p-grid').innerHTML = userAns.map((a, i) => `<div onclick="loadQ(${i})" class="p-item ${a.status} ${i===currIdx?'border-indigo-600 border-2':''}">${i+1}</div>`).join(''); }
         
-        window.submitExamCheck = () => { if(confirm("Submit Exam?")) submitExam(); };
+        window.submitExamCheck = () => { if(confirm("Submit?")) submitExam(); };
         window.submitExam = async () => {
             clearInterval(timer); localStorage.removeItem('ex_state');
             if(document.fullscreenElement) document.exitFullscreen();
-            
-            let score=0, c=0, w=0, sols="";
-            const pos = currExam.posMarks || 4, neg = currExam.negMarks || 1;
-            
-            userAns.forEach((a, i) => {
-                let correctVal = currExam.type==='pdf_exam' ? currExam.answerKey[i] : currExam.questions[i].correct;
-                if(a.val !== -1) { if(a.val === correctVal) { score+=pos; c++; } else { score-=neg; w++; } }
-                if(currExam.type==='native_exam' && currExam.questions[i].sol) sols += `<div class="p-2 bg-slate-50 rounded mb-1"><b>Q${i+1}:</b> ${currExam.questions[i].sol}</div>`;
-            });
-
-            await addDoc(collection(db, "results"), { uid: user.uid, studentName: user.name, examTitle: currExam.title, score, totalMarks: userAns.length * pos, timestamp: serverTimestamp() });
-            
+            let score=0, c=0, w=0, sols=""; const pos=currExam.posMarks, neg=currExam.negMarks;
+            userAns.forEach((a, i) => { const q=currExam.questions[i]; if(a.val!==-1){ if(a.val===q.correct){score+=pos;c++} else{score-=neg;w++} } if(q.sol) sols+=`<div class="p-2 bg-slate-50 rounded mb-1 text-xs"><b>Q${i+1}:</b> ${q.sol}</div>`; });
+            await addDoc(collection(db, "results"), { uid: user.uid, studentName: user.name, examTitle: currExam.title, score, totalMarks: userAns.length*pos, stats:{c,w,s:userAns.length-(c+w)}, timestamp: serverTimestamp() });
+            await updateDoc(doc(db,"students",user.uid), {xp:(user.xp||0)+score});
             document.getElementById('exam-ui').classList.add('hidden');
             document.getElementById('result-modal').classList.remove('hidden');
             document.getElementById('res-score').innerText = score;
             document.getElementById('res-c').innerText = c; document.getElementById('res-w').innerText = w; document.getElementById('res-s').innerText = userAns.length-(c+w);
-            document.getElementById('res-solutions').innerHTML = sols || "Check formula sheet.";
-            
+            document.getElementById('res-solutions').innerHTML = sols;
             new Chart(document.getElementById('res-chart'), { type: 'doughnut', data: { labels: ['C','W','S'], datasets: [{ data: [c, w, userAns.length-(c+w)], backgroundColor: ['#22c55e', '#ef4444', '#cbd5e1'], borderWidth:0 }] }, options: {cutout:'70%', plugins:{legend:{display:false}}} });
         };
 
-        // Calculator
-        window.calc = (v) => document.getElementById('calc-disp').value += v;
-        window.calcClr = () => document.getElementById('calc-disp').value = '0';
-        window.calcExec = () => { try{ document.getElementById('calc-disp').value = eval(document.getElementById('calc-disp').value); }catch{document.getElementById('calc-disp').value='Err'} };
+        window.c = (v) => document.getElementById('calc-disp').value += v;
+        window.evalC = () => { try{ document.getElementById('calc-disp').value = eval(document.getElementById('calc-disp').value.replace('sin','Math.sin').replace('cos','Math.cos').replace('tan','Math.tan')); }catch{document.getElementById('calc-disp').value='Err'} };
+        window.saveProfile = async() => { await updateDoc(doc(db,"students",user.uid), { name:document.getElementById('in-name').value, phone:document.getElementById('in-phone').value, address:document.getElementById('in-addr').value }); alert("Saved"); };
         
-        // Expose
-        window.navQ = window.navQ; window.pick = window.pick; window.markRev = window.markRev; window.submitExamCheck = window.submitExamCheck;
-        window.calc = window.calc; window.calcClr = window.calcClr; window.calcExec = window.calcExec;
+        window.nav = window.nav; window.filterContent = window.filterContent; window.startExam = window.startExam; window.pick = window.pick; window.markRev = window.markRev; window.navQ = window.navQ; window.submitExamCheck = window.submitExamCheck; window.saveProfile = window.saveProfile; window.sendChat = window.sendChat; window.c = window.c; window.evalC = window.evalC;
     </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NeonLMS - Advanced</title>
+    <title>NeonLMS - Ultimate</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -49,13 +49,13 @@
         .btn-secondary { background: rgba(255,255,255,0.1); color: white; }
         .btn-danger { background: rgba(255, 0, 85, 0.2); color: var(--danger); border: 1px solid var(--danger); }
         .btn-success { background: rgba(0, 255, 157, 0.2); color: var(--success); border: 1px solid var(--success); }
+        .btn-warning { background: rgba(255, 183, 0, 0.2); color: var(--warning); border: 1px solid var(--warning); }
         .btn-sm { padding: 6px 12px; width: auto; font-size: 12px; }
 
         /* Formatting Toolbar */
         .format-toolbar { display: flex; gap: 5px; margin-bottom: 5px; }
         .format-btn { background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); padding: 5px 10px; border-radius: 4px; color: #ccc; cursor: pointer; font-size: 12px; width: auto; }
-        .format-btn:hover { background: var(--primary); color: white; }
-
+        
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; width: 100%;
             background: rgba(10, 10, 15, 0.98); border-top: 1px solid var(--glass-border);
@@ -75,9 +75,19 @@
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
         th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--glass-border); }
         th { color: var(--secondary); text-transform: uppercase; font-size: 11px; }
+        
         .badge { padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; background: #333; }
         .badge-active { color: var(--success); border: 1px solid var(--success); }
+        .badge-pending { color: var(--warning); border: 1px solid var(--warning); }
+        
+        /* Profile Status Badges */
+        .status-excellent { color: #00ff9d; border: 1px solid #00ff9d; padding: 5px 10px; border-radius: 20px; }
+        .status-good { color: #00f7ff; border: 1px solid #00f7ff; padding: 5px 10px; border-radius: 20px; }
+        .status-avg { color: #ffb700; border: 1px solid #ffb700; padding: 5px 10px; border-radius: 20px; }
+
         .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .rank-card { display: flex; align-items: center; padding: 10px; margin-bottom: 10px; background: rgba(255,255,255,0.03); border-radius: 10px; }
+        .rank-num { font-size: 20px; font-weight: bold; width: 40px; color: var(--warning); }
         
         #toast-box { position: fixed; top: 20px; right: 20px; z-index: 9999; }
         .toast { background: #1e1e24; border-left: 4px solid var(--primary); padding: 15px; margin-bottom: 10px; color: white; animation: slideIn 0.3s; }
@@ -85,6 +95,14 @@
         .spinner { width:40px; height:40px; border:4px solid #333; border-top-color:var(--secondary); border-radius:50%; animation:spin 1s infinite linear; }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes slideIn { from{transform:translateX(100%)} to{transform:translateX(0)} }
+        
+        /* Switch Toggle */
+        .switch { position: relative; display: inline-block; width: 34px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #444; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(14px); }
     </style>
 </head>
 <body>
@@ -123,6 +141,7 @@
             </div>
             <div id="reg-form" class="hidden">
                 <input type="text" id="reg-name" placeholder="Full Name">
+                <input type="tel" id="reg-phone" placeholder="Phone Number">
                 <div style="display:flex; gap:10px;">
                     <select id="reg-class"><option value="" disabled selected>Class</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
                     <select id="reg-div"><option value="A">A</option><option value="B">B</option></select>
@@ -148,7 +167,16 @@
     <!-- ADMIN DASHBOARD -->
     <div id="view-admin" class="container hidden">
         <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-            <div><h2 style="margin:0;">Admin</h2><small id="admin-name">Hi, Admin</small></div>
+            <div>
+                <h2 style="margin:0;">Admin</h2>
+                <div style="display:flex; align-items:center; gap:10px; margin-top:5px;">
+                    <small style="color:#aaa;">Leaderboard:</small>
+                    <label class="switch">
+                        <input type="checkbox" id="admin-lb-toggle" onchange="app.toggleLeaderboard()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
             <button class="btn-danger btn-sm" onclick="app.logout()">Logout</button>
         </div>
         <div class="tabs">
@@ -172,7 +200,7 @@
                     <input type="text" id="ex-pin" placeholder="PIN (Opt)">
                 </div>
                 <label style="font-size:12px; margin-bottom:10px; display:block;">
-                    <input type="checkbox" id="ex-shuffle" style="width:auto;"> Shuffle Questions for Students
+                    <input type="checkbox" id="ex-shuffle" style="width:auto;"> Shuffle Questions
                 </label>
                 
                 <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; margin-bottom:10px;">
@@ -214,8 +242,11 @@
                 <button class="btn-secondary btn-sm" onclick="app.closeResDetail()">&larr; Back</button>
                 <div class="card">
                     <h3 id="res-title">Exam</h3>
-                    <button class="btn-primary btn-sm" onclick="app.publishAll()">Publish All</button>
-                    <table id="res-table"><thead><tr><th>Name</th><th>Score</th><th>Action</th></tr></thead><tbody></tbody></table>
+                    <div style="display:flex; gap:10px; margin-bottom:10px;">
+                        <button class="btn-primary btn-sm" onclick="app.publishAll(true)">Pub All</button>
+                        <button class="btn-warning btn-sm" onclick="app.publishAll(false)">Unpub All</button>
+                    </div>
+                    <table id="res-table"><thead><tr><th>Name</th><th>Score</th><th>Status</th><th>Act</th></tr></thead><tbody></tbody></table>
                 </div>
             </div>
         </div>
@@ -231,43 +262,66 @@
 
     <!-- STUDENT DASHBOARD -->
     <div id="view-student" class="container hidden">
-        <!-- Home Tab -->
+        <!-- Home -->
         <div id="stu-tab-home">
             <div class="card">
                 <h2>Hello, <span id="stu-name">Student</span>!</h2>
                 <p style="color:var(--secondary)">Class <span id="stu-class">--</span></p>
             </div>
-            <div class="card">
+            <div class="card" id="leaderboard-card">
                 <h3>🏆 Class Leaderboard</h3>
                 <div id="leaderboard-list"><p>No results yet.</p></div>
             </div>
+            <div class="card hidden" id="leaderboard-disabled">
+                <h3>🏆 Class Leaderboard</h3>
+                <p style="color:#aaa;">Leaderboard is hidden by Admin.</p>
+            </div>
         </div>
 
-        <!-- Exams Tab -->
+        <!-- Exams -->
         <div id="stu-tab-exams" class="hidden">
             <h3>Available Exams</h3>
             <div id="stu-exam-list"></div>
         </div>
 
-        <!-- Results Tab -->
+        <!-- Results -->
         <div id="stu-tab-results" class="hidden">
             <h3>My History</h3>
             <div id="stu-history-list"></div>
         </div>
 
-        <!-- Profile Tab -->
+        <!-- Profile -->
         <div id="stu-tab-profile" class="hidden">
             <div class="card" style="text-align:center;">
                 <div style="width:80px; height:80px; background:var(--primary); border-radius:50%; margin:0 auto 15px; display:flex; align-items:center; justify-content:center; font-size:30px;">
                     <i class="fas fa-user"></i>
                 </div>
-                <h3 id="pro-name">Name</h3>
-                <p id="pro-email" style="color:#aaa;">email</p>
+                <h2 id="pro-name">Name</h2>
+                <div id="pro-status" style="margin: 10px 0;"></div>
+                
+                <div class="option-grid" style="margin-top:20px; text-align:left;">
+                    <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px;">
+                        <small style="color:#aaa">Email</small><br>
+                        <span id="pro-email">--</span>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px;">
+                        <small style="color:#aaa">Phone</small><br>
+                        <span id="pro-phone">--</span>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px;">
+                        <small style="color:#aaa">Exams Taken</small><br>
+                        <span id="pro-count">0</span>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px;">
+                        <small style="color:#aaa">Avg Score</small><br>
+                        <span id="pro-avg">0%</span>
+                    </div>
+                </div>
+
                 <button class="btn-danger" style="margin-top:20px;" onclick="app.logout()">Logout</button>
             </div>
         </div>
 
-        <!-- BOTTOM NAV -->
         <div class="bottom-nav">
             <div class="nav-item active" onclick="app.stuNav('home', this)"><i class="fas fa-home"></i><span>Home</span></div>
             <div class="nav-item" onclick="app.stuNav('exams', this)"><i class="fas fa-file-alt"></i><span>Exams</span></div>
@@ -322,7 +376,7 @@
                 b.appendChild(d); setTimeout(()=>d.remove(),3000);
             },
             
-            // AUTH & LOGIN
+            // AUTH
             toggleAuth: (mode) => {
                 document.getElementById('login-form').classList.toggle('hidden', mode==='reg');
                 document.getElementById('reg-form').classList.toggle('hidden', mode!=='reg');
@@ -338,19 +392,19 @@
                     const snap = await getDoc(ref);
                     if(!snap.exists()) {
                         const role = res.user.email===ADMIN_EMAIL ? 'admin':'student';
-                        await setDoc(ref, { email:res.user.email, displayName:res.user.displayName, role, class:'9', division:'A', isApproved:role==='admin' });
+                        await setDoc(ref, { email:res.user.email, displayName:res.user.displayName, phone: "N/A", role, class:'9', division:'A', isApproved:role==='admin' });
                     }
                 } catch(e){ app.toast(e.message,'error'); }
             },
             register: async () => {
                 const n=document.getElementById('reg-name').value, c=document.getElementById('reg-class').value;
                 const d=document.getElementById('reg-div').value, e=document.getElementById('reg-email').value;
-                const p=document.getElementById('reg-pass').value;
+                const p=document.getElementById('reg-pass').value, ph=document.getElementById('reg-phone').value;
                 if(!n||!c) return app.toast('Fill fields','error');
                 try {
                     const res = await createUserWithEmailAndPassword(auth, e, p);
                     const role = e===ADMIN_EMAIL?'admin':'student';
-                    await setDoc(doc(db,"users",res.user.uid), { email:e, displayName:n, role, class:c, division:d, isApproved:role==='admin' });
+                    await setDoc(doc(db,"users",res.user.uid), { email:e, displayName:n, phone: ph, role, class:c, division:d, isApproved:role==='admin' });
                     if(role!=='admin') app.toast('Registered! Wait for approval.');
                 } catch(err){ app.toast(err.message,'error'); }
             },
@@ -367,55 +421,44 @@
                 if(t==='results') app.loadResList();
             },
             
-            // Exam Builder + Smart Formatting
+            // Leaderboard Toggle Logic
+            loadConfig: async () => {
+                const docSnap = await getDoc(doc(db, "system", "config"));
+                if(docSnap.exists()) {
+                    document.getElementById('admin-lb-toggle').checked = docSnap.data().leaderboardVisible;
+                }
+            },
+            toggleLeaderboard: async () => {
+                const status = document.getElementById('admin-lb-toggle').checked;
+                await setDoc(doc(db, "system", "config"), { leaderboardVisible: status }, {merge: true});
+                app.toast(status ? "Leaderboard Visible" : "Leaderboard Hidden");
+            },
+
+            // Formatter
+            smartFormat: (textarea) => {
+                let val = textarea.value;
+                val = val.replace(/([A-Z][a-z]?)(\d+)/g, "$1<sub>$2</sub>");
+                val = val.replace(/\^(\d+)/g, "<sup>$1</sup>");
+                textarea.value = val; app.toast("Auto-Formatted!");
+            },
+            insertTag: (btn, tag) => {
+                const ta = btn.parentElement.nextElementSibling;
+                const s = ta.selectionStart, e = ta.selectionEnd, val = ta.value;
+                ta.value = val.slice(0,s) + `<${tag}>${val.slice(s,e)}</${tag}>` + val.slice(e);
+            },
             setBuilderMode: (m) => {
                 document.getElementById('builder-manual').classList.toggle('hidden', m!=='manual');
                 document.getElementById('builder-json').classList.toggle('hidden', m!=='json');
                 document.getElementById('mode-manual').classList.toggle('active', m==='manual');
                 document.getElementById('mode-json').classList.toggle('active', m==='json');
             },
-            
-            // SMART FORMAT HELPER
-            smartFormat: (textarea) => {
-                let val = textarea.value;
-                // Chemistry: H2O -> H₂O, CO2 -> CO₂
-                val = val.replace(/([A-Z][a-z]?)(\d+)/g, "$1<sub>$2</sub>");
-                // Math: x2 -> x², ^2 -> ²
-                val = val.replace(/\^(\d+)/g, "<sup>$1</sup>");
-                // x2 case (dangerous, but requested: auto format x2 -> x²)
-                // Only replace if preceded by a letter
-                val = val.replace(/([a-z])2/g, "$1<sup>2</sup>");
-                val = val.replace(/([a-z])3/g, "$1<sup>3</sup>");
-                
-                textarea.value = val; // Note: In textarea it shows raw HTML.
-                app.toast("Auto-Formatted! (HTML)");
-            },
-
-            insertTag: (btn, tag) => {
-                const ta = btn.parentElement.nextElementSibling; // Get textarea
-                const start = ta.selectionStart;
-                const end = ta.selectionEnd;
-                const text = ta.value;
-                const before = text.substring(0, start);
-                const after  = text.substring(end, text.length);
-                const val = (tag === 'img') ? `<img src="URL" width="100">` : `<${tag}>${text.substring(start, end)}</${tag}>`;
-                ta.value = before + val + after;
-            },
-
             addQ: (data=null) => {
                 const c = document.getElementById('q-container');
                 const div = document.createElement('div'); div.className='card q-card'; div.style.padding='15px';
                 div.innerHTML = `
-                    <div style="display:flex; justify-content:space-between;"><small>Question</small><i class="fas fa-times" style="color:red" onclick="this.parentElement.parentElement.remove()"></i></div>
-                    
-                    <div class="format-toolbar">
-                        <button class="format-btn" onclick="app.insertTag(this,'b')"><b>B</b></button>
-                        <button class="format-btn" onclick="app.insertTag(this,'sup')">x²</button>
-                        <button class="format-btn" onclick="app.insertTag(this,'sub')">x₂</button>
-                        <button class="format-btn" onclick="app.smartFormat(this.parentElement.nextElementSibling)">🪄 Magic</button>
-                    </div>
-
-                    <textarea class="q-txt" placeholder="Question Text (HTML allowed)">${data?data.text:''}</textarea>
+                    <div style="display:flex; justify-content:space-between;"><small>MCQ (HTML Allowed)</small><i class="fas fa-times" style="color:red" onclick="this.parentElement.parentElement.remove()"></i></div>
+                    <div class="format-toolbar"><button class="format-btn" onclick="app.insertTag(this,'b')">B</button><button class="format-btn" onclick="app.insertTag(this,'sup')">x²</button><button class="format-btn" onclick="app.insertTag(this,'sub')">x₂</button><button class="format-btn" onclick="app.smartFormat(this.parentElement.nextElementSibling)">🪄</button></div>
+                    <textarea class="q-txt" placeholder="Question">${data?data.text:''}</textarea>
                     <div class="option-grid">
                         <input type="text" class="o0" placeholder="A" value="${data?data.options[0]:''}">
                         <input type="text" class="o1" placeholder="B" value="${data?data.options[1]:''}">
@@ -431,7 +474,14 @@
                 `;
                 c.appendChild(div);
             },
-            
+            processJSON: () => {
+                try {
+                    const json = JSON.parse(document.getElementById('json-input').value);
+                    document.getElementById('q-container').innerHTML = "";
+                    json.forEach(q => app.addQ(q));
+                    app.setBuilderMode('manual');
+                } catch(e){ app.toast("Invalid JSON", 'error'); }
+            },
             saveExam: async () => {
                 const btn = document.getElementById('btn-save');
                 const title = document.getElementById('ex-title').value;
@@ -474,7 +524,6 @@
                 } catch(e){ app.toast(e.message, 'error'); }
                 btn.disabled=false; btn.innerText="Publish";
             },
-
             loadExams: async () => {
                 const d = document.getElementById('exam-list'); d.innerHTML = "";
                 const snap = await getDocs(collection(db, "exams"));
@@ -482,7 +531,7 @@
                     const e = doc.data();
                     d.innerHTML += `
                         <div class="card" style="display:flex; justify-content:space-between;">
-                            <div><b>${e.title}</b> <span class="badge badge-active">${e.targetClass}</span><br><small>Neg: ${e.negMark||0} | PIN: ${e.pin||'None'}</small></div>
+                            <div><b>${e.title}</b> <span class="badge badge-active">${e.targetClass}</span><br><small>Neg: ${e.negMark||0}</small></div>
                             <div>
                                 <button class="btn-secondary btn-sm" onclick="app.editExam('${doc.id}')"><i class="fas fa-edit"></i></button>
                                 <button class="btn-danger btn-sm" onclick="app.delExam('${doc.id}')"><i class="fas fa-trash"></i></button>
@@ -514,7 +563,7 @@
             },
             delExam: async (id) => { if(confirm("Delete?")) { await deleteDoc(doc(db,"exams",id)); app.loadExams(); }},
 
-            // Results & Students (Admin)
+            // Admin Results
             loadResList: async () => {
                 const list = document.getElementById('results-list'); list.innerHTML = "Loading...";
                 const snap = await getDocs(collection(db, "exams"));
@@ -534,16 +583,43 @@
                 tbody.innerHTML = "";
                 snap.forEach(d => {
                     const r = d.data();
-                    const status = (rel || r.isReleased) ? "Pub" : "Hidden";
-                    const btn = (rel || r.isReleased) ? "-" : `<button class="btn-success btn-sm" onclick="app.pubOne('${d.id}')">Pub</button>`;
-                    tbody.innerHTML += `<tr><td>${r.studentName}</td><td>${r.score}</td><td>${btn}</td></tr>`;
+                    // Fix: Check explicit release or global release
+                    const isPub = (r.isReleased === true || rel === true);
+                    const status = isPub ? '<span style="color:lime">Pub</span>' : '<span style="color:orange">Hid</span>';
+                    
+                    const toggleBtn = isPub 
+                        ? `<i class="fas fa-eye-slash" style="cursor:pointer; color:orange; margin-right:10px;" onclick="app.toggleResult('${d.id}', false)"></i>` 
+                        : `<i class="fas fa-eye" style="cursor:pointer; color:lime; margin-right:10px;" onclick="app.toggleResult('${d.id}', true)"></i>`;
+                    
+                    const delBtn = `<i class="fas fa-trash" style="cursor:pointer; color:red;" onclick="app.deleteResult('${d.id}')"></i>`;
+
+                    tbody.innerHTML += `<tr><td>${r.studentName}</td><td>${r.score}</td><td>${status}</td><td>${toggleBtn} ${delBtn}</td></tr>`;
                 });
             },
-            closeResDetail: () => { document.getElementById('res-detail-view').classList.add('hidden'); document.getElementById('res-list-view').classList.remove('hidden'); },
-            publishAll: async () => {
-                if(confirm("Publish All?")) { await updateDoc(doc(db,"exams",adminCurrentExamId),{resultsReleased:true}); app.toast("Published"); }
+            toggleResult: async (rid, status) => {
+                await updateDoc(doc(db, "results", rid), { isReleased: status });
+                // Refresh view
+                const examDoc = await getDoc(doc(db, "exams", adminCurrentExamId));
+                app.viewResDetail(adminCurrentExamId, examDoc.data().title, examDoc.data().resultsReleased);
             },
-            pubOne: async (rid) => { await updateDoc(doc(db,"results",rid),{isReleased:true}); app.toast("Released"); },
+            deleteResult: async (rid) => {
+                if(confirm("Permanently delete this result?")) {
+                    await deleteDoc(doc(db, "results", rid));
+                    // Refresh view
+                    const examDoc = await getDoc(doc(db, "exams", adminCurrentExamId));
+                    app.viewResDetail(adminCurrentExamId, examDoc.data().title, examDoc.data().resultsReleased);
+                }
+            },
+            closeResDetail: () => { document.getElementById('res-detail-view').classList.add('hidden'); document.getElementById('res-list-view').classList.remove('hidden'); },
+            publishAll: async (status) => {
+                if(confirm(status ? "Publish All?" : "Unpublish All?")) { 
+                    await updateDoc(doc(db,"exams",adminCurrentExamId),{resultsReleased:status}); 
+                    app.viewResDetail(adminCurrentExamId, document.getElementById('res-title').innerText, status);
+                    app.toast(status ? "All Published" : "All Hidden"); 
+                }
+            },
+            
+            // Admin Students
             loadStu: async () => {
                 const t = document.querySelector('#stu-table tbody'); t.innerHTML='<tr><td>Loading...</td></tr>';
                 const snap = await getDocs(query(collection(db,"users"), where("role","==","student")));
@@ -579,9 +655,50 @@
                 if(t==='home') app.loadLeaderboard();
                 if(t==='exams') app.loadStuExams();
                 if(t==='results') app.loadStuHistory();
+                if(t==='profile') app.loadProfileStats();
             },
+            
+            // PROFILE STATS LOGIC
+            loadProfileStats: async () => {
+                const q = query(collection(db, "results"), where("uid", "==", user.uid));
+                const snap = await getDocs(q);
+                let totalExams = 0;
+                let totalScorePct = 0;
+                
+                snap.forEach(d => {
+                    const r = d.data();
+                    totalExams++;
+                    totalScorePct += (r.score / r.total) * 100;
+                });
+
+                const avg = totalExams > 0 ? (totalScorePct / totalExams) : 0;
+                let statusBadge = "";
+                
+                if(totalExams === 0) statusBadge = `<span class="badge">New Student</span>`;
+                else if(avg >= 80) statusBadge = `<span class="status-excellent">🏆 Excellent</span>`;
+                else if(avg >= 60) statusBadge = `<span class="status-good">🌟 Good</span>`;
+                else statusBadge = `<span class="status-avg">⚠️ Needs Improvement</span>`;
+
+                document.getElementById('pro-count').innerText = totalExams;
+                document.getElementById('pro-avg').innerText = avg.toFixed(1) + "%";
+                document.getElementById('pro-status').innerHTML = statusBadge;
+            },
+
             loadLeaderboard: async () => {
                 const c = document.getElementById('leaderboard-list'); c.innerHTML="Loading...";
+                const disableDiv = document.getElementById('leaderboard-disabled');
+                const cardDiv = document.getElementById('leaderboard-card');
+                
+                // Check Global Config
+                const configSnap = await getDoc(doc(db, "system", "config"));
+                if(configSnap.exists() && configSnap.data().leaderboardVisible === false) {
+                    cardDiv.classList.add('hidden');
+                    disableDiv.classList.remove('hidden');
+                    return;
+                }
+                cardDiv.classList.remove('hidden');
+                disableDiv.classList.add('hidden');
+
                 const exSnap = await getDocs(query(collection(db,"exams"), where("resultsReleased","==",true)));
                 if(exSnap.empty) { c.innerHTML="<p>No published results yet.</p>"; return; }
                 const q = query(collection(db,"results"), orderBy("score", "desc"), limit(10));
@@ -623,10 +740,9 @@
                 }
             },
             
-            // EXAM ENGINE & PROCTORING
+            // EXAM ENGINE
             take: (id) => {
                 activeExam = exams.find(e=>e.id===id);
-                // PIN Check
                 if(activeExam.pin) {
                     const entered = prompt("Enter Exam PIN:");
                     if(entered !== activeExam.pin) { app.toast("Wrong PIN", 'error'); return; }
@@ -640,12 +756,9 @@
                     document.getElementById('pdf-frame').src = activeExam.pdf; 
                 } else document.getElementById('pdf-viewer').classList.add('hidden');
 
-                // Shuffle Questions if enabled
                 let questionsToRender = [...activeExam.questions];
-                if(activeExam.shuffle) {
-                    questionsToRender = questionsToRender.sort(() => Math.random() - 0.5);
-                }
-                activeExam._shuffled = questionsToRender; // Store for score calc
+                if(activeExam.shuffle) { questionsToRender = questionsToRender.sort(() => Math.random() - 0.5); }
+                activeExam._shuffled = questionsToRender;
 
                 const c = document.getElementById('paper-qs'); c.innerHTML="";
                 questionsToRender.forEach((q,i) => {
@@ -658,7 +771,6 @@
                     </div>`;
                 });
                 
-                // Start Proctoring
                 warningCount = 0;
                 document.addEventListener("visibilitychange", app.handleVisibility);
                 
@@ -673,10 +785,7 @@
                 if(document.hidden) {
                     warningCount++;
                     alert(`WARNING: Switching tabs is not allowed! Warning ${warningCount}/3`);
-                    if(warningCount >= 3) {
-                        alert("Max warnings reached. Auto-submitting.");
-                        app.submit();
-                    }
+                    if(warningCount >= 3) { alert("Max warnings reached. Auto-submitting."); app.submit(); }
                 }
             },
             submit: async () => {
@@ -715,12 +824,14 @@
                     document.getElementById('view-admin').classList.remove('hidden');
                     document.getElementById('admin-name').innerText = user.displayName;
                     app.loadExams();
+                    app.loadConfig(); // Load Leaderboard setting
                 } else if(user.isApproved) {
                     document.getElementById('view-student').classList.remove('hidden');
                     document.getElementById('stu-name').innerText = user.displayName;
                     document.getElementById('stu-class').innerText = `${user.class}-${user.division}`;
                     document.getElementById('pro-name').innerText = user.displayName;
                     document.getElementById('pro-email').innerText = user.email;
+                    document.getElementById('pro-phone').innerText = user.phone || 'N/A';
                     app.stuNav('home', document.querySelector('.bottom-nav .nav-item'));
                 } else document.getElementById('view-pending').classList.remove('hidden');
             } else {

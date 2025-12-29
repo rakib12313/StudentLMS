@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Science Exam Portal</title>
+    <title>Student Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -12,148 +12,176 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
-        :root { --primary: #4f46e5; --bg: #f8fafc; --text: #0f172a; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); user-select: none; }
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap');
+        :root { --primary: #6366f1; --dark: #0f172a; --glass: rgba(255, 255, 255, 0.8); }
         
-        /* MathJax & Images */
-        mjx-container { font-size: 115% !important; outline: none; margin: 5px 0; }
-        .q-img { max-height: 250px; max-width: 100%; border-radius: 4px; display: block; margin: 10px auto; }
-        
-        /* UI Components */
-        .card { background: white; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: 0.2s; cursor: pointer; }
-        .card:active { transform: scale(0.98); }
-        .btn { padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2); }
-        .btn-outline { border: 1px solid #cbd5e1; background: white; color: #475569; }
-        
-        /* Exam Options */
-        .option-box { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border: 2px solid #f1f5f9; border-radius: 12px; cursor: pointer; margin-bottom: 8px; transition: 0.2s; }
-        .option-box:hover { border-color: #cbd5e1; background: #f8fafc; }
-        .option-box.selected { border-color: var(--primary); background: #eef2ff; }
-        .opt-id { min-width: 24px; height: 24px; border-radius: 50%; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #94a3b8; }
-        .selected .opt-id { border-color: var(--primary); color: var(--primary); background: white; }
-        
-        /* Palette */
-        .p-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-        .p-node { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid #e2e8f0; background: white; }
-        .st-ans { background: var(--success); color: white; border-color: var(--success); }
-        .st-rev { background: var(--warning); color: white; border-color: var(--warning); }
-        .st-skip { background: var(--danger); color: white; border-color: var(--danger); }
-        
-        .hidden { display: none !important; }
-        .animate-enter { animation: slideUp 0.3s ease-out forwards; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body { font-family: 'Outfit', sans-serif; background: #f8fafc; color: var(--dark); user-select: none; padding-bottom: 80px; }
         
         /* Dark Mode */
-        body.dark { --bg: #0f172a; --text: #f8fafc; }
-        body.dark .card, body.dark .bg-white { background: #1e293b; border-color: #334155; color: white; }
-        body.dark .option-box { border-color: #334155; }
-        body.dark .option-box:hover { background: #334155; }
+        body.dark { background: #0b0f19; color: #f1f5f9; }
+        body.dark .glass-card { background: rgba(30, 41, 59, 0.7); border-color: rgba(255,255,255,0.1); }
+        body.dark .nav-bar { background: rgba(15, 23, 42, 0.9); border-color: rgba(255,255,255,0.1); }
+        
+        /* Glass Components */
+        .glass-card {
+            background: white; border: 1px solid #e2e8f0; border-radius: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); transition: 0.2s; overflow: hidden;
+        }
+        .glass-card:active { transform: scale(0.98); }
+        
+        .nav-bar {
+            position: fixed; bottom: 0; width: 100%; background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(12px); border-top: 1px solid #e2e8f0;
+            display: flex; justify-content: space-around; padding: 12px; z-index: 50;
+        }
+        
+        .btn-primary { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; border-radius: 12px; font-weight: bold; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
+        
+        /* Exam Options */
+        .opt-box {
+            display: flex; gap: 12px; padding: 16px; border: 2px solid #f1f5f9;
+            border-radius: 16px; cursor: pointer; transition: 0.2s; align-items: center;
+        }
+        body.dark .opt-box { border-color: #334155; }
+        .opt-box.selected { border-color: var(--primary); background: #eef2ff; }
+        body.dark .opt-box.selected { background: rgba(99, 102, 241, 0.1); }
+        
+        .opt-circle {
+            width: 24px; height: 24px; border-radius: 50%; border: 2px solid #cbd5e1;
+            display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;
+        }
+        .selected .opt-circle { border-color: var(--primary); background: var(--primary); color: white; }
+
+        /* Palette */
+        .p-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .p-item { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: bold; border: 1px solid #e2e8f0; font-size: 12px; }
+        .st-ans { background: #10b981; color: white; border-color: #10b981; }
+        .st-rev { background: #f59e0b; color: white; border-color: #f59e0b; }
+        
+        .hidden { display: none !important; }
+        .animate-enter { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        mjx-container { font-size: 115% !important; outline: none; }
     </style>
 </head>
-<body class="bg-slate-50">
+<body>
+
+    <!-- Sounds -->
+    <audio id="click-snd" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
+    <audio id="success-snd" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
 
     <!-- Login -->
-    <div id="login-section" class="min-h-screen flex items-center justify-center p-6">
-        <div class="card w-full max-w-sm p-8 text-center animate-enter">
-            <h1 class="text-2xl font-bold mb-2 text-indigo-600">Student Portal</h1>
-            <p class="text-sm text-slate-400 mb-6">Login to access assessments</p>
-            <button id="google-btn" class="w-full btn btn-primary">Continue with Google</button>
+    <div id="login-section" class="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-indigo-500 to-purple-600">
+        <div class="glass-card w-full max-w-sm p-8 text-center animate-enter">
+            <div class="w-16 h-16 bg-gradient-to-tr from-indigo-500 to-pink-500 rounded-2xl mx-auto flex items-center justify-center text-white text-2xl font-bold mb-6 shadow-xl rotate-3">🚀</div>
+            <h1 class="text-2xl font-bold mb-2">Student Portal</h1>
+            <p class="text-sm text-slate-400 mb-8">Access your exams anywhere</p>
+            <button id="google-btn" class="w-full py-4 bg-white border rounded-xl font-bold flex items-center justify-center gap-3 hover:bg-slate-50 transition">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5"> Continue with Google
+            </button>
         </div>
     </div>
 
-    <!-- Dashboard -->
-    <div id="dashboard-section" class="hidden min-h-screen pb-20">
-        <div class="bg-white border-b px-4 py-3 flex justify-between items-center sticky top-0 z-30">
+    <!-- Main App -->
+    <div id="app-section" class="hidden">
+        <!-- Header -->
+        <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-200 px-4 py-3 flex justify-between items-center dark:bg-slate-900/80 dark:border-slate-800">
             <div class="flex items-center gap-3">
-                <img id="u-img" class="w-9 h-9 rounded-full bg-slate-200">
-                <div><h3 id="u-name" class="font-bold text-sm">Student</h3></div>
+                <img id="u-photo" class="w-9 h-9 rounded-full bg-slate-200 border-2 border-white shadow-sm">
+                <div><h3 id="u-name" class="font-bold text-sm leading-tight">Student</h3><span class="text-[10px] font-bold text-indigo-500">Online</span></div>
             </div>
-            <div class="flex gap-2">
-                <button onclick="document.body.classList.toggle('dark')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"><i class="fas fa-moon"></i></button>
-                <button id="logout-btn" class="text-red-500"><i class="fas fa-power-off"></i></button>
+            <button onclick="toggleTheme()" class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center dark:bg-slate-800"><i class="fas fa-moon"></i></button>
+        </header>
+
+        <div class="p-4 max-w-3xl mx-auto space-y-6">
+            
+            <!-- Filters -->
+            <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                <button onclick="filterExams('all')" class="px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-bold whitespace-nowrap">All</button>
+                <button onclick="filterExams('Physics')" class="px-4 py-2 rounded-full bg-white border text-slate-600 text-xs font-bold whitespace-nowrap">Physics</button>
+                <button onclick="filterExams('Chemistry')" class="px-4 py-2 rounded-full bg-white border text-slate-600 text-xs font-bold whitespace-nowrap">Chemistry</button>
+                <button onclick="filterExams('Maths')" class="px-4 py-2 rounded-full bg-white border text-slate-600 text-xs font-bold whitespace-nowrap">Maths</button>
             </div>
+
+            <div id="exam-list" class="space-y-4 animate-enter"></div>
+            
+            <h3 class="font-bold text-lg opacity-70 mt-8">Recent History</h3>
+            <div id="history-list" class="space-y-3"></div>
         </div>
-        <div class="max-w-4xl mx-auto p-4 space-y-6">
-            <h2 class="font-bold text-lg opacity-70">Available Exams</h2>
-            <div id="exam-list" class="grid gap-3"></div>
-            <h2 class="font-bold text-lg opacity-70 mt-6">Attempt History</h2>
-            <div id="result-list" class="grid gap-3"></div>
-        </div>
+
+        <!-- Bottom Nav -->
+        <nav class="nav-bar dark:bg-slate-900">
+            <button class="text-indigo-600 flex flex-col items-center"><i class="fas fa-home text-xl"></i></button>
+            <button class="text-slate-400 flex flex-col items-center"><i class="fas fa-chart-bar text-xl"></i></button>
+            <button id="logout-btn" class="text-slate-400 flex flex-col items-center"><i class="fas fa-sign-out-alt text-xl"></i></button>
+        </nav>
     </div>
 
-    <!-- CBT RUNNER -->
-    <div id="exam-runner" class="hidden fixed inset-0 z-50 bg-white flex flex-col h-full">
-        <div class="h-14 bg-white border-b flex justify-between items-center px-4 flex-shrink-0 shadow-sm z-10">
-            <h3 id="run-title" class="font-bold text-sm truncate w-1/3">Exam</h3>
-            <div class="flex items-center gap-2 bg-slate-100 px-3 py-1 rounded-lg">
-                <i class="fas fa-clock text-indigo-600"></i>
-                <span id="timer" class="font-mono font-bold text-lg text-slate-800">00:00</span>
+    <!-- EXAM RUNNER -->
+    <div id="exam-ui" class="hidden fixed inset-0 z-50 bg-white dark:bg-slate-900 flex flex-col">
+        <div class="h-16 border-b flex justify-between items-center px-4 shadow-sm z-20 bg-white dark:bg-slate-900 dark:border-slate-800">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-100 text-indigo-600 px-3 py-1 rounded-lg font-mono font-bold text-lg" id="timer">00:00</div>
             </div>
-            <button onclick="togglePalette()" class="text-slate-600 md:hidden"><i class="fas fa-th text-xl"></i></button>
+            <button onclick="togglePalette()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center dark:bg-slate-800"><i class="fas fa-th"></i></button>
         </div>
 
         <div class="flex-grow flex overflow-hidden relative">
-            <!-- Question Area -->
-            <div class="flex-grow flex flex-col h-full w-full md:w-3/4">
-                <div id="question-area" class="flex-grow overflow-y-auto p-6">
-                    <div class="flex justify-between mb-4 border-b pb-2">
-                        <span class="text-xs font-bold text-white bg-indigo-600 px-2 py-1 rounded">Q <span id="q-curr-num">1</span></span>
-                        <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded border border-green-200">+<span id="q-pos">4</span> / <span class="text-red-500">-<span id="q-neg">1</span></span></span>
-                    </div>
-                    <div id="q-img-box" class="hidden"><img id="q-img-el" class="q-img"></div>
-                    <p id="q-text" class="text-lg font-medium opacity-80 mb-6 leading-relaxed"></p>
-                    <div id="q-options" class="space-y-3"></div>
+            <!-- Questions -->
+            <div class="flex-grow overflow-y-auto p-6 pb-24" id="q-area">
+                <div class="flex justify-between mb-4">
+                    <span class="text-xs font-bold text-white bg-indigo-500 px-3 py-1 rounded-full">Question <span id="q-num">1</span></span>
+                    <span class="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded border border-green-100">+<span id="q-pos">4</span></span>
                 </div>
-
-                <div class="h-16 border-t bg-slate-50 flex items-center justify-between px-6 flex-shrink-0">
-                    <div class="flex gap-2">
-                        <button onclick="changeQ(-1)" class="btn btn-outline text-xs">Prev</button>
-                        <button onclick="changeQ(1)" class="btn btn-primary text-xs">Next</button>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="markReview()" class="btn btn-outline text-amber-500 border-amber-200 text-xs">Review</button>
-                        <button onclick="submitExamCheck()" class="btn text-white bg-red-500 text-xs hover:bg-red-600">Submit</button>
-                    </div>
-                </div>
+                
+                <div id="q-img-wrap" class="hidden text-center mb-4"><img id="q-img" class="max-h-48 rounded-lg border inline-block"></div>
+                <p id="q-txt" class="text-lg font-medium mb-6 leading-relaxed"></p>
+                <div id="q-opts" class="space-y-3"></div>
             </div>
 
-            <!-- Palette -->
-            <div id="exam-sidebar" class="w-full md:w-1/4 bg-white border-l flex flex-col h-full absolute md:relative right-0 top-0 hidden md:flex z-40">
-                <div class="p-4 border-b flex justify-between md:hidden"><h3 class="font-bold">Palette</h3><button onclick="togglePalette()">&times;</button></div>
-                <div class="p-4 grid grid-cols-2 gap-2 text-[10px] font-bold opacity-60 border-b bg-slate-50">
-                    <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-green-500"></span> Answered</div>
-                    <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-amber-500"></span> Review</div>
-                    <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-red-500"></span> Skipped</div>
-                    <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-white border"></span> Visit</div>
+            <!-- Sidebar -->
+            <div id="palette-bar" class="absolute inset-y-0 right-0 w-64 bg-white border-l transform translate-x-full transition duration-300 z-30 flex flex-col dark:bg-slate-900 dark:border-slate-800">
+                <div class="p-4 border-b font-bold dark:border-slate-800">Question Palette</div>
+                <div id="p-grid" class="p-4 p-grid flex-grow overflow-y-auto content-start"></div>
+                <div class="p-4 border-t bg-slate-50 dark:bg-slate-800">
+                    <button onclick="submitExam()" class="w-full btn-primary py-3">Submit Exam</button>
                 </div>
-                <div id="palette-grid" class="flex-grow overflow-y-auto p-4 p-grid content-start"></div>
             </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="fixed bottom-0 w-full bg-white border-t p-3 flex justify-between z-20 dark:bg-slate-900 dark:border-slate-800">
+            <div class="flex gap-3">
+                <button onclick="navQ(-1)" class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center hover:bg-slate-200 dark:bg-slate-800"><i class="fas fa-chevron-left"></i></button>
+                <button onclick="navQ(1)" class="w-12 h-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-500/30"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <button onclick="markRev()" class="px-6 rounded-xl border border-amber-200 text-amber-600 font-bold text-sm bg-amber-50">Review</button>
         </div>
     </div>
 
-    <!-- Analysis Modal -->
-    <div id="result-modal" class="hidden fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-4xl h-[90vh] rounded-2xl flex flex-col overflow-hidden relative">
-            <button onclick="document.getElementById('result-modal').classList.add('hidden')" class="absolute top-4 right-4 text-2xl z-20 hover:text-red-500">&times;</button>
-            <div class="p-6 border-b bg-slate-50 flex justify-center gap-10 text-center">
-                <div><p class="text-xs font-bold text-slate-400">SCORE</p><h1 id="res-score" class="text-4xl font-bold text-indigo-600">0</h1></div>
-                <div><p class="text-xs font-bold text-slate-400">ACCURACY</p><h1 id="res-acc" class="text-4xl font-bold text-green-600">0%</h1></div>
+    <!-- Result Modal -->
+    <div id="result-modal" class="hidden fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-md rounded-3xl p-6 text-center animate-enter dark:bg-slate-900 dark:text-white">
+            <h2 class="text-2xl font-bold mb-1">Result Analysis</h2>
+            <p class="text-sm opacity-60 mb-6">Great effort! Here is your report.</p>
+            
+            <div class="relative w-48 h-48 mx-auto mb-6">
+                <canvas id="res-chart"></canvas>
+                <div class="absolute inset-0 flex items-center justify-center flex-col">
+                    <span class="text-3xl font-bold" id="res-score">0</span>
+                    <span class="text-[10px] uppercase font-bold opacity-50">Score</span>
+                </div>
             </div>
-            <div class="flex-grow overflow-y-auto p-6 grid md:grid-cols-2 gap-6">
-                <div class="h-64 flex items-center justify-center"><canvas id="res-chart"></canvas></div>
-                <div id="res-details" class="space-y-4"></div>
+            
+            <div class="grid grid-cols-3 gap-2 mb-6 text-xs font-bold">
+                <div class="bg-green-50 text-green-700 p-2 rounded-lg border border-green-100">Correct<br><span id="res-c" class="text-lg">0</span></div>
+                <div class="bg-red-50 text-red-700 p-2 rounded-lg border border-red-100">Wrong<br><span id="res-w" class="text-lg">0</span></div>
+                <div class="bg-slate-50 text-slate-700 p-2 rounded-lg border border-slate-100">Skipped<br><span id="res-s" class="text-lg">0</span></div>
             </div>
-        </div>
-    </div>
 
-    <!-- Fullscreen Warning -->
-    <div id="fs-warning" class="hidden fixed inset-0 z-[100] bg-red-600 text-white flex flex-col items-center justify-center text-center p-6">
-        <i class="fas fa-exclamation-triangle text-6xl mb-4"></i>
-        <h2 class="text-3xl font-bold">Action Required</h2>
-        <p class="mb-6">You must stay in Fullscreen mode to continue the exam.</p>
-        <button onclick="document.documentElement.requestFullscreen()" class="btn bg-white text-red-600">Return to Exam</button>
+            <button onclick="location.reload()" class="w-full btn-primary py-3">Back to Home</button>
+        </div>
     </div>
 
     <script type="module">
@@ -161,138 +189,164 @@
         import { signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { doc, getDoc, setDoc, updateDoc, collection, getDocs, query, orderBy, serverTimestamp, addDoc, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        let user=null, currentExam=null, userAnswers=[], currQIndex=0, timerInt=null;
+        let user=null, allExams=[], currExam=null, userAns=[], currIdx=0, timer=null;
+        const sndClick = document.getElementById('click-snd');
+        const sndSuccess = document.getElementById('success-snd');
 
         onAuthStateChanged(auth, async (u) => {
             if(u) {
                 const ref = doc(db, "students", u.uid);
                 const snap = await getDoc(ref);
                 if(!snap.exists()) {
-                    const d = { uid: u.uid, email: u.email, name: u.displayName, photo: u.photoURL, role: "student", batch: "all", xp: 0 };
+                    const d = { uid: u.uid, email: u.email, name: u.displayName, photo: u.photoURL, role: "student", banned: false };
                     await setDoc(ref, d); user = d;
                 } else user = snap.data();
-                initUI();
+                
+                if(user.banned) { alert("Access Denied."); signOut(auth); return; }
+                initApp();
             } else document.getElementById('login-section').classList.remove('hidden');
         });
 
         document.getElementById('google-btn').addEventListener('click', () => signInWithPopup(auth, provider));
         document.getElementById('logout-btn').addEventListener('click', () => signOut(auth).then(()=>location.reload()));
 
-        async function initUI() {
+        async function initApp() {
             document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('dashboard-section').classList.remove('hidden');
+            document.getElementById('app-section').classList.remove('hidden');
             document.getElementById('u-name').innerText = user.name;
-            document.getElementById('u-img').src = user.photo;
-            
-            const q = query(collection(db, "exams"), orderBy("createdAt", "desc"));
-            const s = await getDocs(q);
-            document.getElementById('exam-list').innerHTML = s.docs.map(d => {
-                const e = d.data();
-                if(e.batch === "all" || e.batch === user.batch) {
-                    return `<div class="card p-4 flex justify-between items-center border-l-4 border-indigo-500"><div><h4 class="font-bold text-sm text-slate-700">${e.title}</h4><span class="text-[10px] text-slate-400 font-bold uppercase">${e.duration} Mins • ${e.questions.length} Qs</span></div><button onclick="startExam('${d.id}')" class="btn btn-primary text-xs">Start</button></div>`;
-                }
-            }).join('') || "<p class='text-center text-slate-400 text-sm'>No Active Exams</p>";
+            document.getElementById('u-photo').src = user.photo;
 
-            const hQ = query(collection(db, "results"), where("uid","==",user.uid), orderBy("timestamp","desc"));
-            const hS = await getDocs(hQ);
-            document.getElementById('result-list').innerHTML = hS.docs.map(d => `<div class="card p-3 flex justify-between items-center" onclick="showAnalysisDoc('${d.id}')"><div><span class="font-bold text-sm block">${d.data().title}</span><span class="text-[10px] text-slate-400">View Analysis</span></div><span class="font-bold text-indigo-600">${d.data().score}</span></div>`).join('');
+            // Update Last Active
+            await updateDoc(doc(db,"students",user.uid), { lastActive: serverTimestamp() });
+
+            // Load Content
+            const s = await getDocs(query(collection(db, "exams"), orderBy("createdAt", "desc")));
+            allExams = [];
+            s.forEach(d => allExams.push({id: d.id, ...d.data()}));
+            renderExams(allExams);
+
+            // Load History
+            const h = await getDocs(query(collection(db, "results"), where("uid","==",user.uid), orderBy("timestamp","desc")));
+            document.getElementById('history-list').innerHTML = h.docs.map(d => `
+                <div class="glass-card p-3 flex justify-between items-center border-l-4 border-indigo-500">
+                    <div><div class="font-bold text-sm">${d.data().examTitle}</div><div class="text-[10px] opacity-60">Score: ${d.data().score}</div></div>
+                    <div class="text-xl font-bold text-indigo-600">${Math.round((d.data().score/d.data().totalMarks)*100)}%</div>
+                </div>`).join('');
         }
 
-        window.startExam = async (id) => {
-            const s = await getDoc(doc(db,"exams",id));
-            currentExam = { id: s.id, ...s.data() };
-            
-            // Randomization & State
-            const saved = JSON.parse(localStorage.getItem('exam_state'));
-            if(saved && saved.eid === id && confirm("Resume previous session?")) {
-                userAnswers = saved.ans; var t = saved.time;
-                if(currentExam.randomize && saved.qs) currentExam.questions = saved.qs;
-            } else {
-                if(currentExam.randomize) currentExam.questions = currentExam.questions.sort(() => Math.random() - 0.5);
-                userAnswers = Array(currentExam.questions.length).fill().map(() => ({ val: -1, status: 'st-visit', timeSpent: 0 }));
-                var t = currentExam.duration * 60;
-            }
+        window.filterExams = (sub) => {
+            renderExams(sub === 'all' ? allExams : allExams.filter(e => e.subject === sub));
+        };
 
-            // Setup UI
-            document.getElementById('exam-runner').classList.remove('hidden');
-            document.getElementById('run-title').innerText = currentExam.title;
-            document.getElementById('q-pos').innerText = currentExam.posMarks;
-            document.getElementById('q-neg').innerText = currentExam.negMarks;
+        function renderExams(list) {
+            document.getElementById('exam-list').innerHTML = list.map(e => `
+                <div class="glass-card p-5 relative overflow-hidden group cursor-pointer" onclick="startExam('${e.id}')">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-bl-full -mr-4 -mt-4 transition group-hover:scale-110"></div>
+                    <div class="relative z-10">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-500 bg-indigo-50 px-2 py-1 rounded">${e.subject || 'General'}</span>
+                        <h3 class="font-bold text-lg mt-2 mb-1">${e.title}</h3>
+                        <div class="flex gap-4 text-xs text-slate-500 font-bold">
+                            <span><i class="fas fa-clock"></i> ${e.duration}m</span>
+                            <span><i class="fas fa-list"></i> ${e.questions.length} Qs</span>
+                        </div>
+                    </div>
+                    <button class="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-indigo-600 text-white shadow-lg flex items-center justify-center group-hover:scale-110 transition"><i class="fas fa-play"></i></button>
+                </div>`).join('');
+        }
+
+        // --- EXAM RUNNER ---
+        window.startExam = (id) => {
+            currExam = allExams.find(e => e.id === id);
             
-            renderPalette(); loadQuestion(0);
+            // Randomize if needed
+            if(currExam.randomize) currExam.questions.sort(() => Math.random() - 0.5);
             
-            timerInt = setInterval(() => {
-                t--; userAnswers[currQIndex].timeSpent++;
+            userAns = Array(currExam.questions.length).fill().map(() => ({ val: -1, status: 'visit' }));
+            currIdx = 0;
+            
+            document.getElementById('exam-ui').classList.remove('hidden');
+            document.getElementById('q-pos').innerText = currExam.posMarks;
+            
+            renderPalette();
+            loadQ(0);
+            
+            let t = currExam.duration * 60;
+            timer = setInterval(() => {
+                t--;
                 document.getElementById('timer').innerText = `${Math.floor(t/60)}:${(t%60).toString().padStart(2,'0')}`;
-                localStorage.setItem('exam_state', JSON.stringify({ eid: id, ans: userAnswers, time: t, qs: currentExam.questions }));
-                if(t<=0) finishExam();
+                if(t<=0) submitExam();
             }, 1000);
             
-            try { await document.documentElement.requestFullscreen(); } catch(e){}
-            document.addEventListener('fullscreenchange', () => { document.getElementById('fs-warning').classList.toggle('hidden', document.fullscreenElement); });
+            document.documentElement.requestFullscreen().catch(()=>{});
         };
 
-        function loadQuestion(idx) {
-            currQIndex = idx;
-            if(userAnswers[idx].status === 'st-visit') { userAnswers[idx].status = 'st-skip'; renderPaletteItem(idx); }
-            const q = currentExam.questions[idx];
-            document.getElementById('q-curr-num').innerText = idx + 1;
-            document.getElementById('q-text').innerHTML = q.q; 
-            if(q.img) { document.getElementById('q-img-el').src=q.img; document.getElementById('q-img-box').classList.remove('hidden'); }
-            else document.getElementById('q-img-box').classList.add('hidden');
+        function loadQ(i) {
+            currIdx = i;
+            const q = currExam.questions[i];
+            
+            document.getElementById('q-num').innerText = i+1;
+            document.getElementById('q-txt').innerHTML = q.q;
+            
+            if(q.img) { document.getElementById('q-img').src = q.img; document.getElementById('q-img-wrap').classList.remove('hidden'); }
+            else document.getElementById('q-img-wrap').classList.add('hidden');
 
-            document.getElementById('q-options').innerHTML = q.options.map((opt, v) => `<div class="option-box ${userAnswers[idx].val === v ? 'selected' : ''}" onclick="selectOption(${v})"><div class="opt-id">${String.fromCharCode(65+v)}</div><span class="text-sm font-medium">${opt}</span></div>`).join('');
+            document.getElementById('q-opts').innerHTML = q.options.map((o, v) => `
+                <div class="opt-box ${userAns[i].val === v ? 'selected' : ''}" onclick="pick(${v})">
+                    <div class="opt-circle">${String.fromCharCode(65+v)}</div>
+                    <span class="text-sm font-medium">${o}</span>
+                </div>`).join('');
+                
             if(window.MathJax) MathJax.typesetPromise();
+            sndClick.play();
         }
 
-        window.selectOption = (v) => { userAnswers[currQIndex].val = v; userAnswers[currQIndex].status = 'st-ans'; renderPaletteItem(currQIndex); loadQuestion(currQIndex); };
-        window.markReview = () => { userAnswers[currQIndex].status = 'st-rev'; renderPaletteItem(currQIndex); };
-        window.changeQ = (dir) => { const n = currQIndex + dir; if(n >= 0 && n < userAnswers.length) loadQuestion(n); };
-        function renderPalette() { document.getElementById('palette-grid').innerHTML = userAnswers.map((_, i) => `<div id="p-${i}" class="p-node st-visit" onclick="loadQuestion(${i})">${i+1}</div>`).join(''); }
-        function renderPaletteItem(i) { document.getElementById(`p-${i}`).className = `p-node ${userAnswers[i].status} ${i===currQIndex?'border-indigo-600 border-2':''}`; }
-        window.submitExamCheck = () => { if(confirm("Submit Exam?")) finishExam(); };
-        window.togglePalette = () => document.getElementById('exam-sidebar').classList.toggle('hidden');
-
-        window.finishExam = async () => {
-            clearInterval(timerInt); localStorage.removeItem('exam_state');
-            if(document.fullscreenElement) document.exitFullscreen();
-            let score=0, correct=0, wrong=0, analysis=[];
-            userAnswers.forEach((ans, i) => {
-                const q = currentExam.questions[i];
-                let status='skipped';
-                if(ans.val !== -1) {
-                    if(ans.val === q.correct) { score += currentExam.posMarks; correct++; status='correct'; }
-                    else { score -= currentExam.negMarks; wrong++; status='wrong'; }
-                }
-                analysis.push({ q: q.q, img: q.img, user: ans.val, correct: q.correct, status, sol: q.sol, time: ans.timeSpent });
-            });
-            const res = { uid: user.uid, examId: currentExam.id, title: currentExam.title, score, total: userAnswers.length*currentExam.posMarks, stats: {correct, wrong, skipped: userAnswers.length-(correct+wrong)}, analysis, timestamp: serverTimestamp() };
-            await addDoc(collection(db, "results"), res);
-            document.getElementById('exam-runner').classList.add('hidden');
-            renderAnalysisData(res);
-        };
-
-        window.showAnalysisDoc = async(id) => { const s = await getDoc(doc(db,"results",id)); renderAnalysisData(s.data()); };
-
-        function renderAnalysisData(d) {
-            document.getElementById('result-modal').classList.remove('hidden');
-            document.getElementById('res-score').innerText = d.score;
-            document.getElementById('res-acc').innerText = Math.round((d.stats.correct/(d.stats.correct+d.stats.wrong||1))*100) + "%";
-            const chartCanvas = document.getElementById('res-chart');
-            const newCanvas = chartCanvas.cloneNode(true); chartCanvas.parentNode.replaceChild(newCanvas, chartCanvas);
-            new Chart(newCanvas, { type: 'doughnut', data: { labels: ['Correct','Wrong','Skipped'], datasets: [{ data: [d.stats.correct, d.stats.wrong, d.stats.skipped], backgroundColor: ['#10b981','#ef4444','#cbd5e1'] }] } });
-            document.getElementById('res-details').innerHTML = d.analysis.map((item, i) => `<div class="card p-4 border-l-4 ${item.status==='correct'?'border-green-500':item.status==='wrong'?'border-red-500':'border-slate-300'}"><p class="font-bold text-sm mb-2"><span class="text-slate-400">Q${i+1} (${item.time}s)</span> ${item.q}</p>${item.img ? `<img src="${item.img}" class="h-20 mb-2 rounded border">` : ''}<div class="text-xs grid grid-cols-2 gap-2 text-slate-600 mb-2"><span>You: <b>${item.user===-1?'Skipped':String.fromCharCode(65+item.user)}</b></span><span>Correct: <b>${String.fromCharCode(65+item.correct)}</b></span></div>${item.sol ? `<div class="bg-indigo-50 p-2 rounded text-xs text-indigo-800"><strong>💡 Solution:</strong> ${item.sol}</div>` : ''}</div>`).join('');
-            if(window.MathJax) MathJax.typesetPromise();
-        }
+        window.pick = (v) => { userAns[currIdx].val = v; userAns[currIdx].status = 'st-ans'; loadQ(currIdx); renderPalette(); };
+        window.markRev = () => { userAns[currIdx].status = 'st-rev'; renderPalette(); };
+        window.navQ = (d) => { const n = currIdx + d; if(n >= 0 && n < userAns.length) loadQ(n); };
+        window.togglePalette = () => document.getElementById('palette-bar').classList.toggle('translate-x-full');
         
-        // Expose functions
-        window.startExam = window.startExam;
-        window.selectOption = window.selectOption;
-        window.changeQ = window.changeQ;
-        window.markReview = window.markReview;
-        window.submitExamCheck = window.submitExamCheck;
-        window.togglePalette = window.togglePalette;
-        window.showAnalysisDoc = window.showAnalysisDoc;
+        function renderPalette() {
+            document.getElementById('p-grid').innerHTML = userAns.map((a, i) => `<div onclick="loadQ(${i})" class="p-item ${a.status} ${i===currIdx?'border-indigo-600 border-2':''}">${i+1}</div>`).join('');
+        }
+
+        window.submitExam = async () => {
+            clearInterval(timer);
+            if(document.fullscreenElement) document.exitFullscreen();
+            
+            let score=0, c=0, w=0;
+            const pos = currExam.posMarks || 4, neg = currExam.negMarks || 1;
+            
+            userAns.forEach((a, i) => {
+                if(a.val !== -1) {
+                    if(a.val === currExam.questions[i].correct) { score += pos; c++; }
+                    else { score -= neg; w++; }
+                }
+            });
+
+            await addDoc(collection(db, "results"), {
+                uid: user.uid, studentName: user.name, examTitle: currExam.title,
+                score, totalMarks: currExam.questions.length * pos,
+                stats: {c, w, s: userAns.length-(c+w)}, timestamp: serverTimestamp()
+            });
+
+            document.getElementById('exam-ui').classList.add('hidden');
+            document.getElementById('result-modal').classList.remove('hidden');
+            sndSuccess.play();
+            
+            // Populate Results
+            document.getElementById('res-score').innerText = score;
+            document.getElementById('res-c').innerText = c;
+            document.getElementById('res-w').innerText = w;
+            document.getElementById('res-s').innerText = userAns.length - (c+w);
+            
+            new Chart(document.getElementById('res-chart'), {
+                type: 'doughnut',
+                data: { labels: ['Correct', 'Wrong', 'Skipped'], datasets: [{ data: [c, w, userAns.length-(c+w)], backgroundColor: ['#10b981', '#ef4444', '#cbd5e1'], borderWidth: 0 }] },
+                options: { cutout: '70%', plugins: { legend: { display: false } } }
+            });
+        };
+
+        window.toggleTheme = () => document.body.classList.toggle('dark');
     </script>
 </body>
 </html>

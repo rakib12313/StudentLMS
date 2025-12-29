@@ -12,52 +12,38 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
-        :root { --primary: #6366f1; --dark: #0f172a; --surface: rgba(255, 255, 255, 0.9); }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: var(--dark); user-select: none; padding-bottom: 80px; }
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap');
+        :root { --primary: #6366f1; --dark: #0f172a; }
+        body { font-family: 'Outfit', sans-serif; background: #f8fafc; color: var(--dark); user-select: none; padding-bottom: 80px; }
         
-        /* Aurora BG */
-        .aurora-bg { position: fixed; inset: 0; z-index: -1; background: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%); background-color: #0f172a; }
+        body.dark { background: #0b0f19; color: #f1f5f9; }
+        body.dark .glass-card { background: rgba(30, 41, 59, 0.7); border-color: rgba(255,255,255,0.1); }
+        body.dark .nav-bar { background: rgba(15, 23, 42, 0.9); border-color: rgba(255,255,255,0.1); }
         
-        /* Glass & Components */
         .glass-card { background: white; border: 1px solid #e2e8f0; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); transition: 0.2s; overflow: hidden; }
-        .glass-card:active { transform: scale(0.98); }
         .nav-bar { position: fixed; bottom: 0; width: 100%; background: rgba(255,255,255,0.9); backdrop-filter: blur(12px); border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around; padding: 12px; z-index: 50; }
-        .btn-primary { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; border-radius: 12px; font-weight: bold; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
+        .nav-item { color: #94a3b8; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .nav-item.active { color: var(--primary); }
+        .btn-primary { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; border-radius: 12px; font-weight: bold; }
         
-        /* Exam Options */
         .opt-box { display: flex; gap: 12px; padding: 16px; border: 2px solid #f1f5f9; border-radius: 16px; cursor: pointer; transition: 0.2s; align-items: center; }
-        .opt-box:hover { background: #f1f5f9; }
         .opt-box.selected { border-color: var(--primary); background: #eef2ff; }
         .opt-circle { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; }
         .selected .opt-circle { border-color: var(--primary); background: var(--primary); color: white; }
 
-        /* Palette */
-        .p-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-        .p-item { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: bold; border: 1px solid #e2e8f0; font-size: 12px; }
-        .st-ans { background: #10b981; color: white; border-color: #10b981; }
-        .st-rev { background: #f59e0b; color: white; border-color: #f59e0b; }
-        
         .hidden { display: none !important; }
         .animate-enter { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        mjx-container { font-size: 115% !important; margin: 5px 0 !important; outline: none; }
-        
-        /* Dark Mode */
-        body.dark { background: #0b0f19; color: #f1f5f9; }
-        body.dark .glass-card { background: rgba(30, 41, 59, 0.8); border-color: rgba(255,255,255,0.1); }
-        body.dark .nav-bar { background: rgba(15, 23, 42, 0.9); border-color: rgba(255,255,255,0.1); }
+        mjx-container { font-size: 115% !important; outline: none; }
     </style>
 </head>
 <body>
 
     <!-- 1. LOGIN -->
-    <div id="login-section" class="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
-        <div class="aurora-bg"></div>
+    <div id="login-section" class="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-indigo-500 to-purple-600">
         <div class="glass-card w-full max-w-sm p-8 text-center animate-enter relative z-10 bg-white/90">
-            <div class="w-16 h-16 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-2xl mx-auto flex items-center justify-center text-white text-3xl font-bold mb-6 shadow-xl">🚀</div>
+            <div class="w-16 h-16 bg-gradient-to-tr from-indigo-500 to-pink-500 rounded-2xl mx-auto flex items-center justify-center text-white text-3xl font-bold mb-6">🚀</div>
             <h1 class="text-2xl font-bold mb-2 text-slate-800">Student Portal</h1>
-            <p class="text-sm text-slate-500 mb-8">Your exam dashboard</p>
             <button id="google-btn" class="w-full btn-primary py-3">Continue with Google</button>
         </div>
     </div>
@@ -66,44 +52,58 @@
     <div id="app-section" class="hidden">
         <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-200 px-5 py-3 flex justify-between items-center dark:bg-slate-900/80 dark:border-slate-800">
             <div class="flex items-center gap-3">
-                <img id="u-photo" class="w-10 h-10 rounded-full border shadow-sm">
-                <div><h3 id="u-name" class="font-bold text-sm">Student</h3><span class="text-[10px] text-indigo-500 font-bold">Online</span></div>
+                <img id="u-photo" class="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover bg-slate-200">
+                <div><h3 id="u-name" class="font-bold text-sm leading-tight text-slate-800 dark:text-white">Student</h3></div>
             </div>
             <button onclick="document.body.classList.toggle('dark')" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center dark:bg-slate-800"><i class="fas fa-moon"></i></button>
         </header>
 
         <div class="p-5 max-w-3xl mx-auto space-y-8">
-            <!-- EXAMS VIEW -->
+            
+            <!-- TAB: EXAMS -->
             <div id="view-exams" class="fade-in space-y-4">
-                <div class="flex justify-between items-end">
-                    <h2 class="text-2xl font-bold">Dashboard</h2>
-                    <button onclick="openLeaderboard()" class="text-indigo-500 font-bold text-xs"><i class="fas fa-trophy"></i> Top 10</button>
-                </div>
+                <div id="live-banner" class="hidden bg-red-500 text-white p-3 rounded-xl flex justify-between items-center animate-pulse"><span class="font-bold text-sm"><i class="fas fa-broadcast-tower"></i> Live Class</span><a id="live-btn" target="_blank" class="bg-white text-red-500 px-3 py-1 rounded text-xs font-bold">Join</a></div>
+                <h3 class="font-bold text-lg text-slate-700 dark:text-slate-300">Available Assessments</h3>
                 <div id="exam-list" class="grid gap-4"></div>
             </div>
 
-            <!-- PROFILE VIEW -->
+            <!-- TAB: HISTORY -->
+            <div id="view-history" class="hidden fade-in space-y-4">
+                <h3 class="font-bold text-lg">Attempt History</h3>
+                <div id="history-list" class="space-y-3"></div>
+            </div>
+
+            <!-- TAB: LEADERBOARD -->
+            <div id="view-leaderboard" class="hidden fade-in space-y-4">
+                <h3 class="font-bold text-lg">Top Performers</h3>
+                <div id="lb-list" class="space-y-2"></div>
+            </div>
+
+            <!-- TAB: PROFILE -->
             <div id="view-profile" class="hidden fade-in space-y-4">
-                <h2 class="text-2xl font-bold">Profile</h2>
-                <div class="glass-card p-6">
-                    <input id="in-name" class="w-full p-3 border rounded-xl mb-3 bg-slate-50 dark:bg-slate-800 dark:border-slate-700" placeholder="Full Name">
-                    <input id="in-phone" class="w-full p-3 border rounded-xl mb-3 bg-slate-50 dark:bg-slate-800 dark:border-slate-700" placeholder="Phone">
-                    <input id="in-addr" class="w-full p-3 border rounded-xl mb-3 bg-slate-50 dark:bg-slate-800 dark:border-slate-700" placeholder="Address">
-                    <button onclick="saveProfile()" class="w-full btn-primary py-3">Save Profile</button>
+                <div class="glass-card p-6 text-center">
+                    <img id="p-img" class="w-24 h-24 mx-auto rounded-full object-cover border-4 border-slate-50 shadow-lg">
+                    <h2 class="text-xl font-bold mt-2" id="p-name-disp">User</h2>
+                    <p class="text-xs text-slate-400" id="p-email">email@mail.com</p>
+                    <div class="space-y-3 mt-6 text-left">
+                        <input id="in-name" class="w-full p-3 border rounded-xl bg-slate-50 dark:bg-slate-800" placeholder="Name">
+                        <input id="in-phone" class="w-full p-3 border rounded-xl bg-slate-50 dark:bg-slate-800" placeholder="Phone">
+                        <input id="in-addr" class="w-full p-3 border rounded-xl bg-slate-50 dark:bg-slate-800" placeholder="Address">
+                        <button onclick="saveProfile()" class="w-full btn-primary py-3">Save Changes</button>
+                    </div>
                 </div>
-                <h3 class="font-bold opacity-70 mt-4">History</h3>
-                <div id="history-list" class="space-y-2"></div>
             </div>
         </div>
 
         <nav class="nav-bar dark:bg-slate-900">
-            <button onclick="nav('exams')" id="nav-exams" class="text-indigo-600 flex flex-col items-center"><i class="fas fa-home text-xl"></i></button>
-            <button onclick="nav('profile')" id="nav-profile" class="text-slate-400 flex flex-col items-center"><i class="fas fa-user text-xl"></i></button>
-            <button onclick="document.getElementById('logout-modal').classList.remove('hidden')" class="text-red-400 flex flex-col items-center"><i class="fas fa-sign-out-alt text-xl"></i></button>
+            <button onclick="nav('exams')" id="nav-exams" class="nav-item active"><i class="fas fa-home text-xl"></i><span>Home</span></button>
+            <button onclick="nav('history')" id="nav-history" class="nav-item"><i class="fas fa-history text-xl"></i><span>History</span></button>
+            <button onclick="nav('leaderboard')" id="nav-leaderboard" class="nav-item"><i class="fas fa-trophy text-xl"></i><span>Rank</span></button>
+            <button onclick="nav('profile')" id="nav-profile" class="nav-item"><i class="fas fa-user-circle text-xl"></i><span>Profile</span></button>
         </nav>
     </div>
 
-    <!-- CBT RUNNER -->
+    <!-- EXAM RUNNER -->
     <div id="exam-ui" class="hidden fixed inset-0 z-50 bg-white dark:bg-slate-900 flex flex-col">
         <div class="h-16 border-b flex justify-between items-center px-4 shadow-sm z-20 dark:border-slate-800">
             <div class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg font-mono font-bold" id="timer">00:00</div>
@@ -116,12 +116,14 @@
                     <span class="text-xs font-bold text-white bg-indigo-500 px-3 py-1 rounded-full">Q <span id="q-num">1</span></span>
                     <span class="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded border border-green-100">+<span id="q-pos">4</span></span>
                 </div>
+                <!-- PDF View -->
+                <iframe id="exam-pdf" class="hidden w-full h-96 border rounded-xl mb-4"></iframe>
+                <!-- Native View -->
                 <div id="q-img-wrap" class="hidden text-center mb-4"><img id="q-img" class="max-h-48 rounded-lg border inline-block"></div>
                 <p id="q-txt" class="text-lg font-medium mb-6 leading-relaxed"></p>
                 <div id="q-opts" class="space-y-3"></div>
             </div>
 
-            <!-- Side Palette -->
             <div id="palette-bar" class="absolute inset-y-0 right-0 w-64 bg-white border-l transform translate-x-full transition duration-300 z-30 flex flex-col dark:bg-slate-900 dark:border-slate-800">
                 <div class="p-4 font-bold border-b dark:border-slate-800">Questions</div>
                 <div id="p-grid" class="p-4 p-grid flex-grow overflow-y-auto content-start"></div>
@@ -130,18 +132,15 @@
         </div>
 
         <div class="fixed bottom-0 w-full bg-white border-t p-3 flex justify-between z-20 dark:bg-slate-900 dark:border-slate-800">
-            <div class="flex gap-3">
-                <button onclick="navQ(-1)" class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center"><i class="fas fa-chevron-left"></i></button>
-                <button onclick="navQ(1)" class="w-12 h-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center"><i class="fas fa-chevron-right"></i></button>
-            </div>
+            <div class="flex gap-3"><button onclick="navQ(-1)" class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center"><i class="fas fa-chevron-left"></i></button><button onclick="navQ(1)" class="w-12 h-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center"><i class="fas fa-chevron-right"></i></button></div>
             <button onclick="markRev()" class="px-6 rounded-xl border border-amber-200 text-amber-600 font-bold bg-amber-50">Review</button>
         </div>
     </div>
 
-    <!-- MODALS: Result, Logout, Leaderboard -->
-    <div id="result-modal" class="hidden fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4">
+    <!-- RESULT MODAL -->
+    <div id="result-modal" class="hidden fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white w-full max-w-md rounded-3xl p-6 text-center animate-enter dark:bg-slate-900">
-            <h2 class="text-2xl font-bold">Analysis</h2>
+            <h2 class="text-2xl font-bold mb-1">Analysis</h2>
             <div class="relative w-40 h-40 mx-auto my-4"><canvas id="res-chart"></canvas><div class="absolute inset-0 flex items-center justify-center flex-col"><span class="text-2xl font-bold" id="res-score">0</span></div></div>
             <div class="grid grid-cols-3 gap-2 text-xs font-bold mb-4">
                 <div class="bg-green-50 text-green-700 p-2 rounded border">C: <span id="res-c">0</span></div>
@@ -150,21 +149,6 @@
             </div>
             <div id="res-solutions" class="text-left text-xs space-y-2 max-h-40 overflow-y-auto mb-4"></div>
             <button onclick="location.reload()" class="w-full btn-primary py-3">Finish</button>
-        </div>
-    </div>
-
-    <div id="logout-modal" class="hidden fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4">
-        <div class="bg-white p-6 rounded-3xl max-w-xs w-full text-center dark:bg-slate-800">
-            <h3 class="font-bold text-lg mb-2">Log Out?</h3>
-            <div class="flex gap-3"><button onclick="document.getElementById('logout-modal').classList.add('hidden')" class="flex-1 py-2 border rounded-xl">No</button><button onclick="signOutApp()" class="flex-1 py-2 bg-red-500 text-white rounded-xl">Yes</button></div>
-        </div>
-    </div>
-
-    <div id="lb-modal" class="hidden fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-sm rounded-3xl p-6 relative dark:bg-slate-900">
-            <button onclick="document.getElementById('lb-modal').classList.add('hidden')" class="absolute top-4 right-4 text-xl">&times;</button>
-            <h2 class="text-xl font-bold mb-4 text-center">🏆 Leaderboard</h2>
-            <div id="lb-list" class="space-y-2 max-h-64 overflow-y-auto"></div>
         </div>
     </div>
 
@@ -183,7 +167,6 @@
                     const d = { uid: u.uid, email: u.email, name: u.displayName, photo: u.photoURL, role: "student", banned: false, xp:0 };
                     await setDoc(ref, d); user = d;
                 } else user = snap.data();
-                
                 if(user.banned) { alert("Access Denied."); signOut(auth); return; }
                 initApp();
             } else document.getElementById('login-section').classList.remove('hidden');
@@ -196,37 +179,75 @@
             document.getElementById('app-section').classList.remove('hidden');
             document.getElementById('u-name').innerText = user.name;
             document.getElementById('u-photo').src = user.photo;
+            document.getElementById('p-img').src = user.photo;
+            document.getElementById('p-email').innerText = user.email;
+            document.getElementById('p-name-disp').innerText = user.name;
             document.getElementById('in-name').value = user.name;
             document.getElementById('in-phone').value = user.phone || "";
             document.getElementById('in-addr').value = user.address || "";
 
-            const s = await getDocs(query(collection(db, "exams"), orderBy("createdAt", "desc")));
-            allExams = []; s.forEach(d => allExams.push({id: d.id, ...d.data()}));
-            renderExams(allExams);
-
-            const h = await getDocs(query(collection(db, "results"), where("uid","==",user.uid), orderBy("timestamp","desc")));
-            document.getElementById('history-list').innerHTML = h.docs.map(d => `<div class="glass-card p-3 flex justify-between items-center text-xs border-l-4 border-indigo-500"><div><b>${d.data().examTitle}</b><br>Score: ${d.data().score}</div><span class="text-indigo-600 font-bold">${Math.round((d.data().score/d.data().totalMarks)*100)}%</span></div>`).join('');
+            checkLive(); loadExams(); loadHistory(); loadLeaderboard();
         }
 
-        window.nav = (v) => { ['exams','profile'].forEach(x=>{document.getElementById('view-'+x).classList.add('hidden');document.getElementById('nav-'+x).classList.remove('text-indigo-600');}); document.getElementById('view-'+v).classList.remove('hidden'); document.getElementById('nav-'+v).classList.add('text-indigo-600'); };
-        window.filterExams = (sub) => renderExams(sub==='all'?allExams:allExams.filter(e=>e.subject===sub));
-        function renderExams(l) { document.getElementById('exam-list').innerHTML = l.map(e => `<div class="glass-card p-5 relative overflow-hidden group cursor-pointer border-l-4 border-indigo-500" onclick="startExam('${e.id}')"><h3 class="font-bold text-lg dark:text-white">${e.title}</h3><div class="flex gap-3 text-xs font-bold text-slate-400 mt-1"><span>${e.subject||'Gen'}</span> • <span>${e.duration}m</span> • <span>${e.questions.length} Qs</span></div></div>`).join(''); }
+        window.nav = (v) => { 
+            ['exams','history','leaderboard','profile'].forEach(x=>{
+                document.getElementById('view-'+x).classList.add('hidden');
+                document.getElementById('nav-'+x).classList.remove('active');
+            }); 
+            document.getElementById('view-'+v).classList.remove('hidden'); 
+            document.getElementById('nav-'+v).classList.add('active'); 
+        };
 
-        // EXAM LOGIC
+        async function loadExams() {
+            const s = await getDocs(query(collection(db, "exams"), orderBy("createdAt", "desc")));
+            allExams = []; s.forEach(d => allExams.push({id: d.id, ...d.data()}));
+            document.getElementById('exam-list').innerHTML = allExams.map(e => `
+                <div class="glass-card p-5 relative overflow-hidden group cursor-pointer border-l-4 border-indigo-500" onclick="startExam('${e.id}')">
+                    <h3 class="font-bold text-lg text-slate-800 dark:text-white">${e.title}</h3>
+                    <div class="flex gap-3 text-xs font-bold text-slate-400 mt-1"><span>${e.type==='pdf_exam'?'PDF':'CBT'}</span> • <span>${e.duration}m</span></div>
+                    <button class="absolute right-4 top-4 w-10 h-10 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition"><i class="fas fa-play"></i></button>
+                </div>
+            `).join('');
+        }
+
+        async function loadHistory() {
+            const h = await getDocs(query(collection(db, "results"), where("uid","==",user.uid), orderBy("timestamp","desc")));
+            document.getElementById('history-list').innerHTML = h.docs.map(d => `<div class="glass-card p-3 flex justify-between items-center text-xs border-l-4 border-green-500"><div><b>${d.data().examTitle}</b><br>Score: ${d.data().score}</div><span class="text-green-600 font-bold">${Math.round((d.data().score/d.data().totalMarks)*100)}%</span></div>`).join('');
+        }
+
+        async function loadLeaderboard() {
+            const s = await getDocs(query(collection(db,"results"), orderBy("score","desc"), limit(10)));
+            document.getElementById('lb-list').innerHTML = s.docs.map((d,i) => `<div class="glass-card p-3 flex justify-between items-center text-xs ${i==0?'bg-yellow-50':''}"><div><span class="font-bold">#${i+1}</span> ${d.data().studentName}</div><span class="text-indigo-600 font-bold">${d.data().score}</span></div>`).join('');
+        }
+
         window.startExam = async(id) => {
             currExam = allExams.find(e => e.id === id);
             
-            // Auto Resume
+            // Resume Check
             const saved = JSON.parse(localStorage.getItem('ex_state'));
             if(saved && saved.eid===id && confirm("Resume?")) { userAns=saved.ans; var t=saved.t; if(currExam.randomize) currExam.questions=saved.qs; }
             else {
-                if(currExam.randomize) currExam.questions.sort(() => Math.random() - 0.5);
-                userAns = Array(currExam.questions.length).fill().map(() => ({ val: -1, status: 'visit' }));
+                if(currExam.randomize && currExam.type==='native_exam') currExam.questions.sort(() => Math.random() - 0.5);
+                const len = currExam.type==='native_exam' ? currExam.questions.length : currExam.answerKey.length;
+                userAns = Array(len).fill().map(() => ({ val: -1, status: 'visit' }));
                 var t = currExam.duration * 60;
             }
 
             document.getElementById('exam-ui').classList.remove('hidden');
             document.getElementById('q-pos').innerText = currExam.posMarks;
+            
+            // PDF vs Native UI
+            if(currExam.type === 'pdf_exam') {
+                document.getElementById('exam-pdf').src = currExam.fileUrl;
+                document.getElementById('exam-pdf').classList.remove('hidden');
+                document.getElementById('q-txt').classList.add('hidden');
+                document.getElementById('q-opts').classList.add('hidden');
+            } else {
+                document.getElementById('exam-pdf').classList.add('hidden');
+                document.getElementById('q-txt').classList.remove('hidden');
+                document.getElementById('q-opts').classList.remove('hidden');
+            }
+
             renderPalette(); loadQ(0);
             
             timer = setInterval(() => {
@@ -235,17 +256,24 @@
                 if(t<=0) submitExam();
             }, 1000);
             
-            // Anti-Cheat
-            let v=0;
-            document.addEventListener("visibilitychange", () => { if(document.hidden && !document.getElementById('exam-ui').classList.contains('hidden')) { v++; if(v>=3) { alert("Auto-Submitting due to tab switching."); submitExam(); } else alert(`Warning ${v}/3: Don't switch tabs!`); } });
+            try { document.documentElement.requestFullscreen(); } catch(e){}
+            document.addEventListener("visibilitychange", () => { if(document.hidden && !document.getElementById('exam-ui').classList.contains('hidden')) { alert("Warning: Don't switch tabs!"); } });
         };
 
         function loadQ(i) {
-            currIdx = i; const q = currExam.questions[i];
-            document.getElementById('q-num').innerText = i+1; document.getElementById('q-txt').innerHTML = q.q;
-            if(q.img) { document.getElementById('q-img').src=q.img; document.getElementById('q-img-wrap').classList.remove('hidden'); } else document.getElementById('q-img-wrap').classList.add('hidden');
-            document.getElementById('q-opts').innerHTML = q.options.map((o,v) => `<div class="opt-box ${userAns[i].val===v?'selected':''}" onclick="pick(${v})"><div class="opt-circle">${String.fromCharCode(65+v)}</div><span class="text-sm font-medium">${o}</span></div>`).join('');
-            if(window.MathJax) MathJax.typesetPromise();
+            currIdx = i; document.getElementById('q-num').innerText = i+1;
+            
+            if(currExam.type === 'native_exam') {
+                const q = currExam.questions[i];
+                document.getElementById('q-txt').innerHTML = q.q;
+                if(q.img) { document.getElementById('q-img').src=q.img; document.getElementById('q-img-wrap').classList.remove('hidden'); } else document.getElementById('q-img-wrap').classList.add('hidden');
+                document.getElementById('q-opts').innerHTML = q.options.map((o,v) => `<div class="opt-box ${userAns[i].val===v?'selected':''}" onclick="pick(${v})"><div class="opt-circle">${String.fromCharCode(65+v)}</div><span class="text-sm font-medium">${o}</span></div>`).join('');
+                if(window.MathJax) MathJax.typesetPromise();
+            } else {
+                // PDF Mode OMR
+                document.getElementById('q-txt').innerHTML = "Mark your answer for Question "+(i+1);
+                document.getElementById('q-opts').innerHTML = ['A','B','C','D'].map((o,v) => `<div class="opt-box ${userAns[i].val===v?'selected':''}" onclick="pick(${v})"><div class="opt-circle">${o}</div></div>`).join('');
+            }
         }
 
         window.pick = (v) => { userAns[currIdx].val = v; userAns[currIdx].status = 'st-ans'; loadQ(currIdx); renderPalette(); };
@@ -256,37 +284,32 @@
         window.submitExamCheck = () => { if(confirm("Submit Exam?")) submitExam(); };
         window.submitExam = async () => {
             clearInterval(timer); localStorage.removeItem('ex_state');
+            if(document.fullscreenElement) document.exitFullscreen();
+            
             let score=0, c=0, w=0, sols="";
             const pos = currExam.posMarks || 4, neg = currExam.negMarks || 1;
             
             userAns.forEach((a, i) => {
-                const q = currExam.questions[i];
-                if(a.val !== -1) { if(a.val === q.correct) { score+=pos; c++; } else { score-=neg; w++; } }
-                if(q.sol) sols += `<div class="p-2 bg-slate-50 rounded mb-1"><b>Q${i+1}:</b> ${q.sol}</div>`;
+                let correctVal = currExam.type==='pdf_exam' ? currExam.answerKey[i] : currExam.questions[i].correct;
+                if(a.val !== -1) { if(a.val === correctVal) { score+=pos; c++; } else { score-=neg; w++; } }
+                if(currExam.type==='native_exam' && currExam.questions[i].sol) sols += `<div class="p-2 bg-slate-50 rounded mb-1"><b>Q${i+1}:</b> ${currExam.questions[i].sol}</div>`;
             });
 
-            await addDoc(collection(db, "results"), { uid: user.uid, studentName: user.name, examTitle: currExam.title, score, totalMarks: currExam.questions.length * pos, stats: {c,w,s:userAns.length-(c+w)}, timestamp: serverTimestamp() });
+            await addDoc(collection(db, "results"), { uid: user.uid, studentName: user.name, examTitle: currExam.title, score, totalMarks: userAns.length * pos, timestamp: serverTimestamp() });
             
             document.getElementById('exam-ui').classList.add('hidden');
             document.getElementById('result-modal').classList.remove('hidden');
             document.getElementById('res-score').innerText = score;
             document.getElementById('res-c').innerText = c; document.getElementById('res-w').innerText = w; document.getElementById('res-s').innerText = userAns.length-(c+w);
-            document.getElementById('res-solutions').innerHTML = sols || "No solutions provided.";
+            document.getElementById('res-solutions').innerHTML = sols || "View solutions in class.";
             
             new Chart(document.getElementById('res-chart'), { type: 'doughnut', data: { labels: ['C','W','S'], datasets: [{ data: [c, w, userAns.length-(c+w)], backgroundColor: ['#22c55e', '#ef4444', '#cbd5e1'], borderWidth:0 }] }, options: {cutout:'70%', plugins:{legend:{display:false}}} });
         };
 
-        window.openLeaderboard = async () => {
-            document.getElementById('lb-modal').classList.remove('hidden');
-            const s = await getDocs(query(collection(db,"results"), orderBy("score","desc"), limit(10)));
-            document.getElementById('lb-list').innerHTML = s.docs.map((d,i) => `<div class="flex justify-between p-2 border-b text-xs ${i==0?'bg-yellow-50':''}"><span class="font-bold">#${i+1} ${d.data().studentName}</span><span class="text-indigo-600 font-bold">${d.data().score}</span></div>`).join('');
-        };
-
+        async function checkLive() { const s=await getDoc(doc(db,"settings","live")); if(s.exists()&&s.data().active) { document.getElementById('live-banner').classList.remove('hidden'); document.getElementById('live-btn').href=s.data().url; } }
         window.saveProfile = async() => { await updateDoc(doc(db,"students",user.uid), { name:document.getElementById('in-name').value, phone:document.getElementById('in-phone').value, address:document.getElementById('in-addr').value }); alert("Saved"); location.reload(); };
-        window.signOutApp = () => signOut(auth).then(()=>location.reload());
         
-        // Expose functions
-        window.nav = window.nav; window.filterExams = window.filterExams; window.startExam = window.startExam; window.pick = window.pick; window.markRev = window.markRev; window.navQ = window.navQ; window.submitExamCheck = window.submitExamCheck; window.openLeaderboard = window.openLeaderboard; window.saveProfile = window.saveProfile; window.signOutApp = window.signOutApp;
+        window.nav = window.nav; window.startExam = window.startExam; window.pick = window.pick; window.markRev = window.markRev; window.navQ = window.navQ; window.submitExamCheck = window.submitExamCheck; window.saveProfile = window.saveProfile;
     </script>
 </body>
 </html>

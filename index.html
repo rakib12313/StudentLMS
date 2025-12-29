@@ -3,262 +3,352 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Student LMS Exam System</title>
+    <title>NeonLMS - Ultimate Exam System</title>
     
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* --- CSS STYLES --- */
+        /* --- THEME VARIABLES --- */
         :root {
-            --primary: #6C63FF;
-            --accent: #00d4ff;
-            --bg-grad: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            --glass: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --text: #ffffff;
+            --primary: #7000ff;
+            --primary-glow: #bd00ff;
+            --secondary: #00f7ff;
+            --bg-dark: #050505;
+            --glass-bg: rgba(20, 20, 25, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --success: #00ff9d;
+            --danger: #ff0055;
+            --card-radius: 24px;
         }
 
+        /* --- GLOBAL RESET --- */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         body {
             margin: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: var(--bg-grad);
-            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(112, 0, 255, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 247, 255, 0.15) 0%, transparent 40%);
+            color: var(--text-main);
             min-height: 100vh;
             overflow-x: hidden;
-            padding-bottom: 100px; /* Space for bottom nav */
+            padding-bottom: 90px;
         }
 
-        /* Utils */
+        /* --- UTILITIES --- */
         .hidden { display: none !important; }
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-        .center-flex { display: flex; justify-content: center; align-items: center; min-height: 80vh; }
+        .flex-center { display: flex; justify-content: center; align-items: center; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
 
-        /* Glass Cards */
-        .glass-card {
-            background: var(--glass);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            margin-bottom: 20px;
-            animation: fadeIn 0.5s ease;
-        }
+        /* --- ANIMATIONS --- */
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulseGlow { 0% { box-shadow: 0 0 10px var(--primary-glow); } 50% { box-shadow: 0 0 25px var(--primary-glow); } 100% { box-shadow: 0 0 10px var(--primary-glow); } }
+        @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Inputs & Buttons */
-        h2, h3 { margin-top: 0; font-weight: 300; letter-spacing: 1px; }
+        /* --- UI COMPONENTS --- */
         
-        input, select {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            color: white;
-            box-sizing: border-box;
-            outline: none;
-            font-size: 16px;
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            margin-top: 10px;
-            border: none;
-            border-radius: 12px;
-            background: var(--primary);
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.4);
-        }
-
-        button:active { transform: scale(0.98); }
-        button.secondary { background: rgba(255,255,255,0.1); }
-        button.google-btn { background: #db4437; }
-        button.danger { background: #ff4444; width: auto; padding: 8px 15px; font-size: 14px; }
-
-        /* --- GLASSY BOTTOM NAV --- */
-        .bottom-nav {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 500px;
-            height: 70px;
-            background: rgba(20, 20, 40, 0.6);
+        /* Glass Card */
+        .card {
+            background: var(--glass-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 25px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 1000;
+            border: 1px solid var(--glass-border);
+            border-radius: var(--card-radius);
+            padding: 25px;
+            margin-bottom: 20px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            transition: transform 0.2s;
         }
-
-        .nav-item {
-            color: rgba(255,255,255,0.5);
-            text-align: center;
-            font-size: 12px;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .nav-item i { font-size: 20px; margin-bottom: 2px; }
-        .nav-item.active { color: var(--accent); transform: translateY(-5px); }
-        .nav-item.active i { text-shadow: 0 0 10px var(--accent); }
-
-        /* Specific Views */
-        .question-block {
-            background: rgba(255,255,255,0.05);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            border-left: 3px solid var(--accent);
-        }
-
-        .exam-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            font-size: 0.9em;
-            color: #aaa;
-        }
-
-        img.preview { max-width: 100%; border-radius: 10px; margin-top: 10px; }
         
-        /* Loading Spinner */
-        .loader {
-            border: 4px solid rgba(255,255,255,0.1);
-            border-left-color: var(--accent);
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
+        /* Typography */
+        h1, h2, h3 { margin: 0 0 15px 0; font-weight: 700; }
+        .gradient-text {
+            background: linear-gradient(135deg, #fff 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* Responsive */
-        @media (min-width: 768px) {
-            .container { padding-top: 50px; }
-            .bottom-nav { bottom: 30px; width: 400px; }
+        /* Forms */
+        input, select, textarea {
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 15px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 16px;
+            transition: 0.3s;
         }
+        input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 15px rgba(112, 0, 255, 0.2); }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-glow)); color: white; box-shadow: 0 4px 15px rgba(112, 0, 255, 0.3); }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: white; }
+        .btn-danger { background: rgba(255, 0, 85, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+        .btn-google { background: #fff; color: #333; }
+
+        /* --- TOAST NOTIFICATION --- */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+        .toast {
+            background: rgba(20, 20, 30, 0.95);
+            border-left: 4px solid var(--primary);
+            padding: 15px 25px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            display: flex; align-items: center; gap: 10px;
+            animation: slideInRight 0.3s;
+        }
+        .toast.success { border-color: var(--success); }
+        .toast.error { border-color: var(--danger); }
+        @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+        /* --- BOTTOM NAV --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px;
+            background: rgba(30, 30, 40, 0.85);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 15px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        }
+        .nav-item {
+            color: var(--text-muted); font-size: 20px; padding: 10px;
+            border-radius: 50%; transition: 0.3s;
+            position: relative;
+        }
+        .nav-item.active { color: white; background: var(--primary); transform: translateY(-5px); box-shadow: 0 5px 15px rgba(112, 0, 255, 0.4); }
+
+        /* --- EXAM SPECIFIC --- */
+        .exam-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; margin-bottom: 20px; }
+        .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; background: rgba(255,255,255,0.1); }
+        .badge-blue { background: rgba(0, 247, 255, 0.2); color: var(--secondary); }
+        
+        .question-box {
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            transition: 0.3s;
+        }
+        .question-box:hover { border-color: var(--glass-border); background: rgba(255,255,255,0.05); }
+
+        /* Radio Custom */
+        .option-label {
+            display: flex; align-items: center;
+            padding: 12px; margin: 8px 0;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.2);
+            cursor: pointer; transition: 0.2s;
+            border: 1px solid transparent;
+        }
+        .option-label:hover { background: rgba(255,255,255,0.1); }
+        input[type="radio"]:checked + .option-label { border-color: var(--primary); background: rgba(112, 0, 255, 0.1); }
+        input[type="radio"] { display: none; }
+
+        /* Loader */
+        .loader-box { display: flex; justify-content: center; padding: 40px; }
+        .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--secondary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Admin Stats */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 16px; text-align: center; }
+        .stat-val { font-size: 24px; font-weight: bold; color: var(--secondary); }
+        .stat-label { font-size: 12px; color: var(--text-muted); }
+
     </style>
 </head>
 <body>
 
-    <!-- === VIEW: LOGIN === -->
-    <div id="view-auth" class="center-flex">
-        <div class="glass-card" style="width: 100%; max-width: 350px; text-align: center;">
-            <i class="fas fa-graduation-cap" style="font-size: 50px; color: var(--accent); margin-bottom: 20px;"></i>
-            <h2 id="auth-title">Student LMS Login</h2>
+    <div id="toast-container"></div>
+
+    <!-- === VIEW: AUTH === -->
+    <div id="view-auth" class="flex-center" style="min-height: 100vh;">
+        <div class="card" style="width: 100%; max-width: 380px; text-align: center;">
+            <div style="width: 80px; height: 80px; background: rgba(112,0,255,0.2); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-atom" style="font-size: 40px; color: var(--secondary);"></i>
+            </div>
+            <h1 class="gradient-text">NeonLMS</h1>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">Next Gen Examination Portal</p>
             
-            <input type="email" id="email" placeholder="Email Address">
-            <input type="password" id="password" placeholder="Password">
-            
-            <button id="btn-login" onclick="handleLogin()">Login</button>
-            <button id="btn-google" class="google-btn" onclick="handleGoogleLogin()"><i class="fab fa-google"></i> Google Login</button>
-            
-            <div id="reg-fields" class="hidden">
-                <select id="role">
-                    <option value="student">Student</option>
-                    <option value="admin">Admin</option>
-                </select>
-                <button class="secondary" onclick="handleRegister()">Create Account</button>
+            <div id="auth-forms">
+                <input type="email" id="email" placeholder="Email Address">
+                <input type="password" id="password" placeholder="Password">
+                
+                <button id="btn-login" class="btn btn-primary" onclick="handleLogin()">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+                <div style="height: 15px;"></div>
+                <button id="btn-google" class="btn btn-google" onclick="handleGoogleLogin()">
+                    <i class="fab fa-google"></i> Continue with Google
+                </button>
             </div>
 
-            <p style="margin-top: 20px; font-size: 14px;">
-                <span id="toggle-text">New user?</span> 
-                <a href="#" style="color: var(--accent);" onclick="toggleAuthMode()">Click here</a>
+            <div id="reg-actions" class="hidden">
+                <button class="btn btn-primary" onclick="handleRegister()">Create Account</button>
+            </div>
+
+            <p style="margin-top: 25px; font-size: 14px; color: var(--text-muted);">
+                <span id="toggle-text">New here?</span> 
+                <a href="#" style="color: var(--secondary); text-decoration: none; font-weight: bold;" onclick="toggleAuthMode()">Create Account</a>
             </p>
         </div>
     </div>
 
     <!-- === VIEW: ADMIN DASHBOARD === -->
     <div id="view-admin" class="container hidden">
-        <div class="glass-card">
-            <div class="exam-meta">
-                <h2><i class="fas fa-user-shield"></i> Admin Panel</h2>
-                <button class="danger" onclick="doLogout()">Logout</button>
+        <div class="card" style="border: 1px solid var(--primary);">
+            <div class="exam-header" style="border:none; margin:0;">
+                <div>
+                    <h2 class="gradient-text">Admin Command</h2>
+                    <p style="font-size:12px; color:var(--text-muted); margin:0;">Logged as Super Admin</p>
+                </div>
+                <button onclick="doLogout()" class="btn btn-danger" style="width:auto; padding: 10px 15px;"><i class="fas fa-power-off"></i></button>
             </div>
-            <h3>Create New Exam</h3>
-            <input type="text" id="new-exam-title" placeholder="Exam Subject / Title">
-            <input type="number" id="new-exam-time" placeholder="Duration (Minutes)">
-            <hr style="border-color: var(--glass-border); margin: 20px 0;">
+        </div>
+
+        <!-- Create Exam -->
+        <div class="card">
+            <h3><i class="fas fa-plus-circle" style="color: var(--success);"></i> Create New Exam</h3>
+            <input type="text" id="new-exam-title" placeholder="Exam Title (e.g., Physics Final)">
+            <input type="number" id="new-exam-time" placeholder="Duration in Minutes">
             
             <div id="builder-questions"></div>
 
-            <button class="secondary" onclick="addQuestionField()"><i class="fas fa-plus"></i> Add Question</button>
-            <button onclick="saveExam()" id="btn-save-exam" style="background: var(--accent); margin-top: 20px;">Publish Exam</button>
+            <button class="btn btn-secondary" onclick="addQuestionField()" style="border: 1px dashed var(--text-muted);">
+                <i class="fas fa-plus"></i> Add Question
+            </button>
+            <div style="height: 15px;"></div>
+            <button onclick="saveExam()" id="btn-save-exam" class="btn btn-primary">
+                <i class="fas fa-cloud-upload-alt"></i> Publish Exam
+            </button>
+        </div>
+
+        <!-- Manage Exams -->
+        <h3 style="margin-left: 10px;">Manage Exams</h3>
+        <div id="admin-exam-list">
+            <!-- Populated via JS -->
         </div>
     </div>
 
-    <!-- === VIEW: STUDENT HOME === -->
-    <div id="view-student" class="container hidden">
-        <div class="glass-card" style="display:flex; justify-content:space-between; align-items:center;">
-            <h2><i class="fas fa-user-graduate"></i> Available Exams</h2>
-            <button class="danger" onclick="doLogout()">Logout</button>
+    <!-- === VIEW: STUDENT DASHBOARD === -->
+    
+    <!-- Tab 1: Home (Exam List) -->
+    <div id="view-student-home" class="container hidden">
+        <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <h2 style="margin:0;">Hello, Scholar 👋</h2>
+                <p style="margin:0; font-size:13px; color:var(--text-muted);">Ready to test your skills?</p>
+            </div>
+            <div style="width: 40px; height: 40px; background: var(--glass-bg); border-radius: 50%; display:flex; align-items:center; justify-content:center;">
+                <i class="fas fa-user" style="color: var(--secondary);"></i>
+            </div>
         </div>
-        <div id="exam-list">
-            <!-- Exams load here -->
-            <div class="loader"></div>
+
+        <h3 style="margin-left: 10px; margin-bottom: 15px;">Available Exams</h3>
+        <div id="exam-list"></div>
+    </div>
+
+    <!-- Tab 2: History -->
+    <div id="view-student-history" class="container hidden">
+        <h2 style="margin-left: 10px;">Your Performance</h2>
+        <div id="history-list"></div>
+    </div>
+
+    <!-- Tab 3: Profile -->
+    <div id="view-student-profile" class="container hidden">
+        <div class="card" style="text-align: center; padding-top: 40px;">
+            <div style="width: 100px; height: 100px; background: linear-gradient(45deg, var(--primary), var(--secondary)); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white;">
+                <i class="fas fa-user-astronaut"></i>
+            </div>
+            <h2 id="profile-email">user@email.com</h2>
+            <div class="badge badge-blue" style="display:inline-block;">Student Account</div>
+
+            <div class="stats-grid" style="margin-top: 30px;">
+                <div class="stat-card">
+                    <div class="stat-val" id="stat-taken">0</div>
+                    <div class="stat-label">Exams Taken</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" id="stat-avg">0%</div>
+                    <div class="stat-label">Avg Score</div>
+                </div>
+            </div>
+
+            <button onclick="doLogout()" class="btn btn-danger" style="margin-top: 20px;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
         </div>
     </div>
 
     <!-- === VIEW: TAKING EXAM === -->
-    <div id="view-taking-exam" class="container hidden">
-        <div class="glass-card sticky-header" style="position:sticky; top:10px; z-index:900; background: rgba(15, 12, 41, 0.95); border-bottom: 2px solid var(--accent);">
-            <div style="display: flex; justify-content: space-between;">
-                <h3 id="active-exam-name">Exam</h3>
-                <h3 style="color: var(--accent);" id="timer-display">00:00</h3>
+    <div id="view-taking-exam" class="container hidden" style="padding-bottom: 20px;">
+        <div class="card" style="position: sticky; top: 10px; z-index: 900; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--secondary);">
+            <span style="font-weight: bold;" id="active-exam-name">Exam Name</span>
+            <div class="badge badge-blue" style="font-size: 16px;">
+                <i class="far fa-clock"></i> <span id="timer-display">00:00</span>
             </div>
         </div>
-        <div id="quiz-area" style="margin-top: 20px;"></div>
-        <div class="glass-card">
-            <button onclick="submitExam()" style="background: #00c851;">Submit Answers</button>
-        </div>
+        
+        <div id="quiz-area"></div>
+        
+        <button onclick="submitExam()" class="btn btn-primary" style="background: var(--success); color: black;">
+            <i class="fas fa-check-circle"></i> Submit Answers
+        </button>
     </div>
 
-    <!-- === GLASSY BOTTOM NAV (Hidden on login) === -->
+    <!-- === BOTTOM NAVIGATION === -->
     <div id="bottom-nav" class="bottom-nav hidden">
-        <div class="nav-item active" onclick="navTo('home')">
+        <div class="nav-item active" onclick="switchStudentTab('home', this)">
             <i class="fas fa-home"></i>
-            <span>Home</span>
         </div>
-        <div class="nav-item" onclick="navTo('profile')">
+        <div class="nav-item" onclick="switchStudentTab('history', this)">
+            <i class="fas fa-history"></i>
+        </div>
+        <div class="nav-item" onclick="switchStudentTab('profile', this)">
             <i class="fas fa-user"></i>
-            <span>Profile</span>
-        </div>
-        <div class="nav-item" onclick="doLogout()">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Logout</span>
         </div>
     </div>
 
     <!-- === JAVASCRIPT === -->
     <script type="module">
-        // --- CONFIGURATION ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, query, where } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, deleteDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-        // YOUR SPECIFIC CREDENTIALS
+        // --- CREDENTIALS ---
         const firebaseConfig = {
             apiKey: "AIzaSyBEMPS8vEJztGpoBPJjJIzKKInyt4IY9rQ",
             authDomain: "studentlms-79722.firebaseapp.com",
@@ -267,13 +357,11 @@
             messagingSenderId: "1029623857004",
             appId: "1:1029623857004:web:fa07cb3de1270990a87d49"
         };
+        const CLOUD_URL = "https://api.cloudinary.com/v1_1/dpe74ejhl/image/upload";
+        const CLOUD_PRESET = "lms_upload";
+        const ADMIN_EMAIL = "rakibk155@gmail.com";
 
-        // YOUR CLOUDINARY CREDENTIALS
-        const CLOUD_NAME = "dpe74ejhl"; 
-        const CLOUD_PRESET = "lms_upload"; 
-        const CLOUD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
-
-        // Initialize
+        // --- INIT ---
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -283,123 +371,149 @@
         let currentExamData = null;
         let timerInterval = null;
 
-        // --- GLOBAL FUNCTIONS (Attached to Window for HTML access) ---
+        // --- UI HELPERS ---
+        window.showToast = (msg, type = 'success') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i> <span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        };
 
-        // 1. Auth Logic
         window.toggleAuthMode = () => {
-            const regFields = document.getElementById('reg-fields');
-            const isHidden = regFields.classList.contains('hidden');
-            const title = document.getElementById('auth-title');
-            const toggleText = document.getElementById('toggle-text');
-            
-            if(isHidden) {
-                regFields.classList.remove('hidden');
-                document.getElementById('btn-login').classList.add('hidden');
+            const regMode = document.getElementById('reg-actions').classList.contains('hidden');
+            if (regMode) {
+                document.getElementById('reg-actions').classList.remove('hidden');
+                document.getElementById('auth-forms').querySelector('button').classList.add('hidden'); // hide login btn
                 document.getElementById('btn-google').classList.add('hidden');
-                title.innerText = "Register Account";
-                toggleText.innerText = "Have an account?";
+                document.getElementById('toggle-text').innerText = "Have an account?";
             } else {
-                regFields.classList.add('hidden');
-                document.getElementById('btn-login').classList.remove('hidden');
+                document.getElementById('reg-actions').classList.add('hidden');
+                document.getElementById('auth-forms').querySelector('button').classList.remove('hidden');
                 document.getElementById('btn-google').classList.remove('hidden');
-                title.innerText = "Student Login";
-                toggleText.innerText = "New user?";
+                document.getElementById('toggle-text').innerText = "New here?";
             }
         };
 
-        window.handleRegister = async () => {
-            const email = document.getElementById('email').value;
-            const pass = document.getElementById('password').value;
-            const role = document.getElementById('role').value;
-            try {
-                const res = await createUserWithEmailAndPassword(auth, email, pass);
-                await setDoc(doc(db, "users", res.user.uid), { email, role });
-                alert("Account created! You are logged in.");
-            } catch(e) { alert(e.message); }
-        };
-
+        // --- AUTH LOGIC ---
         window.handleLogin = async () => {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('password').value;
-            try { await signInWithEmailAndPassword(auth, email, pass); } 
-            catch(e) { alert(e.message); }
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+                showToast("Welcome back!", "success");
+            } catch(e) { showToast(e.message, "error"); }
+        };
+
+        window.handleRegister = async () => {
+            const email = document.getElementById('email').value.trim();
+            const pass = document.getElementById('password').value;
+            if(pass.length < 6) return showToast("Password too short (min 6)", "error");
+
+            try {
+                const res = await createUserWithEmailAndPassword(auth, email, pass);
+                const role = (email.toLowerCase() === ADMIN_EMAIL) ? 'admin' : 'student';
+                await setDoc(doc(db, "users", res.user.uid), { email, role });
+                showToast(`Account created as ${role}`, "success");
+            } catch(e) { showToast(e.message, "error"); }
         };
 
         window.handleGoogleLogin = async () => {
             try {
                 const res = await signInWithPopup(auth, googleProvider);
-                // Check if user doc exists, if not create as student
                 const userDoc = await getDoc(doc(db, "users", res.user.uid));
                 if (!userDoc.exists()) {
-                    await setDoc(doc(db, "users", res.user.uid), { email: res.user.email, role: 'student' });
+                    const role = (res.user.email.toLowerCase() === ADMIN_EMAIL) ? 'admin' : 'student';
+                    await setDoc(doc(db, "users", res.user.uid), { email: res.user.email, role });
                 }
-            } catch(e) { 
-                console.error(e);
-                alert("Google Login Error: " + e.message); 
-            }
+                showToast("Logged in with Google", "success");
+            } catch(e) { showToast(e.message, "error"); }
         };
 
-        window.doLogout = () => signOut(auth);
+        window.doLogout = () => {
+            signOut(auth);
+            showToast("Logged out successfully", "success");
+        };
 
-        // 2. Navigation & UI Logic
+        // --- ROUTING & NAVIGATION ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
-                // Get Role
-                const snap = await getDoc(doc(db, "users", user.uid));
-                const role = snap.exists() ? snap.data().role : 'student';
+                let role = 'student';
                 
+                // Security Check
+                if (user.email.toLowerCase() === ADMIN_EMAIL) {
+                    role = 'admin';
+                } else {
+                    const snap = await getDoc(doc(db, "users", user.uid));
+                    if(snap.exists()) role = snap.data().role;
+                    if(user.email.toLowerCase() === ADMIN_EMAIL) role = 'admin'; // Override
+                }
+
                 document.getElementById('view-auth').classList.add('hidden');
-                document.getElementById('bottom-nav').classList.remove('hidden');
 
                 if (role === 'admin') {
-                    showView('view-admin');
+                    document.getElementById('view-admin').classList.remove('hidden');
+                    loadAdminExamList();
                 } else {
-                    showView('view-student');
-                    loadExams();
+                    document.getElementById('bottom-nav').classList.remove('hidden');
+                    switchStudentTab('home');
                 }
             } else {
                 currentUser = null;
-                showView('view-auth');
+                // Hide all views, show auth
+                document.querySelectorAll('.container').forEach(el => el.classList.add('hidden'));
                 document.getElementById('bottom-nav').classList.add('hidden');
+                document.getElementById('view-auth').classList.remove('hidden');
             }
         });
 
-        function showView(viewId) {
-            ['view-auth', 'view-admin', 'view-student', 'view-taking-exam'].forEach(id => {
-                document.getElementById(id).classList.add('hidden');
-            });
-            document.getElementById(viewId).classList.remove('hidden');
-        }
-
-        window.navTo = (dest) => {
-            // Simple nav logic for bottom bar
-            if(dest === 'home') {
-                 window.location.reload(); 
+        window.switchStudentTab = (tab, el) => {
+            // UI Switch
+            ['view-student-home', 'view-student-history', 'view-student-profile'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById(`view-student-${tab}`).classList.remove('hidden');
+            
+            // Nav Active State
+            if(el) {
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                el.classList.add('active');
+            } else {
+                // Default home active
+                document.querySelectorAll('.nav-item')[0].classList.add('active');
             }
-            if(dest === 'profile') alert(`Profile:\n${currentUser.email}`);
+
+            // Data Load
+            if(tab === 'home') loadExams();
+            if(tab === 'history') loadHistory();
+            if(tab === 'profile') loadProfile();
         };
 
-        // 3. Admin: Exam Creation
-        let questionCount = 0;
+        // --- ADMIN FEATURES ---
+        let qCount = 0;
         window.addQuestionField = () => {
-            questionCount++;
+            qCount++;
             const container = document.getElementById('builder-questions');
             const div = document.createElement('div');
-            div.className = 'question-block';
+            div.className = 'question-box';
             div.innerHTML = `
-                <h4>Question ${questionCount}</h4>
-                <input type="text" class="q-txt" placeholder="Question Text">
+                <div style="display:flex; justify-content:space-between;">
+                    <h4 style="margin:0;">Q${qCount}</h4>
+                    <i class="fas fa-trash" style="color:var(--danger); cursor:pointer;" onclick="this.parentElement.parentElement.remove()"></i>
+                </div>
+                <input type="text" class="q-txt" placeholder="Question Text" style="margin-top:10px;">
                 <input type="file" class="q-img" accept="image/*">
-                <input type="text" class="opt1" placeholder="Option 1">
-                <input type="text" class="opt2" placeholder="Option 2">
-                <input type="text" class="opt3" placeholder="Option 3">
-                <input type="text" class="opt4" placeholder="Option 4">
-                <select class="q-correct">
-                    <option value="0">Option 1 is Correct</option>
-                    <option value="1">Option 2 is Correct</option>
-                    <option value="2">Option 3 is Correct</option>
-                    <option value="3">Option 4 is Correct</option>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <input type="text" class="opt1" placeholder="Option 1">
+                    <input type="text" class="opt2" placeholder="Option 2">
+                    <input type="text" class="opt3" placeholder="Option 3">
+                    <input type="text" class="opt4" placeholder="Option 4">
+                </div>
+                <select class="q-correct" style="margin-top:10px;">
+                    <option value="0">Option 1 Correct</option>
+                    <option value="1">Option 2 Correct</option>
+                    <option value="2">Option 3 Correct</option>
+                    <option value="3">Option 4 Correct</option>
                 </select>
             `;
             container.appendChild(div);
@@ -409,151 +523,15 @@
             const btn = document.getElementById('btn-save-exam');
             const title = document.getElementById('new-exam-title').value;
             const time = document.getElementById('new-exam-time').value;
-            const qBlocks = document.querySelectorAll('#builder-questions .question-block');
+            const qBlocks = document.querySelectorAll('.question-box');
 
-            if(!title || qBlocks.length === 0) return alert("Please fill exam details");
+            if(!title || qBlocks.length === 0) return showToast("Fill details & add questions", "error");
 
-            btn.innerText = "Uploading Images...";
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
             btn.disabled = true;
-
-            let questionsData = [];
+            let qData = [];
 
             for(let block of qBlocks) {
                 const text = block.querySelector('.q-txt').value;
                 const fileIn = block.querySelector('.q-img');
-                const correct = block.querySelector('.q-correct').value;
-                const opts = [
-                    block.querySelector('.opt1').value,
-                    block.querySelector('.opt2').value,
-                    block.querySelector('.opt3').value,
-                    block.querySelector('.opt4').value
-                ];
-
-                let imgUrl = "";
-                if(fileIn.files[0]) {
-                    const fd = new FormData();
-                    fd.append('file', fileIn.files[0]);
-                    fd.append('upload_preset', CLOUD_PRESET);
-                    try {
-                        const res = await fetch(CLOUD_URL, { method: 'POST', body: fd });
-                        const json = await res.json();
-                        imgUrl = json.secure_url;
-                    } catch(e) { 
-                        console.error("Img Upload Error", e);
-                        alert("Image upload failed. Check Cloudinary settings.");
-                    }
-                }
-
-                questionsData.push({ text, options: opts, correct: parseInt(correct), image: imgUrl });
-            }
-
-            try {
-                await addDoc(collection(db, "exams"), {
-                    title, time: parseInt(time), questions: questionsData, createdAt: new Date()
-                });
-                alert("Exam Published Successfully!");
-                window.location.reload();
-            } catch(e) {
-                alert("Database Error: " + e.message);
-                btn.disabled = false;
-            }
-        };
-
-        // 4. Student: Logic
-        async function loadExams() {
-            const list = document.getElementById('exam-list');
-            const snap = await getDocs(collection(db, "exams"));
-            list.innerHTML = "";
-            
-            if(snap.empty) {
-                list.innerHTML = "<p>No exams available.</p>";
-                return;
-            }
-
-            snap.forEach(d => {
-                const ex = d.data();
-                const card = document.createElement('div');
-                card.className = "glass-card";
-                card.innerHTML = `
-                    <h3>${ex.title}</h3>
-                    <p><i class="far fa-clock"></i> ${ex.time} mins | <i class="far fa-question-circle"></i> ${ex.questions.length} Questions</p>
-                    <button onclick="window.startExam('${d.id}')">Start Exam</button>
-                `;
-                list.appendChild(card);
-            });
-            // Attach exam data globally for helper access
-            window.allExams = snap.docs.map(d => ({id: d.id, ...d.data()}));
-        }
-
-        window.startExam = (id) => {
-            currentExamData = window.allExams.find(e => e.id === id);
-            showView('view-taking-exam');
-            document.getElementById('active-exam-name').innerText = currentExamData.title;
-            
-            // Build UI
-            const area = document.getElementById('quiz-area');
-            area.innerHTML = "";
-            currentExamData.questions.forEach((q, idx) => {
-                let imgHTML = q.image ? `<img src="${q.image}" class="preview">` : '';
-                let optsHTML = q.options.map((opt, i) => `
-                    <div style="background:rgba(0,0,0,0.2); padding:10px; margin:5px 0; border-radius:5px;">
-                        <input type="radio" name="q${idx}" value="${i}" id="q${idx}_${i}">
-                        <label for="q${idx}_${i}" style="margin-left:10px; cursor:pointer; width:100%; display:inline-block;">${opt}</label>
-                    </div>
-                `).join('');
-
-                area.innerHTML += `
-                    <div class="question-block">
-                        <p><strong>Q${idx+1}:</strong> ${q.text}</p>
-                        ${imgHTML}
-                        ${optsHTML}
-                    </div>
-                `;
-            });
-
-            // Timer
-            let timeLeft = currentExamData.time * 60;
-            const timerDisplay = document.getElementById('timer-display');
-            timerInterval = setInterval(() => {
-                let m = Math.floor(timeLeft / 60);
-                let s = timeLeft % 60;
-                timerDisplay.innerText = `${m}:${s < 10 ? '0'+s : s}`;
-                timeLeft--;
-                if(timeLeft < 0) {
-                    clearInterval(timerInterval);
-                    alert("Time Up! Submitting automatically.");
-                    window.submitExam();
-                }
-            }, 1000);
-        };
-
-        window.submitExam = async () => {
-            clearInterval(timerInterval);
-            let score = 0;
-            currentExamData.questions.forEach((q, idx) => {
-                const sel = document.querySelector(`input[name="q${idx}"]:checked`);
-                if(sel && parseInt(sel.value) === q.correct) score++;
-            });
-
-            const percent = ((score / currentExamData.questions.length) * 100).toFixed(1);
-            
-            try {
-                await addDoc(collection(db, "results"), {
-                    uid: currentUser.uid,
-                    email: currentUser.email,
-                    examTitle: currentExamData.title,
-                    score,
-                    total: currentExamData.questions.length,
-                    date: new Date()
-                });
-                alert(`You scored ${score} out of ${currentExamData.questions.length} (${percent}%)`);
-            } catch(e) {
-                console.error(e);
-                alert("Score saved locally, but db error: " + e.message);
-            }
-            window.location.reload();
-        };
-
-    </script>
-</body>
-</html>
+                const correct =

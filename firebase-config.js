@@ -3,12 +3,13 @@ import { getAuth, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBEMPS8vEJztGpoBPJjJIzKKInyt4IY9rQ",
-  authDomain: "studentlms-79722.firebaseapp.com",
-  projectId: "studentlms-79722",
-  storageBucket: "studentlms-79722.firebasestorage.app",
-  messagingSenderId: "1029623857004",
-  appId: "1:1029623857004:web:fa07cb3de1270990a87d49"
+  // 🔴 PASTE YOUR FIREBASE KEYS HERE
+  apiKey: "AIzaSyB...", 
+  authDomain: "your-project.firebaseapp.com",
+  projectId: "your-project",
+  storageBucket: "your-project.firebasestorage.app",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abcdef"
 };
 
 const app = initializeApp(firebaseConfig);

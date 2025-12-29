@@ -5,23 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Science Exam Controller</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- MathJax for Formulas -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+        :root { --primary: #4f46e5; --bg: #f8fafc; --text: #0f172a; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); }
+        
+        /* Components */
+        .card { background: white; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: 0.2s; }
+        .btn { padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; cursor: pointer; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-outline { border: 1px solid #cbd5e1; background: white; color: #475569; }
+        
+        /* Toolbar */
+        .editor-toolbar { display: flex; gap: 5px; margin-bottom: 5px; }
+        .tool-btn { padding: 4px 8px; background: #eef2ff; color: #4f46e5; border-radius: 4px; font-size: 10px; font-weight: bold; cursor: pointer; }
+        .tool-btn:hover { background: #4f46e5; color: white; }
+
+        .hidden { display: none !important; }
+        .q-img { max-height: 150px; display: block; margin: 5px 0; border-radius: 4px; border: 1px solid #eee; }
+        mjx-container { font-size: 110% !important; margin: 0 !important; }
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
 
-    <!-- Header -->
-    <div class="h-16 bg-white border-b flex items-center justify-between px-6 sticky top-0 z-30 shadow-sm">
+    <!-- Navbar -->
+    <div class="h-16 bg-white border-b flex items-center justify-between px-6 sticky top-0 z-30">
         <div class="flex items-center gap-2">
             <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold">S</div>
-            <span class="font-bold text-lg hidden md:block">Science Admin</span>
+            <span class="font-bold text-lg hidden md:block">Exam Controller</span>
         </div>
-        <div class="flex gap-3">
+        <div class="flex gap-2">
             <button onclick="openExamModal()" class="btn btn-primary text-xs"><i class="fas fa-plus"></i> New Exam</button>
-            <button onclick="signOutAdmin()" class="btn btn-outline text-xs text-red-500 hover:bg-red-50"><i class="fas fa-power-off"></i></button>
+            <button id="logout-btn" class="btn btn-outline text-xs text-red-500"><i class="fas fa-power-off"></i></button>
         </div>
     </div>
 
@@ -31,108 +50,138 @@
             <div class="card p-4"><p class="text-[10px] font-bold text-slate-400 uppercase">Students</p><h1 id="stat-users" class="text-2xl font-bold">0</h1></div>
             <div class="card p-4"><p class="text-[10px] font-bold text-slate-400 uppercase">Exams</p><h1 id="stat-exams" class="text-2xl font-bold">0</h1></div>
         </div>
-
         <div class="card overflow-hidden">
             <div class="p-4 border-b bg-slate-50 font-bold text-sm text-slate-600">Published Assessments</div>
             <div id="exam-list" class="divide-y divide-slate-100 max-h-[70vh] overflow-y-auto"></div>
         </div>
     </div>
 
-    <!-- EXAM CREATOR MODAL -->
+    <!-- CREATE EXAM MODAL -->
     <div id="exam-modal" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white w-full max-w-4xl rounded-2xl h-[90vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 border-b flex justify-between items-center bg-slate-50">
-                <h3 class="font-bold text-lg">Create Exam</h3>
+                <h3 class="font-bold text-lg">Exam Creator</h3>
                 <button onclick="document.getElementById('exam-modal').classList.add('hidden')" class="text-2xl text-slate-400 hover:text-red-500">&times;</button>
             </div>
 
             <div class="flex-grow overflow-y-auto p-6 space-y-6">
-                <!-- 1. Configuration -->
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="col-span-2">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase">Title</label>
-                            <input id="ex-title" class="w-full p-2 border rounded-lg text-sm font-bold" placeholder="e.g. Physics: Thermodynamics">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-400 uppercase">Class</label>
-                            <select id="ex-batch" class="w-full p-2 border rounded-lg text-sm bg-white">
-                                <option value="all">All</option>
-                                <option value="6">Class 6</option>
-                                <option value="7">Class 7</option>
-                                <option value="8">Class 8</option>
-                                <option value="9">Class 9</option>
-                                <option value="10">Class 10</option>
-                                <option value="11">Class 11</option>
-                                <option value="12">Class 12</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-400 uppercase">Time (Min)</label>
-                            <input id="ex-dur" type="number" class="w-full p-2 border rounded-lg text-sm">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-green-600 uppercase">Correct (+)</label>
-                            <input id="ex-pos" type="number" value="4" class="w-full p-2 border rounded-lg text-sm">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-red-500 uppercase">Wrong (-)</label>
-                            <input id="ex-neg" type="number" value="1" class="w-full p-2 border rounded-lg text-sm">
-                        </div>
-                        <div class="col-span-2 flex items-center gap-2 bg-white p-2 rounded border">
-                            <input type="checkbox" id="ex-random" checked class="toggle-checkbox">
-                            <span class="text-xs font-bold text-indigo-700">Shuffle Questions (Unique sets)</span>
-                        </div>
-                    </div>
+                <!-- Config -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="col-span-2"><label class="text-[10px] font-bold text-slate-400 uppercase">Title</label><input id="ex-title" class="w-full p-2 border rounded-lg text-sm font-bold" placeholder="Physics: Kinematics"></div>
+                    <div><label class="text-[10px] font-bold text-slate-400 uppercase">Class</label><select id="ex-batch" class="w-full p-2 border rounded-lg text-sm bg-white"><option value="all">All</option><option value="9">Class 9</option><option value="10">Class 10</option><option value="11">Class 11</option><option value="12">Class 12</option></select></div>
+                    <div><label class="text-[10px] font-bold text-slate-400 uppercase">Time (Min)</label><input id="ex-dur" type="number" class="w-full p-2 border rounded-lg text-sm"></div>
+                    <div><label class="text-[10px] font-bold text-green-600 uppercase">Correct (+)</label><input id="ex-pos" type="number" value="4" class="w-full p-2 border rounded-lg text-sm"></div>
+                    <div><label class="text-[10px] font-bold text-red-500 uppercase">Wrong (-)</label><input id="ex-neg" type="number" value="1" class="w-full p-2 border rounded-lg text-sm"></div>
+                    <div class="col-span-2 flex items-center gap-2 bg-white p-2 rounded border"><input type="checkbox" id="ex-random" checked class="w-4 h-4"><span class="text-xs font-bold text-indigo-700">Shuffle Questions (Unique Sets)</span></div>
                 </div>
 
-                <!-- 2. Modes -->
-                <div class="flex gap-4 border-b">
-                    <button onclick="setMode('manual')" id="tab-manual" class="pb-2 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600">Manual Entry</button>
-                    <button onclick="setMode('bulk')" id="tab-bulk" class="pb-2 text-sm font-bold text-slate-400">⚡ Bulk JSON</button>
-                    <button onclick="setMode('pdf')" id="tab-pdf" class="pb-2 text-sm font-bold text-slate-400">PDF Upload</button>
-                </div>
-
-                <!-- Manual Mode -->
-                <div id="mode-manual" class="space-y-4">
-                    <div id="q-container" class="space-y-4"></div>
-                    <button onclick="addQuestion()" class="w-full py-3 border-2 border-dashed border-indigo-300 text-indigo-600 font-bold rounded-xl hover:bg-indigo-50">+ Add Question</button>
-                </div>
-
-                <!-- Bulk Mode -->
-                <div id="mode-bulk" class="hidden space-y-2">
-                    <p class="text-xs text-slate-500">JSON Format: [{"q":"...","img":"...","options":["..."],"correct":0,"sol":"..."}]</p>
-                    <textarea id="json-input" class="w-full h-48 p-3 border rounded-xl text-xs font-mono bg-slate-50" placeholder="Paste JSON here..."></textarea>
-                    <button onclick="parseJSON()" class="btn btn-outline w-full">Import Questions</button>
-                </div>
-
-                <!-- PDF Mode -->
-                <div id="mode-pdf" class="hidden space-y-3">
-                    <input id="ex-file" type="file" class="w-full text-xs p-2 border rounded bg-white">
-                    <div class="flex gap-2">
-                        <input id="ex-count" type="number" placeholder="Total Questions" class="w-full p-2 border rounded">
-                        <button onclick="genKeys()" class="btn btn-outline">Generate OMR</button>
-                    </div>
-                    <div id="ex-keys" class="grid grid-cols-5 gap-2 max-h-40 overflow-y-auto"></div>
-                </div>
+                <!-- Manual Builder -->
+                <div id="q-container" class="space-y-4"></div>
+                <button onclick="addQuestion()" class="w-full py-3 border-2 border-dashed border-indigo-300 text-indigo-600 font-bold rounded-xl hover:bg-indigo-50 transition">+ Add Question</button>
             </div>
 
-            <div class="p-4 border-t bg-slate-50 text-right">
-                <button onclick="publishExam()" class="btn btn-primary px-6">Publish Exam</button>
-            </div>
+            <div class="p-4 border-t bg-slate-50 text-right"><button onclick="publishExam()" class="btn btn-primary px-6">Publish Exam</button></div>
         </div>
     </div>
 
-    <script type="module" src="admin.js"></script>
-    <script>
-        function setMode(m) {
-            ['manual','bulk','pdf'].forEach(x => {
-                document.getElementById('mode-'+x).classList.toggle('hidden', x!==m);
-                document.getElementById('tab-'+x).className = x===m ? "pb-2 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600" : "pb-2 text-sm font-bold text-slate-400";
-            });
-            window.examMode = m;
+    <script type="module">
+        import { auth, db } from './firebase-config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { doc, getDoc, collection, getDocs, setDoc, addDoc, deleteDoc, updateDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        onAuthStateChanged(auth, async (user) => {
+            if(!user || (await getDoc(doc(db, "students", user.uid))).data().role !== "admin") location.href="index.html";
+            loadDashboard();
+        });
+
+        async function loadDashboard() {
+            loadExams();
+            const u = await getDocs(collection(db, "students"));
+            const e = await getDocs(collection(db, "exams"));
+            document.getElementById('stat-users').innerText = u.size;
+            document.getElementById('stat-exams').innerText = e.size;
         }
-        window.examMode = 'manual';
+
+        window.addQuestion = () => {
+            const id = Date.now();
+            const h = `
+            <div class="p-5 bg-white border border-slate-200 rounded-xl relative q-item shadow-sm" id="q-${id}">
+                <button onclick="document.getElementById('q-${id}').remove()" class="absolute top-3 right-3 text-slate-300 hover:text-red-500"><i class="fas fa-trash"></i></button>
+                
+                <div class="editor-toolbar">
+                    <button class="tool-btn" onclick="insertText('q-txt-${id}', '\\\\( ',' \\\\)')">Formula</button>
+                    <button class="tool-btn" onclick="insertText('q-txt-${id}', '**','**')">Bold</button>
+                    <button class="tool-btn" onclick="insertText('q-txt-${id}', '_','_')">Italic</button>
+                </div>
+                <textarea id="q-txt-${id}" class="w-full p-2 border rounded text-sm font-bold q-txt bg-slate-50 focus:outline-none focus:border-indigo-500" rows="2" placeholder="Question Text..."></textarea>
+                
+                <input class="w-full p-2 border rounded text-xs q-img mt-2" placeholder="Image URL (Optional)">
+                
+                <div class="grid grid-cols-2 gap-3 mt-3">
+                    ${[0,1,2,3].map(i => `<div class="flex items-center gap-2"><span class="text-xs font-bold text-slate-400">${String.fromCharCode(65+i)}</span><input class="w-full border rounded p-2 text-xs q-opt-${i}"></div>`).join('')}
+                </div>
+                <div class="flex gap-4 pt-2 border-t mt-2">
+                    <div class="w-1/3"><label class="text-[10px] font-bold text-indigo-600 uppercase">Correct</label><select class="w-full p-2 border rounded text-xs font-bold q-ans bg-indigo-50"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select></div>
+                    <div class="w-2/3"><label class="text-[10px] font-bold text-green-600 uppercase">Solution</label><input class="w-full p-2 border rounded text-xs q-sol" placeholder="Explanation..."></div>
+                </div>
+            </div>`;
+            document.getElementById('q-container').insertAdjacentHTML('beforeend', h);
+        };
+
+        window.insertText = (id, start, end) => {
+            const el = document.getElementById(id);
+            const v = el.value;
+            const s = el.selectionStart;
+            const e = el.selectionEnd;
+            el.value = v.substring(0, s) + start + v.substring(s, e) + end + v.substring(e);
+        };
+
+        window.publishExam = async () => {
+            const title = document.getElementById('ex-title').value;
+            const dur = document.getElementById('ex-dur').value;
+            if(!title || !dur) return alert("Fill Title/Duration");
+
+            let qs = [];
+            document.querySelectorAll('.q-item').forEach(q => {
+                const txt = q.querySelector('.q-txt').value;
+                const img = q.querySelector('.q-img').value;
+                const opts = [0,1,2,3].map(i => q.querySelector(`.q-opt-${i}`).value);
+                const ans = parseInt(q.querySelector('.q-ans').value);
+                const sol = q.querySelector('.q-sol').value;
+                if(txt || img) qs.push({ q: txt, img, options: opts, correct: ans, sol });
+            });
+
+            if(qs.length===0) return alert("Add Questions");
+
+            await addDoc(collection(db,"exams"), {
+                title, duration: parseInt(dur), batch: document.getElementById('ex-batch').value,
+                posMarks: parseInt(document.getElementById('ex-pos').value), 
+                negMarks: parseInt(document.getElementById('ex-neg').value),
+                randomize: document.getElementById('ex-random').checked,
+                questions: qs, type: 'native_exam', createdAt: serverTimestamp()
+            });
+            alert("Published!"); location.reload();
+        };
+
+        window.loadExams = async () => {
+            const s = await getDocs(query(collection(db, "exams"), orderBy("createdAt", "desc")));
+            document.getElementById('exam-list').innerHTML = s.docs.map(d => `
+                <div class="p-4 flex justify-between items-center hover:bg-slate-50 border-b">
+                    <div><span class="font-bold block text-sm">${d.data().title}</span><span class="text-[10px] text-slate-400 bg-white border px-1 rounded">Class ${d.data().batch}</span></div>
+                    <button onclick="delExam('${d.id}')" class="text-red-400 hover:text-red-600"><i class="fas fa-trash"></i></button>
+                </div>`).join('');
+        };
+
+        window.openExamModal = () => { document.getElementById('exam-modal').classList.remove('hidden'); document.getElementById('q-container').innerHTML=''; window.addQuestion(); };
+        window.delExam = async(id)=>{ if(confirm("Delete?")) await deleteDoc(doc(db,"exams",id)); loadExams(); };
+        document.getElementById('logout-btn').addEventListener('click', () => signOut(auth).then(()=>location.href="index.html"));
+        
+        // Expose to global scope for HTML buttons
+        window.insertText = window.insertText;
+        window.addQuestion = window.addQuestion;
+        window.publishExam = window.publishExam;
+        window.openExamModal = window.openExamModal;
+        window.delExam = window.delExam;
     </script>
 </body>
 </html>

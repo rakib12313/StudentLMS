@@ -2,1102 +2,380 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NeonLMS - macOS Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NeonLMS - Command</title>
     
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=SF+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         :root {
-            /* macOS-inspired Color Palette */
-            --bg-primary: #f5f7fa;
-            --bg-secondary: #ffffff;
-            --bg-sidebar: #f8f9fa;
-            --bg-card: #ffffff;
-            --border-color: #e1e5e9;
-            --border-hover: #d0d7de;
-            --text-primary: #1d1d1f;
-            --text-secondary: #86868b;
-            --text-tertiary: #8b8b8f;
-            --accent-blue: #007aff;
-            --accent-purple: #5856d6;
-            --accent-green: #34c759;
-            --accent-orange: #ff9500;
-            --accent-red: #ff3b30;
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 18px;
-            --radius-xl: 24px;
-            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --neon-blue: #00f3ff; --neon-purple: #bc13fe;
+            --bg-dark: #050a14; --glass: rgba(16, 24, 45, 0.95);
+            --glass-border: rgba(0, 243, 255, 0.2); --text-main: #e0e6ed;
+            --danger: #ff2a6d; --success: #05d5fa; --warning: #fcee0a;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.5;
-            overflow-x: hidden;
-            min-height: 100vh;
+            margin: 0; font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: linear-gradient(rgba(5,10,20,0.9), rgba(5,10,20,0.9)), url("https://www.transparenttextures.com/patterns/cubes.png");
+            color: var(--text-main); min-height: 100vh; padding-bottom: 90px;
         }
 
-        /* Hidden helper */
+        .container { max-width: 900px; margin: 0 auto; padding: 15px; animation: fadeIn 0.5s ease; }
         .hidden { display: none !important; }
+        .flex-center { display: flex; justify-content: center; align-items: center; min-height: 80vh; }
 
-        /* macOS Window Controls */
-        .window-controls {
-            display: flex;
-            gap: 8px;
-            padding: 12px 16px;
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-        }
-
-        /* Layout */
-        .app-container {
-            display: flex;
-            min-height: calc(100vh - 48px);
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 240px;
-            background: var(--bg-sidebar);
-            border-right: 1px solid var(--border-color);
-            padding: 20px 0;
-            display: flex;
-            flex-direction: column;
-            position: sticky;
-            top: 48px;
-            height: calc(100vh - 48px);
-            overflow-y: auto;
-        }
-
-        .sidebar-header {
-            padding: 0 20px 20px;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 20px;
-        }
-
-        .app-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .logo-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .nav-section {
-            padding: 0 20px;
-            margin-bottom: 24px;
-        }
-
-        .section-label {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-tertiary);
-            margin-bottom: 12px;
-            padding-left: 4px;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 12px;
-            border-radius: var(--radius-md);
-            margin-bottom: 4px;
-            cursor: pointer;
-            transition: var(--transition);
-            color: var(--text-secondary);
-            font-weight: 500;
-            text-decoration: none;
-            border: none;
-            background: none;
-            width: 100%;
-            text-align: left;
-            font-family: inherit;
-        }
-
-        .nav-item:hover {
-            background: rgba(0, 122, 255, 0.08);
-            color: var(--accent-blue);
-        }
-
-        .nav-item.active {
-            background: rgba(0, 122, 255, 0.12);
-            color: var(--accent-blue);
-            font-weight: 600;
-        }
-
-        .nav-item i {
-            width: 20px;
-            text-align: center;
-            font-size: 16px;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            padding: 24px;
-            overflow-y: auto;
-            height: calc(100vh - 48px);
-        }
-
-        .content-header {
-            margin-bottom: 24px;
-        }
-
-        .page-title {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .page-subtitle {
-            color: var(--text-secondary);
-            font-size: 15px;
-        }
-
-        /* macOS Cards */
+        /* CARDS */
         .card {
-            background: var(--bg-card);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-color);
-            padding: 24px;
-            margin-bottom: 20px;
-            transition: var(--transition);
-            box-shadow: var(--shadow-sm);
+            background: var(--glass); border: 1px solid var(--glass-border);
+            border-radius: 12px; padding: 20px; margin-bottom: 15px;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.05); backdrop-filter: blur(12px);
+            position: relative; overflow: hidden;
+        }
+        .card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%;
+            background: linear-gradient(to bottom, var(--neon-blue), var(--neon-purple));
         }
 
-        .card:hover {
-            box-shadow: var(--shadow-md);
-            border-color: var(--border-hover);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        /* macOS Buttons */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 20px;
-            border-radius: var(--radius-md);
-            font-weight: 500;
-            font-size: 14px;
-            cursor: pointer;
-            transition: var(--transition);
-            border: none;
-            outline: none;
-            font-family: 'SF Pro Display', sans-serif;
-            white-space: nowrap;
-            text-decoration: none;
-        }
-
-        .btn-primary {
-            background: var(--accent-blue);
-            color: white;
-            box-shadow: 0 1px 3px rgba(0, 122, 255, 0.2);
-        }
-
-        .btn-primary:hover {
-            background: #0066cc;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
-        }
-
-        .btn-secondary {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-        }
-
-        .btn-secondary:hover {
-            background: #f8f9fa;
-            border-color: var(--border-hover);
-        }
-
-        .btn-success {
-            background: var(--accent-green);
-            color: white;
-        }
-
-        .btn-danger {
-            background: var(--accent-red);
-            color: white;
-        }
-
-        .btn-warning {
-            background: var(--accent-orange);
-            color: white;
-        }
-
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 12px;
-        }
-
-        .btn-full {
-            width: 100%;
-            justify-content: center;
-        }
-
-        /* macOS Inputs */
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .input-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text-primary);
-            font-size: 14px;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            font-family: 'SF Pro Display', sans-serif;
-            font-size: 15px;
-            transition: var(--transition);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-        }
-
-        .input-field::placeholder {
-            color: var(--text-tertiary);
-        }
-
-        /* macOS Tables */
-        .table-container {
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-            background: var(--bg-secondary);
-        }
-
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .table th {
-            background: var(--bg-sidebar);
-            padding: 14px 16px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 13px;
-            color: var(--text-secondary);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .table td {
-            padding: 16px;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 14px;
-        }
-
-        .table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .table tr:hover {
-            background: rgba(0, 122, 255, 0.04);
-        }
-
-        /* Status Badges */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-
-        .badge-success {
-            background: rgba(52, 199, 89, 0.1);
-            color: var(--accent-green);
-            border: 1px solid rgba(52, 199, 89, 0.2);
-        }
-
-        .badge-warning {
-            background: rgba(255, 149, 0, 0.1);
-            color: var(--accent-orange);
-            border: 1px solid rgba(255, 149, 0, 0.2);
-        }
-
-        .badge-danger {
-            background: rgba(255, 59, 48, 0.1);
-            color: var(--accent-red);
-            border: 1px solid rgba(255, 59, 48, 0.2);
-        }
-
-        .badge-info {
-            background: rgba(0, 122, 255, 0.1);
-            color: var(--accent-blue);
-            border: 1px solid rgba(0, 122, 255, 0.2);
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
+        /* STATS CARD (ADMIN HOME) */
         .stat-card {
-            background: var(--bg-card);
-            border-radius: var(--radius-md);
-            padding: 20px;
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
+            background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
+            border-radius: 10px; padding: 15px; text-align: center;
         }
+        .stat-val { font-family: 'Orbitron'; font-size: 24px; color: var(--neon-blue); margin-bottom: 5px; }
+        .stat-label { font-size: 12px; color: #888; text-transform: uppercase; }
 
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+        /* INPUTS & BUTTONS */
+        input, select, textarea {
+            width: 100%; padding: 12px; margin-bottom: 12px;
+            background: rgba(0,0,0,0.5); border: 1px solid #333;
+            border-radius: 6px; color: var(--neon-blue);
+            font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 500;
         }
-
-        .stat-value {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 4px;
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        button {
+            width: 100%; padding: 12px; border: none; border-radius: 6px;
+            font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 700;
+            cursor: pointer; text-transform: uppercase; display: flex; justify-content: center; align-items: center; gap: 8px;
         }
+        .btn-primary { background: linear-gradient(90deg, var(--neon-purple), var(--neon-blue)); color: #000; }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
+        .btn-danger { background: rgba(255, 42, 109, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+        .btn-sm { padding: 6px 12px; width: auto; font-size: 10px; }
 
-        .stat-label {
-            font-size: 13px;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        /* Progress Bar */
-        .progress-bar {
-            height: 6px;
-            background: var(--border-color);
-            border-radius: 3px;
-            overflow: hidden;
-            margin: 12px 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue));
-            border-radius: 3px;
-            transition: width 0.6s ease;
-        }
-
-        /* macOS Modal */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: var(--bg-card);
-            border-radius: var(--radius-xl);
-            padding: 32px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-lg);
-            animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        /* macOS Tabs */
-        .tabs {
-            display: flex;
-            gap: 4px;
-            background: var(--bg-sidebar);
-            padding: 4px;
-            border-radius: var(--radius-md);
-            margin-bottom: 24px;
-        }
-
-        .tab-btn {
-            padding: 10px 20px;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            font-weight: 500;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            transition: var(--transition);
-            font-family: 'SF Pro Display', sans-serif;
-        }
-
-        .tab-btn.active {
-            background: white;
-            color: var(--text-primary);
-            box-shadow: var(--shadow-sm);
-        }
-
-        /* macOS Switch */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 44px;
-            height: 24px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: var(--border-color);
-            transition: var(--transition);
-            border-radius: 34px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: var(--transition);
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: var(--accent-blue);
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(20px);
-        }
-
-        /* macOS Toast */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 10000;
-        }
-
-        .toast {
-            background: var(--bg-card);
-            border-radius: var(--radius-md);
-            padding: 16px 20px;
-            margin-bottom: 10px;
-            box-shadow: var(--shadow-lg);
-            border-left: 4px solid var(--accent-blue);
-            animation: toastSlideIn 0.3s ease;
-            max-width: 320px;
-            border: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .toast-success {
-            border-left-color: var(--accent-green);
-        }
-
-        .toast-error {
-            border-left-color: var(--accent-red);
-        }
-
-        .toast-warning {
-            border-left-color: var(--accent-orange);
-        }
-
-        @keyframes toastSlideIn {
-            from {
-                opacity: 0;
-                transform: translateX(100%);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        /* Loading Spinner */
-        .spinner {
-            width: 24px;
-            height: 24px;
-            border: 3px solid var(--border-color);
-            border-top-color: var(--accent-blue);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Quick Actions */
-        .quick-actions {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-
-        .action-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 20px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            color: var(--text-primary);
-            text-decoration: none;
-            transition: var(--transition);
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 14px;
-        }
-
-        .action-btn:hover {
-            background: var(--bg-sidebar);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-sm);
-        }
-
-        /* File Upload Area */
-        .file-upload-area {
-            border: 2px dashed var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 40px 20px;
-            text-align: center;
-            transition: var(--transition);
-            cursor: pointer;
-            margin-bottom: 20px;
-        }
-
-        .file-upload-area:hover {
-            border-color: var(--accent-blue);
-            background: rgba(0, 122, 255, 0.04);
-        }
-
-        .file-upload-area.active {
-            border-color: var(--accent-blue);
-            background: rgba(0, 122, 255, 0.08);
-        }
-
-        /* Question Builder */
-        .q-card {
-            margin-bottom: 20px;
-            border-left: 4px solid var(--accent-blue);
-        }
-
-        .option-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 10px 0;
-        }
-
-        /* Exam Timer */
-        .exam-timer {
-            font-family: 'SF Mono', monospace;
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--accent-blue);
-            background: rgba(0, 122, 255, 0.1);
-            padding: 8px 16px;
-            border-radius: var(--radius-md);
-            border: 1px solid rgba(0, 122, 255, 0.2);
-        }
-
-        /* PDF Viewer */
-        .pdf-viewer {
-            width: 100%;
-            height: 400px;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-
-        .pdf-viewer iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        /* Search Box */
-        .search-box {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .search-box input {
-            padding-left: 40px;
-        }
-
-        .search-box i {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-tertiary);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .app-container {
-                flex-direction: column;
-            }
-            
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                top: 0;
-                padding: 16px 0;
-            }
-            
-            .sidebar-header {
-                padding: 0 16px 16px;
-            }
-            
-            .main-content {
-                padding: 16px;
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .nav-item {
-                padding: 8px 12px;
-            }
-
-            .modal {
-                padding: 10px;
-            }
-
-            .modal-content {
-                padding: 20px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .page-title {
-                font-size: 24px;
-            }
-            
-            .card {
-                padding: 16px;
-            }
-
-            .option-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .quick-actions {
-                flex-direction: column;
-            }
-
-            .action-btn, .btn {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-
-        /* Dark Mode */
-        [data-theme="dark"] {
-            --bg-primary: #1a1a1a;
-            --bg-secondary: #2c2c2e;
-            --bg-sidebar: #242426;
-            --bg-card: #2c2c2e;
-            --border-color: #3a3a3c;
-            --border-hover: #48484a;
-            --text-primary: #f5f5f7;
-            --text-secondary: #98989d;
-            --text-tertiary: #6c6c70;
-        }
-
-        /* Focus Styles */
-        *:focus-visible {
-            outline: 2px solid var(--accent-blue);
-            outline-offset: 2px;
-        }
-
-        /* Smooth Scrolling */
-        html {
-            scroll-behavior: smooth;
-        }
-
-        /* Avatar */
-        .avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--accent-blue);
-        }
-
-        /* Leaderboard */
-        .leaderboard-item {
-            display: flex;
-            align-items: center;
-            padding: 12px;
-            border-radius: var(--radius-md);
-            margin-bottom: 8px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-        }
-
-        .leaderboard-rank {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
-            color: white;
-            border-radius: 50%;
-            font-weight: 600;
-            margin-right: 12px;
-        }
-
-        /* Loading Overlay */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg-primary);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-secondary);
-        }
-
-        .empty-state i {
-            font-size: 48px;
-            margin-bottom: 16px;
-            opacity: 0.5;
-        }
-
-        /* Grid System */
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-
-        @media (max-width: 768px) {
-            .grid-2, .grid-3 {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Bottom Navigation (Mobile) */
+        /* NAV */
         .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: var(--bg-card);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 0;
-            z-index: 100;
-            display: none;
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px;
+            background: rgba(10, 15, 30, 0.95); border: 1px solid var(--glass-border);
+            border-radius: 30px; display: flex; justify-content: space-around;
+            padding: 12px 0; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #555; font-size: 10px; cursor: pointer; transition: 0.3s; }
+        .nav-item i { font-size: 18px; margin-bottom: 3px; }
+        .nav-item.active { color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
 
-        @media (max-width: 768px) {
-            .bottom-nav {
-                display: flex;
-            }
-            
-            .main-content {
-                padding-bottom: 80px;
-            }
-        }
+        /* TABS & UTILS */
+        .tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; background: transparent; border: 1px solid #333; color: #888; padding: 10px; border-radius: 6px; }
+        .tab-btn.active { background: rgba(0, 243, 255, 0.1); border-color: var(--neon-blue); color: var(--neon-blue); }
+        
+        .badge { padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; background: #111; border: 1px solid #333; }
+        .text-neon { color: var(--neon-blue); }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        /* EXAM & RESULT STYLES */
+        .exam-card { border-left: 3px solid var(--warning); }
+        .res-card-pub { border-left: 3px solid var(--success); }
+        .res-card-pen { border-left: 3px solid var(--warning); opacity: 0.7; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        #toast-box { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+        .toast { background: #1e1e24; border-left: 4px solid var(--primary); padding: 15px; margin-bottom: 10px; color: white; animation: fadeIn 0.3s; }
+        
+        #global-loader { position: fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:99999; display:flex; justify-content:center; align-items:center; flex-direction: column;}
+        .spinner { width: 50px; height: 50px; border: 3px solid transparent; border-top-color: var(--neon-blue); border-right-color: var(--neon-purple); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--neon-blue); }
+        input:checked + .slider:before { transform: translateX(20px); }
     </style>
 </head>
 <body>
-    <!-- Loading Overlay -->
-    <div id="loading-overlay" class="loading-overlay">
-        <div class="spinner" style="width: 48px; height: 48px; margin-bottom: 20px;"></div>
-        <h2 style="color: var(--accent-blue); margin-bottom: 8px;">Initializing NeonLMS</h2>
-        <p style="color: var(--text-secondary);">Loading system modules...</p>
+
+    <div id="global-loader">
+        <div class="spinner"></div>
+        <h3 style="margin-top:20px; color:var(--neon-blue);">SYSTEM INITIALIZING...</h3>
     </div>
+    <div id="toast-box"></div>
 
-    <!-- Toast Container -->
-    <div class="toast-container" id="toast-container"></div>
-
-    <!-- Main App (Initially Hidden) -->
-    <div id="app-main" class="hidden">
-        <!-- macOS Window Controls -->
-        <div class="window-controls">
-            <div class="app-logo" style="margin-right: auto; padding-left: 0;">
-                <div class="logo-icon">
-                    <i class="fas fa-graduation-cap"></i>
-                </div>
-                <span>NeonLMS</span>
-            </div>
-            <div style="display: flex; gap: 8px; margin-left: auto;">
-                <button class="btn btn-secondary btn-sm" onclick="app.toggleDarkMode()" style="padding: 4px 12px;">
-                    <i class="fas fa-moon"></i>
-                </button>
-                <button class="btn btn-danger btn-sm" onclick="app.logout()" style="padding: 4px 12px;">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            </div>
-        </div>
-
-        <!-- App Container -->
-        <div class="app-container">
-            <!-- Sidebar Navigation -->
-            <aside class="sidebar" id="sidebar">
-                <div id="nav-content">
-                    <!-- Navigation will be dynamically populated -->
-                </div>
-            </aside>
-
-            <!-- Main Content Area -->
-            <main class="main-content" id="main-content">
-                <div id="content-area">
-                    <!-- Content will be dynamically loaded here -->
-                </div>
-            </main>
-        </div>
-
-        <!-- Bottom Navigation for Mobile -->
-        <div class="bottom-nav" id="bottom-nav">
-            <!-- Bottom nav will be populated for mobile -->
-        </div>
-    </div>
-
-    <!-- Auth Modal -->
-    <div id="auth-modal" class="modal">
-        <div class="modal-content">
-            <div style="text-align: center; margin-bottom: 32px;">
-                <div class="logo-icon" style="width: 64px; height: 64px; margin: 0 auto 20px;">
-                    <i class="fas fa-graduation-cap" style="font-size: 28px;"></i>
-                </div>
-                <h1 style="font-size: 28px; margin-bottom: 8px; color: var(--text-primary);">Welcome to NeonLMS</h1>
-                <p style="color: var(--text-secondary);">Advanced Learning Management System</p>
-            </div>
-
+    <!-- AUTH VIEW -->
+    <div id="view-auth" class="container flex-center hidden">
+        <div class="card" style="width:100%; max-width:400px; text-align:center;">
+            <i class="fas fa-atom" style="font-size:40px; color:var(--neon-blue); margin-bottom:20px;"></i>
+            <h1 class="text-neon">NeonLMS</h1>
+            <p style="color:#888; font-size:12px; margin-bottom:20px;">SECURE ACCESS PROTOCOL</p>
+            
             <div id="login-form">
-                <div class="input-group">
-                    <label class="input-label">Email Address</label>
-                    <input type="email" class="input-field" id="email" placeholder="Enter your email">
-                </div>
-                <div class="input-group">
-                    <label class="input-label">Password</label>
-                    <input type="password" class="input-field" id="password" placeholder="Enter your password">
-                </div>
-                <button class="btn btn-primary btn-full" onclick="app.login()" style="margin-bottom: 16px;">
-                    Sign In
-                </button>
-                <button class="btn btn-secondary btn-full" onclick="app.loginGoogle()" style="margin-bottom: 16px;">
-                    <i class="fab fa-google"></i> Sign in with Google
-                </button>
-                <div style="text-align: center;">
-                    <p style="color: var(--text-secondary); font-size: 14px;">
-                        Don't have an account? 
-                        <a href="#" onclick="app.toggleAuth('reg')" style="color: var(--accent-blue); text-decoration: none; font-weight: 500;">Create Account</a>
-                    </p>
-                </div>
+                <input type="email" id="email" placeholder="EMAIL ID">
+                <input type="password" id="password" placeholder="PASSCODE">
+                <button class="btn-primary" onclick="app.login()">AUTHENTICATE</button>
+                <button class="btn-secondary" onclick="app.loginGoogle()" style="margin-top:10px;"><i class="fab fa-google"></i> GOOGLE LINK</button>
+                <p style="font-size:12px; margin-top:20px; cursor:pointer; color:var(--neon-purple);" onclick="app.toggleAuth('reg')">NEW IDENTITY REGISTRATION</p>
             </div>
 
             <div id="reg-form" class="hidden">
-                <div class="input-group">
-                    <label class="input-label">Full Name</label>
-                    <input type="text" class="input-field" id="reg-name" placeholder="Enter your full name">
+                <input type="text" id="reg-name" placeholder="FULL NAME">
+                <input type="tel" id="reg-phone" placeholder="PHONE LINK">
+                <div class="grid-2">
+                    <select id="reg-class"><option disabled selected>CLASS</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
+                    <select id="reg-div"><option value="A">DIV A</option><option value="B">DIV B</option><option value="C">DIV C</option></select>
                 </div>
-                <div class="input-group">
-                    <label class="input-label">Phone Number</label>
-                    <input type="tel" class="input-field" id="reg-phone" placeholder="Enter phone number">
-                </div>
-                <div class="grid-2" style="gap: 12px; margin-bottom: 20px;">
-                    <div class="input-group">
-                        <label class="input-label">Class</label>
-                        <select class="input-field" id="reg-class">
-                            <option value="" disabled selected>Select Class</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                            <option value="11">11</option>
-                            <option value="12">12</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label">Division</label>
-                        <select class="input-field" id="reg-div">
-                            <option value="A">Division A</option>
-                            <option value="B">Division B</option>
-                            <option value="C">Division C</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <label class="input-label">Email Address</label>
-                    <input type="email" class="input-field" id="reg-email" placeholder="Enter your email">
-                </div>
-                <div class="input-group">
-                    <label class="input-label">Password</label>
-                    <input type="password" class="input-field" id="reg-pass" placeholder="Create a password">
-                </div>
-                <button class="btn btn-primary btn-full" onclick="app.register()" style="margin-bottom: 16px;">
-                    Create Account
-                </button>
-                <div style="text-align: center;">
-                    <p style="color: var(--text-secondary); font-size: 14px;">
-                        Already have an account? 
-                        <a href="#" onclick="app.toggleAuth('login')" style="color: var(--accent-blue); text-decoration: none; font-weight: 500;">Sign In</a>
-                    </p>
-                </div>
+                <input type="email" id="reg-email" placeholder="EMAIL">
+                <input type="password" id="reg-pass" placeholder="SET PASSCODE">
+                <button class="btn-primary" onclick="app.register()">REGISTER</button>
+                <p style="font-size:12px; margin-top:20px; cursor:pointer; color:#888;" onclick="app.toggleAuth('login')">BACK TO LOGIN</p>
             </div>
         </div>
     </div>
 
-    <!-- Pending Approval View -->
-    <div id="pending-view" class="modal hidden">
-        <div class="modal-content">
-            <div style="text-align: center; padding: 40px 20px;">
-                <i class="fas fa-user-clock" style="font-size: 64px; color: var(--accent-orange); margin-bottom: 24px;"></i>
-                <h2 style="margin-bottom: 16px; color: var(--text-primary);">Account Pending Approval</h2>
-                <p style="color: var(--text-secondary); margin-bottom: 24px;">
-                    Your account is pending administrator approval. You will be notified once your account has been verified.
-                </p>
-                <button class="btn btn-danger" onclick="app.logout()">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
+    <!-- PENDING VIEW -->
+    <div id="view-pending" class="container flex-center hidden">
+        <div class="card" style="text-align:center;">
+            <i class="fas fa-user-lock" style="font-size:50px; color:var(--warning); margin-bottom:20px;"></i>
+            <h2>IDENTITY PENDING</h2>
+            <p id="pend-msg" style="color:#aaa;">Waiting for Admin verification.</p>
+            <button class="btn-danger" style="margin-top:20px;" onclick="app.logout()">DISCONNECT</button>
+        </div>
+    </div>
+
+    <!-- ADMIN VIEW -->
+    <div id="view-admin" class="container hidden">
+        <!-- Admin Dock -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="app.nav('admin-home', this)"><i class="fas fa-chart-line"></i>DASHBOARD</div>
+            <div class="nav-item" onclick="app.nav('admin-exams', this)"><i class="fas fa-file-code"></i>EXAMS</div>
+            <div class="nav-item" onclick="app.nav('admin-results', this)"><i class="fas fa-list-alt"></i>RESULTS</div>
+            <div class="nav-item" onclick="app.nav('admin-students', this)"><i class="fas fa-users"></i>USERS</div>
+        </div>
+
+        <!-- Admin Home (Stats) -->
+        <div id="tab-admin-home">
+            <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                <div><h2 class="text-neon">OVERWATCH</h2><small>System Status: Online</small></div>
+                <button class="btn-danger btn-sm" onclick="app.logout()"><i class="fas fa-power-off"></i></button>
+            </div>
+            
+            <!-- Live Stats -->
+            <div class="grid-2" style="margin-bottom:15px;">
+                <div class="stat-card">
+                    <div class="stat-val" id="stat-total">0</div>
+                    <div class="stat-label">Total Cadets</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" style="color:var(--success)" id="stat-online">0</div>
+                    <div class="stat-label">● Online Now</div>
+                </div>
+            </div>
+            <div class="stat-card" style="margin-bottom:20px;">
+                <div class="stat-val" style="color:#777" id="stat-offline">0</div>
+                <div class="stat-label">● Offline</div>
+            </div>
+
+            <div class="card">
+                <h3>Global Config</h3>
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <span>Public Leaderboard</span>
+                    <label class="switch"><input type="checkbox" id="admin-lb-toggle" onchange="app.toggleLeaderboard()"><span class="slider"></span></label>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Broadcast</h3>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="ann-input" placeholder="Global Announcement..." style="margin:0;">
+                    <button class="btn-primary btn-sm" style="width:auto;" onclick="app.postAnnounce()"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Exams -->
+        <div id="tab-admin-exams" class="hidden">
+            <div class="card" id="exam-editor">
+                <h3>Create Protocol</h3>
+                <input type="hidden" id="ex-id">
+                <div class="grid-2">
+                    <input type="text" id="ex-title" placeholder="Exam Title">
+                    <select id="ex-class"><option value="8">Class 8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
+                </div>
+                <div class="grid-2">
+                    <input type="number" id="ex-time" placeholder="Mins">
+                    <input type="number" id="ex-neg" placeholder="Neg Mark (0.25)" step="0.25">
+                </div>
+                <input type="text" id="ex-pin" placeholder="Access PIN (Optional)">
+                
+                <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:6px; margin-bottom:10px;">
+                    <small style="color:var(--neon-blue); display:block; margin-bottom:5px;"><i class="fas fa-file-pdf"></i> PDF Question Paper</small>
+                    <input type="file" id="ex-pdf" accept="application/pdf">
+                    <input type="hidden" id="ex-pdf-url">
+                </div>
+
+                <div id="q-box"></div>
+                <button class="btn-secondary" onclick="app.addQ()" style="margin-top:10px;">+ MCQ Block</button>
+
+                <div class="grid-2" style="margin-top:20px;">
+                    <button class="btn-primary" onclick="app.saveExam()" id="btn-save">DEPLOY</button>
+                    <button class="btn-secondary" onclick="app.resetForm()">RESET</button>
+                </div>
+            </div>
+            <div id="admin-exam-list"></div>
+        </div>
+
+        <!-- Admin Results -->
+        <div id="tab-admin-results" class="hidden">
+            <div id="res-list-view">
+                <h3>Exam Reports</h3>
+                <div id="results-list"></div>
+            </div>
+            <div id="res-detail-view" class="hidden">
+                <button class="btn-secondary btn-sm" onclick="app.closeResDetail()" style="margin-bottom:10px;">&larr; Back</button>
+                <div class="card">
+                    <h3 id="res-title"></h3>
+                    <div class="grid-2" style="margin-bottom:15px;">
+                        <button class="btn-primary btn-sm" onclick="app.pubAll(true)">Publish All</button>
+                        <button class="btn-secondary btn-sm" onclick="app.pubAll(false)">Unpublish All</button>
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                            <thead><tr style="color:var(--neon-purple); border-bottom:1px solid #333;"><th style="text-align:left; padding:8px;">User</th><th style="text-align:left;">Score</th><th>Act</th></tr></thead>
+                            <tbody id="res-rows"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Students -->
+        <div id="tab-admin-students" class="hidden">
+            <div class="card">
+                <h3>Student Directory</h3>
+                <input type="text" placeholder="Search..." onkeyup="app.filter('stu-rows', this.value)">
+                <div id="stu-rows"></div>
             </div>
         </div>
     </div>
 
-    <!-- Exam Taking View -->
-    <div id="exam-view" class="hidden">
-        <!-- This view will be populated when taking an exam -->
+    <!-- === STUDENT VIEW === -->
+    <div id="view-student" class="container hidden">
+        <!-- Student Dock -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="app.stuNav('home', this)"><i class="fas fa-home"></i>HOME</div>
+            <div class="nav-item" onclick="app.stuNav('exams', this)"><i class="fas fa-crosshairs"></i>EXAMS</div>
+            <div class="nav-item" onclick="app.stuNav('results', this)"><i class="fas fa-chart-pie"></i>RESULTS</div>
+            <div class="nav-item" onclick="app.stuNav('profile', this)"><i class="fas fa-user-astronaut"></i>ID</div>
+        </div>
+
+        <!-- Home -->
+        <div id="tab-stu-home">
+            <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <h2 id="stu-name" class="text-neon">Cadet</h2>
+                    <small id="stu-class">Class --</small>
+                </div>
+                <div id="stu-rank-badge" class="badge">RECRUIT</div>
+            </div>
+            
+            <div class="card">
+                <h3><i class="fas fa-bullhorn" style="color:var(--neon-blue)"></i> Comms</h3>
+                <div id="ann-box"></div>
+                <div id="msg-box" style="margin-top:10px;"></div>
+            </div>
+
+            <div class="card" id="leaderboard-card">
+                <h3><i class="fas fa-trophy" style="color:var(--warning)"></i> Leaderboard</h3>
+                <div id="leaderboard-list"></div>
+            </div>
+            <div class="card hidden" id="leaderboard-disabled"><p style="color:#666;">Leaderboard is offline.</p></div>
+        </div>
+
+        <!-- Exams -->
+        <div id="tab-stu-exams" class="hidden">
+            <h3>Active Missions</h3>
+            <div id="stu-exam-list"></div>
+        </div>
+
+        <!-- Results -->
+        <div id="tab-stu-results" class="hidden">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="app.resFilter('pub', this)">Verified</button>
+                <button class="tab-btn" onclick="app.resFilter('pen', this)">Pending</button>
+            </div>
+            <div id="stu-res-list"></div>
+        </div>
+
+        <!-- Profile -->
+        <div id="tab-stu-profile" class="hidden">
+            <div class="card" style="text-align:center;">
+                <img src="" id="pro-img" style="width:100px; height:100px; border-radius:50%; border:2px solid var(--neon-blue); object-fit:cover;">
+                <label for="pro-file" style="display:block; margin-top:5px; color:var(--neon-purple); cursor:pointer; font-size:10px;">UPLOAD AVATAR</label>
+                <input type="file" id="pro-file" hidden accept="image/*" onchange="app.uplPhoto(this)">
+                
+                <h2 id="pro-name-2" style="margin-top:10px;">User</h2>
+                <div id="pro-status-badge"></div>
+                
+                <div style="text-align:left; margin-top:20px; background:rgba(0,0,0,0.3); padding:15px; border-radius:8px;">
+                    <p style="margin:5px 0;"><i class="fas fa-envelope" style="width:20px; color:#666;"></i> <span id="pro-email">--</span></p>
+                    <p style="margin:5px 0;"><i class="fas fa-phone" style="width:20px; color:#666;"></i> <span id="pro-phone">--</span></p>
+                    <p style="margin:5px 0;"><i class="fas fa-id-badge" style="width:20px; color:#666;"></i> <span id="pro-class-2">--</span></p>
+                    <p style="margin:5px 0;"><i class="fas fa-star" style="width:20px; color:#666;"></i> <span id="pro-avg">0%</span> Avg</p>
+                </div>
+                <button class="btn-danger" style="margin-top:20px;" onclick="app.logout()">LOGOUT</button>
+            </div>
+        </div>
     </div>
 
-    <!-- Exam Results Review View -->
-    <div id="review-view" class="hidden">
-        <!-- This view will be populated when reviewing exam results -->
+    <!-- === EXAM ENGINE === -->
+    <div id="view-paper" class="hidden" style="position:fixed; inset:0; background:#000; z-index:3000; overflow-y:auto;">
+        <div style="position:sticky; top:0; background:rgba(20,20,20,0.95); padding:15px; display:flex; justify-content:space-between; border-bottom:1px solid var(--neon-blue);">
+            <span id="q-title" style="color:white; font-weight:bold;">PROTOCOL</span>
+            <span id="q-timer" style="color:var(--danger); font-family:'Orbitron'; font-size:18px;">00:00</span>
+        </div>
+        <iframe id="pdf-view" class="hidden" style="width:100%; height:35vh; border:none;"></iframe>
+        <div id="q-area" style="padding:20px; padding-bottom:80px;"></div>
+        <div style="position:fixed; bottom:20px; width:90%; left:5%; z-index:3001;">
+            <button class="btn-primary" onclick="app.submit()">COMPLETE MISSION</button>
+        </div>
     </div>
 
-    <!-- Firebase and App Script -->
+    <!-- === ADMIN MODAL === -->
+    <div id="modal-edit-student" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:3000; display:flex; justify-content:center; align-items:center;">
+        <div class="card" style="width:90%; max-width:400px;">
+            <h3>Modify Identity</h3>
+            <input type="hidden" id="edt-uid">
+            <input type="text" id="edt-name" placeholder="Name">
+            <input type="tel" id="edt-phone" placeholder="Phone">
+            <div class="grid-2">
+                <select id="edt-class"><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
+                <select id="edt-div"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
+            </div>
+            <textarea id="edt-msg" rows="2" placeholder="Send Message..."></textarea>
+            <div class="grid-2" style="margin-top:10px;">
+                <button class="btn-primary" onclick="app.saveStudentEdit()">Update</button>
+                <button class="btn-secondary" onclick="document.getElementById('modal-edit-student').classList.add('hidden')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, deleteDoc, updateDoc, query, where, orderBy, limit, Timestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, sendEmailVerification } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, deleteDoc, updateDoc, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBEMPS8vEJztGpoBPJjJIzKKInyt4IY9rQ",
@@ -1107,8 +385,7 @@
             messagingSenderId: "1029623857004",
             appId: "1:1029623857004:web:fa07cb3de1270990a87d49"
         };
-
-        const CLOUD_URL = "https://api.cloudinary.com/v1_1/dpe74ejhl/auto/upload";
+        const CLOUD_URL = "https://api.cloudinary.com/v1_1/dpe74ejhl/image/upload"; 
         const CLOUD_PRESET = "lms_upload";
         const ADMIN_EMAIL = "rakibk155@gmail.com";
 
@@ -1116,2076 +393,435 @@
         const auth = getAuth(appInit);
         const db = getFirestore(appInit);
         
-        let currentUser = null;
-        let currentRole = null;
-        let examsCache = [];
-        let activeExam = null;
-        let examTimer = null;
-        let warningCount = 0;
-        let adminCurrentExamId = null;
-        let userDataCache = {};
+        let user, timer, exams=[], activeExam, warningCount=0, curExamId, activeInterval;
 
-        // Toast Notification System
-        const Toast = {
-            show: (message, type = 'info', duration = 3000) => {
-                const container = document.getElementById('toast-container');
-                const toast = document.createElement('div');
-                toast.className = `toast toast-${type}`;
-                
-                const icons = {
-                    success: 'check-circle',
-                    error: 'exclamation-circle',
-                    warning: 'exclamation-triangle',
-                    info: 'info-circle'
-                };
-                
-                toast.innerHTML = `
-                    <i class="fas fa-${icons[type]}" style="color: var(--accent-${type === 'success' ? 'green' : type === 'error' ? 'red' : type === 'warning' ? 'orange' : 'blue'});"></i>
-                    <span>${message}</span>
-                `;
-                
-                container.appendChild(toast);
-                
-                // Remove toast after duration
-                setTimeout(() => {
-                    toast.style.animation = 'toastSlideIn 0.3s ease reverse';
-                    setTimeout(() => toast.remove(), 300);
-                }, duration);
-            }
-        };
+        document.getElementById('global-loader').style.display='none';
 
-        // Loading Overlay Control
-        const Loading = {
-            show: (message = 'Loading...') => {
-                const overlay = document.getElementById('loading-overlay');
-                overlay.classList.remove('hidden');
-                overlay.querySelector('p').textContent = message;
-            },
-            hide: () => {
-                document.getElementById('loading-overlay').classList.add('hidden');
-            }
-        };
-
-        // Main Application Object
         window.app = {
-            // Initialization
-            init: async () => {
-                // Check for saved theme
-                const savedTheme = localStorage.getItem('theme') || 'light';
-                document.documentElement.setAttribute('data-theme', savedTheme);
-                
-                // Set up auth state listener
-                onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        await app.handleUserAuth(user);
-                    } else {
-                        app.handleUserLogout();
-                    }
-                });
-                
-                // Hide loading after a short delay
-                setTimeout(() => Loading.hide(), 1000);
+            toast: (m, t='success') => {
+                const d=document.createElement('div'); d.className='toast'; 
+                d.style.borderLeftColor = t==='error'?var(--danger):var(--success);
+                d.innerText=m; document.getElementById('toast-box').appendChild(d);
+                setTimeout(()=>d.remove(),3000);
             },
-
-            // Auth Handlers
-            handleUserAuth: async (user) => {
-                Loading.show('Loading user data...');
-                
-                try {
-                    const userDoc = await getDoc(doc(db, "users", user.uid));
-                    
-                    if (userDoc.exists()) {
-                        currentUser = { uid: user.uid, ...userDoc.data() };
-                        currentRole = currentUser.role;
-                        
-                        // Hide auth modal
-                        document.getElementById('auth-modal').classList.add('hidden');
-                        
-                        // Check if user is approved
-                        if (!currentUser.isApproved && currentRole !== 'admin') {
-                            document.getElementById('pending-view').classList.remove('hidden');
-                            Loading.hide();
-                            return;
-                        }
-                        
-                        // Show main app
-                        document.getElementById('app-main').classList.remove('hidden');
-                        
-                        // Setup navigation based on role
-                        app.setupNavigation();
-                        
-                        // Load initial view
-                        if (currentRole === 'admin') {
-                            app.navigateTo('dashboard');
-                        } else if (currentRole === 'student') {
-                            app.navigateTo('home');
-                        }
-                        
-                        // Cache exams
-                        await app.loadExamsCache();
-                        
-                        Toast.show(`Welcome back, ${currentUser.displayName}!`, 'success');
-                    } else {
-                        Toast.show('User data not found. Please contact administrator.', 'error');
-                        await signOut(auth);
-                    }
-                } catch (error) {
-                    console.error('Auth error:', error);
-                    Toast.show('Error loading user data', 'error');
-                }
-                
-                Loading.hide();
+            
+            // AUTH
+            toggleAuth: (m) => {
+                document.getElementById('login-form').classList.toggle('hidden', m==='reg');
+                document.getElementById('reg-form').classList.toggle('hidden', m!=='reg');
             },
-
-            handleUserLogout: () => {
-                currentUser = null;
-                currentRole = null;
-                examsCache = [];
-                
-                // Hide all views
-                document.getElementById('app-main').classList.add('hidden');
-                document.getElementById('pending-view').classList.add('hidden');
-                document.getElementById('exam-view').classList.add('hidden');
-                document.getElementById('review-view').classList.add('hidden');
-                
-                // Show auth modal
-                document.getElementById('auth-modal').classList.remove('hidden');
-                app.toggleAuth('login');
-            },
-
-            // Auth Functions
-            toggleAuth: (mode) => {
-                document.getElementById('login-form').classList.toggle('hidden', mode === 'reg');
-                document.getElementById('reg-form').classList.toggle('hidden', mode !== 'reg');
-            },
-
             login: async () => {
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-                
-                if (!email || !password) {
-                    Toast.show('Please fill in all fields', 'error');
-                    return;
-                }
-                
-                try {
-                    Loading.show('Signing in...');
-                    await signInWithEmailAndPassword(auth, email, password);
-                } catch (error) {
-                    Loading.hide();
-                    Toast.show(error.message, 'error');
-                }
+                try { 
+                    const r = await signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value);
+                    if(!r.user.emailVerified && r.user.email !== ADMIN_EMAIL) {
+                        await signOut(auth); app.toast("Verify email first!", 'error');
+                    }
+                } catch(e){ app.toast(e.message, 'error'); }
             },
-
             loginGoogle: async () => {
                 try {
-                    Loading.show('Connecting to Google...');
-                    const provider = new GoogleAuthProvider();
-                    const result = await signInWithPopup(auth, provider);
-                    
-                    // Check if user exists in database
-                    const userDoc = await getDoc(doc(db, "users", result.user.uid));
-                    
-                    if (!userDoc.exists()) {
-                        const role = result.user.email === ADMIN_EMAIL ? 'admin' : 'student';
-                        await setDoc(doc(db, "users", result.user.uid), {
-                            email: result.user.email,
-                            displayName: result.user.displayName,
-                            phone: "N/A",
-                            role: role,
-                            class: '9',
-                            division: 'A',
-                            isApproved: role === 'admin',
-                            photoURL: result.user.photoURL || ""
-                        });
+                    const r = await signInWithPopup(auth, new GoogleAuthProvider());
+                    const ref = doc(db,"users",r.user.uid);
+                    if(!(await getDoc(ref)).exists()) {
+                        await setDoc(ref, {email:r.user.email, displayName:r.user.displayName, phone:'N/A', role:r.user.email===ADMIN_EMAIL?'admin':'student', class:'9', division:'A', isApproved:r.user.email===ADMIN_EMAIL, lastActive: new Date()});
                     }
-                    
-                    Toast.show('Signed in with Google', 'success');
-                } catch (error) {
-                    Loading.hide();
-                    Toast.show(error.message, 'error');
-                }
+                } catch(e){ app.toast(e.message,'error'); }
             },
-
             register: async () => {
-                const name = document.getElementById('reg-name').value;
-                const email = document.getElementById('reg-email').value;
-                const password = document.getElementById('reg-pass').value;
-                const studentClass = document.getElementById('reg-class').value;
-                const division = document.getElementById('reg-div').value;
-                const phone = document.getElementById('reg-phone').value;
-                
-                if (!name || !email || !password || !studentClass) {
-                    Toast.show('Please fill in all required fields', 'error');
-                    return;
-                }
-                
+                const n=document.getElementById('reg-name').value, c=document.getElementById('reg-class').value;
+                const d=document.getElementById('reg-div').value, e=document.getElementById('reg-email').value, p=document.getElementById('reg-pass').value;
+                if(!n||!c) return app.toast('Fill all fields','error');
                 try {
-                    Loading.show('Creating account...');
-                    const result = await createUserWithEmailAndPassword(auth, email, password);
-                    const role = email === ADMIN_EMAIL ? 'admin' : 'student';
-                    
-                    await setDoc(doc(db, "users", result.user.uid), {
-                        email: email,
-                        displayName: name,
-                        phone: phone || "N/A",
-                        role: role,
-                        class: studentClass,
-                        division: division,
-                        isApproved: role === 'admin',
-                        photoURL: ""
-                    });
-                    
-                    if (role !== 'admin') {
-                        Toast.show('Account created! Awaiting admin approval.', 'warning');
-                    } else {
-                        Toast.show('Admin account created successfully!', 'success');
-                    }
-                } catch (error) {
-                    Loading.hide();
-                    Toast.show(error.message, 'error');
+                    const r = await createUserWithEmailAndPassword(auth, e, p);
+                    await sendEmailVerification(r.user);
+                    await setDoc(doc(db,"users",r.user.uid), {email:e, displayName:n, phone:document.getElementById('reg-phone').value, role:e===ADMIN_EMAIL?'admin':'student', class:c, division:d, isApproved:e===ADMIN_EMAIL, photoURL:"", lastActive: new Date()});
+                    await signOut(auth); app.toast('Verification sent! Check email.'); app.toggleAuth('login');
+                } catch(err){ app.toast(err.message,'error'); }
+            },
+            logout: () => signOut(auth),
+
+            // NAV
+            nav: (t, el) => {
+                document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); if(el) el.classList.add('active');
+                if(t.startsWith('admin')) {
+                    ['admin-home','admin-exams','admin-results','admin-students'].forEach(i=>document.getElementById(`tab-${i}`).classList.add('hidden'));
+                    document.getElementById(`tab-${t}`).classList.remove('hidden');
+                    if(t==='admin-home') app.loadStats();
+                    if(t==='admin-students') app.loadAllStu();
+                    if(t==='admin-exams') app.loadExams();
+                    if(t==='admin-results') app.loadResGroup();
+                } else {
+                    ['stu-home','stu-exams','stu-results','stu-profile'].forEach(i=>document.getElementById(`tab-${i}`).classList.add('hidden'));
+                    document.getElementById(`tab-${t}`).classList.remove('hidden');
+                    if(t==='stu-home') { app.loadAnn(); app.loadMsg(); app.loadLeaderboard(); }
+                    if(t==='stu-exams') app.loadStuExams();
+                    if(t==='stu-results') app.loadStuRes();
+                    if(t==='stu-profile') app.loadPro();
                 }
             },
 
-            logout: async () => {
-                try {
-                    await signOut(auth);
-                    Toast.show('Successfully logged out', 'success');
-                } catch (error) {
-                    Toast.show(error.message, 'error');
-                }
-            },
-
-            // Navigation Setup
-            setupNavigation: () => {
-                const navContent = document.getElementById('nav-content');
-                const bottomNav = document.getElementById('bottom-nav');
-                
-                if (currentRole === 'admin') {
-                    // Admin Navigation
-                    navContent.innerHTML = `
-                        <div class="sidebar-header">
-                            <div class="app-logo">
-                                <div class="logo-icon">
-                                    <i class="fas fa-shield-alt"></i>
-                                </div>
-                                <span>Admin Panel</span>
-                            </div>
-                        </div>
-                        
-                        <div class="nav-section">
-                            <div class="section-label">Dashboard</div>
-                            <button class="nav-item active" data-view="dashboard" onclick="app.navigateTo('dashboard')">
-                                <i class="fas fa-tachometer-alt"></i>
-                                <span>Dashboard</span>
-                            </button>
-                        </div>
-                        
-                        <div class="nav-section">
-                            <div class="section-label">Examination</div>
-                            <button class="nav-item" data-view="exams" onclick="app.navigateTo('exams')">
-                                <i class="fas fa-file-alt"></i>
-                                <span>Exams</span>
-                            </button>
-                            <button class="nav-item" data-view="results" onclick="app.navigateTo('results')">
-                                <i class="fas fa-chart-bar"></i>
-                                <span>Results</span>
-                            </button>
-                        </div>
-                        
-                        <div class="nav-section">
-                            <div class="section-label">Management</div>
-                            <button class="nav-item" data-view="students" onclick="app.navigateTo('students')">
-                                <i class="fas fa-users"></i>
-                                <span>Students</span>
-                            </button>
-                            <button class="nav-item" data-view="announcements" onclick="app.navigateTo('announcements')">
-                                <i class="fas fa-bullhorn"></i>
-                                <span>Announcements</span>
-                            </button>
-                        </div>
-                        
-                        <div class="nav-section">
-                            <div class="section-label">System</div>
-                            <button class="nav-item" data-view="settings" onclick="app.navigateTo('settings')">
-                                <i class="fas fa-cog"></i>
-                                <span>Settings</span>
-                            </button>
-                        </div>
-                    `;
-                } else if (currentRole === 'student') {
-                    // Student Navigation
-                    navContent.innerHTML = `
-                        <div class="sidebar-header">
-                            <div class="app-logo">
-                                <div class="logo-icon">
-                                    <i class="fas fa-user-graduate"></i>
-                                </div>
-                                <span>Student Portal</span>
-                            </div>
-                        </div>
-                        
-                        <div class="nav-section">
-                            <div class="section-label">Dashboard</div>
-                            <button class="nav-item active" data-view="home" onclick="app.navigateTo('home')">
-                                <i class="fas fa-home"></i>
-                                <span>Home</span>
-                            </button>
-                        </div>
-                        
-                        <div class="nav-section">
-                            <div class="section-label">Examinations</div>
-                            <button class="nav-item" data-view="available-exams" onclick="app.navigateTo('available-exams')">
-                                <i class="fas fa-graduation-cap"></i>
-                                <span>Available Exams</span>
-                            </button>
-                            <button class="nav-item" data-view="my-results" onclick="app.navigateTo('my-results')">
-                                <i class="fas fa-chart-line"></i>
-                                <span>My Results</span>
-                            </button>
-                        </div>
-                        
-                        <div class="nav-section">
-                            <div class="section-label">Account</div>
-                            <button class="nav-item" data-view="profile" onclick="app.navigateTo('profile')">
-                                <i class="fas fa-user"></i>
-                                <span>Profile</span>
-                            </button>
-                        </div>
-                    `;
-                    
-                    // Mobile Bottom Navigation
-                    bottomNav.innerHTML = `
-                        <button class="nav-item active" data-view="home" onclick="app.navigateTo('home')">
-                            <i class="fas fa-home"></i>
-                            <span>Home</span>
-                        </button>
-                        <button class="nav-item" data-view="available-exams" onclick="app.navigateTo('available-exams')">
-                            <i class="fas fa-graduation-cap"></i>
-                            <span>Exams</span>
-                        </button>
-                        <button class="nav-item" data-view="my-results" onclick="app.navigateTo('my-results')">
-                            <i class="fas fa-chart-line"></i>
-                            <span>Results</span>
-                        </button>
-                        <button class="nav-item" data-view="profile" onclick="app.navigateTo('profile')">
-                            <i class="fas fa-user"></i>
-                            <span>Profile</span>
-                        </button>
-                    `;
-                }
-            },
-
-            // Navigation
-            navigateTo: async (view) => {
-                // Update active nav items
-                document.querySelectorAll('.nav-item').forEach(item => {
-                    item.classList.remove('active');
-                    if (item.getAttribute('data-view') === view) {
-                        item.classList.add('active');
-                    }
+            // ADMIN STATS
+            loadStats: async () => {
+                const s = await getDocs(query(collection(db,"users"), where("role","==","student")));
+                let tot=0, on=0;
+                const now = new Date();
+                s.forEach(d => {
+                    tot++;
+                    if(d.data().lastActive && (now - d.data().lastActive.toDate()) < 300000) on++; // 5 min activity
                 });
+                document.getElementById('stat-total').innerText = tot;
+                document.getElementById('stat-online').innerText = on;
+                document.getElementById('stat-offline').innerText = tot - on;
                 
-                // Update bottom nav for mobile
-                document.querySelectorAll('#bottom-nav .nav-item').forEach(item => {
-                    item.classList.remove('active');
-                    if (item.getAttribute('data-view') === view) {
-                        item.classList.add('active');
-                    }
-                });
-                
-                // Load the view
-                await app.loadView(view);
+                // Config
+                const cfg = await getDoc(doc(db,"system","config"));
+                if(cfg.exists()) document.getElementById('admin-lb-toggle').checked = cfg.data().leaderboardVisible;
             },
-
-            // View Loader
-            loadView: async (view) => {
-                const contentArea = document.getElementById('content-area');
-                contentArea.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner" style="margin: 0 auto 20px;"></div><p>Loading...</p></div>';
-                
-                try {
-                    if (currentRole === 'admin') {
-                        await app.loadAdminView(view, contentArea);
-                    } else if (currentRole === 'student') {
-                        await app.loadStudentView(view, contentArea);
-                    }
-                } catch (error) {
-                    console.error('Error loading view:', error);
-                    contentArea.innerHTML = `
-                        <div class="card">
-                            <div style="text-align: center; padding: 40px;">
-                                <i class="fas fa-exclamation-circle" style="font-size: 48px; color: var(--accent-red); margin-bottom: 16px;"></i>
-                                <h3>Error Loading Content</h3>
-                                <p style="color: var(--text-secondary); margin-bottom: 20px;">${error.message}</p>
-                                <button class="btn btn-secondary" onclick="app.navigateTo('${currentRole === 'admin' ? 'dashboard' : 'home'}')">
-                                    Return to Dashboard
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                }
-            },
-
-            // Admin Views
-            loadAdminView: async (view, container) => {
-                switch(view) {
-                    case 'dashboard':
-                        container.innerHTML = await app.renderAdminDashboard();
-                        await app.loadAdminDashboardData();
-                        break;
-                    case 'exams':
-                        container.innerHTML = await app.renderExamsManagement();
-                        await app.loadExamsList();
-                        break;
-                    case 'results':
-                        container.innerHTML = await app.renderResultsManagement();
-                        await app.loadResultsList();
-                        break;
-                    case 'students':
-                        container.innerHTML = await app.renderStudentsManagement();
-                        await app.loadStudentsList();
-                        break;
-                    case 'announcements':
-                        container.innerHTML = await app.renderAnnouncementsManagement();
-                        await app.loadAnnouncements();
-                        break;
-                    case 'settings':
-                        container.innerHTML = await app.renderSettings();
-                        await app.loadSettings();
-                        break;
-                    default:
-                        container.innerHTML = await app.renderAdminDashboard();
-                        await app.loadAdminDashboardData();
-                }
-            },
-
-            // Student Views
-            loadStudentView: async (view, container) => {
-                switch(view) {
-                    case 'home':
-                        container.innerHTML = await app.renderStudentDashboard();
-                        await app.loadStudentDashboardData();
-                        break;
-                    case 'available-exams':
-                        container.innerHTML = await app.renderAvailableExams();
-                        await app.loadAvailableExamsList();
-                        break;
-                    case 'my-results':
-                        container.innerHTML = await app.renderStudentResults();
-                        await app.loadStudentResultsList();
-                        break;
-                    case 'profile':
-                        container.innerHTML = await app.renderStudentProfile();
-                        await app.loadStudentProfileData();
-                        break;
-                    default:
-                        container.innerHTML = await app.renderStudentDashboard();
-                        await app.loadStudentDashboardData();
-                }
-            },
-
-            // ===== ADMIN RENDER FUNCTIONS =====
-            
-            renderAdminDashboard: () => {
-                return `
-                    <div class="content-header">
-                        <h1 class="page-title">Admin Dashboard</h1>
-                        <p class="page-subtitle">System overview and quick actions</p>
-                    </div>
-                    
-                    <div class="quick-actions">
-                        <button class="action-btn" onclick="app.navigateTo('exams')">
-                            <i class="fas fa-plus-circle"></i>
-                            <span>Create New Exam</span>
-                        </button>
-                        <button class="action-btn" onclick="app.navigateTo('students')">
-                            <i class="fas fa-user-check"></i>
-                            <span>Approve Students</span>
-                        </button>
-                        <button class="action-btn" onclick="app.navigateTo('announcements')">
-                            <i class="fas fa-bullhorn"></i>
-                            <span>Post Announcement</span>
-                        </button>
-                        <button class="action-btn" onclick="app.navigateTo('results')">
-                            <i class="fas fa-chart-bar"></i>
-                            <span>View Results</span>
-                        </button>
-                    </div>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-value" id="total-students">0</div>
-                            <div class="stat-label">Total Students</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="total-exams">0</div>
-                            <div class="stat-label">Active Exams</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="pending-approvals">0</div>
-                            <div class="stat-label">Pending Approvals</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="total-results">0</div>
-                            <div class="stat-label">Results Processed</div>
-                        </div>
-                    </div>
-                    
-                    <div class="grid-2">
-                        <div class="card">
-                            <div class="card-header">
-                                <h2 class="card-title">Recent Exams</h2>
-                                <button class="btn btn-secondary btn-sm" onclick="app.navigateTo('exams')">View All</button>
-                            </div>
-                            <div id="recent-exams-list">
-                                <div class="empty-state">
-                                    <i class="fas fa-file-alt"></i>
-                                    <p>No exams created yet</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="card">
-                            <div class="card-header">
-                                <h2 class="card-title">Pending Approvals</h2>
-                                <button class="btn btn-secondary btn-sm" onclick="app.navigateTo('students')">View All</button>
-                            </div>
-                            <div id="pending-approvals-list">
-                                <div class="empty-state">
-                                    <i class="fas fa-user-clock"></i>
-                                    <p>No pending approvals</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            },
-
-            renderExamsManagement: () => {
-                return `
-                    <div class="content-header">
-                        <h1 class="page-title">Exam Management</h1>
-                        <p class="page-subtitle">Create and manage examination protocols</p>
-                    </div>
-                    
-                    <div class="tabs" id="exam-tabs">
-                        <button class="tab-btn active" onclick="app.switchExamTab('create')">Create Exam</button>
-                        <button class="tab-btn" onclick="app.switchExamTab('list')">All Exams</button>
-                    </div>
-                    
-                    <div id="exam-create-tab">
-                        <div class="card">
-                            <div class="card-header">
-                                <h2 class="card-title">Create New Exam</h2>
-                                <span class="badge badge-info" id="edit-mode-badge" style="display: none;">Edit Mode</span>
-                            </div>
-                            
-                            <div class="input-group">
-                                <label class="input-label">Exam Title</label>
-                                <input type="text" class="input-field" id="exam-title" placeholder="Enter exam title">
-                            </div>
-                            
-                            <div class="grid-2">
-                                <div class="input-group">
-                                    <label class="input-label">Target Class</label>
-                                    <select class="input-field" id="exam-class">
-                                        <option value="" disabled selected>Select Class</option>
-                                        <option value="8">8</option>
-                                        <option value="9">9</option>
-                                        <option value="10">10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                    </select>
-                                </div>
-                                <div class="input-group">
-                                    <label class="input-label">Duration (minutes)</label>
-                                    <input type="number" class="input-field" id="exam-time" placeholder="60" min="1">
-                                </div>
-                            </div>
-                            
-                            <div class="grid-2">
-                                <div class="input-group">
-                                    <label class="input-label">Negative Marking</label>
-                                    <input type="number" class="input-field" id="exam-neg" placeholder="0.25" step="0.25" min="0">
-                                </div>
-                                <div class="input-group">
-                                    <label class="input-label">Access PIN (Optional)</label>
-                                    <input type="text" class="input-field" id="exam-pin" placeholder="Leave empty for no PIN">
-                                </div>
-                            </div>
-                            
-                            <div class="input-group">
-                                <label class="input-label">Question Paper PDF (Optional)</label>
-                                <div class="file-upload-area" onclick="document.getElementById('exam-pdf').click()" id="pdf-upload-area">
-                                    <i class="fas fa-file-pdf" style="font-size: 32px; margin-bottom: 12px; color: var(--accent-red);"></i>
-                                    <p style="color: var(--text-secondary); margin-bottom: 8px;">Click to upload PDF question paper</p>
-                                    <small style="color: var(--text-tertiary);">Max file size: 10MB</small>
-                                </div>
-                                <input type="file" id="exam-pdf" accept="application/pdf" class="hidden" onchange="app.handlePDFUpload(this)">
-                                <input type="hidden" id="exam-pdf-url">
-                            </div>
-                            
-                            <div class="tabs" style="margin-bottom: 20px;">
-                                <button class="tab-btn active" onclick="app.switchBuilderMode('manual')">Manual Builder</button>
-                                <button class="tab-btn" onclick="app.switchBuilderMode('json')">JSON Import</button>
-                            </div>
-                            
-                            <div id="builder-manual">
-                                <div id="question-container"></div>
-                                <button class="btn btn-secondary btn-full" onclick="app.addQuestion()">
-                                    <i class="fas fa-plus"></i> Add Question
-                                </button>
-                            </div>
-                            
-                            <div id="builder-json" class="hidden">
-                                <div class="input-group">
-                                    <label class="input-label">JSON Questions Array</label>
-                                    <textarea class="input-field" id="json-input" rows="6" placeholder='[{"text": "Question 1", "options": ["A", "B", "C", "D"], "correct": 0}]' style="font-family: 'SF Mono', monospace; font-size: 13px;"></textarea>
-                                </div>
-                                <button class="btn btn-primary" onclick="app.importJSONQuestions()">
-                                    <i class="fas fa-file-import"></i> Import Questions
-                                </button>
-                            </div>
-                            
-                            <div style="display: flex; gap: 12px; margin-top: 24px;">
-                                <button class="btn btn-primary" id="save-exam-btn" onclick="app.saveExam()">
-                                    <i class="fas fa-save"></i> Save Exam
-                                </button>
-                                <button class="btn btn-danger" id="cancel-edit-btn" style="display: none;" onclick="app.cancelEdit()">
-                                    <i class="fas fa-times"></i> Cancel Edit
-                                </button>
-                                <button class="btn btn-secondary" onclick="app.clearExamForm()">
-                                    <i class="fas fa-redo"></i> Clear Form
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div id="exam-list-tab" class="hidden">
-                        <div class="search-box">
-                            <i class="fas fa-search"></i>
-                            <input type="text" id="exam-search" placeholder="Search exams..." oninput="app.filterExams(this.value)">
-                        </div>
-                        <div id="exams-list-container">
-                            <div class="empty-state">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                <p>Loading exams...</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            },
-
-            renderResultsManagement: () => {
-                return `
-                    <div class="content-header">
-                        <h1 class="page-title">Results Management</h1>
-                        <p class="page-subtitle">Review and publish examination results</p>
-                    </div>
-                    
-                    <div id="results-list-view">
-                        <div class="search-box">
-                            <i class="fas fa-search"></i>
-                            <input type="text" id="results-search" placeholder="Search results..." oninput="app.filterResults(this.value)">
-                        </div>
-                        <div id="results-list-container">
-                            <div class="empty-state">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                <p>Loading results...</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div id="results-detail-view" class="hidden">
-                        <!-- Will be populated when viewing specific exam results -->
-                    </div>
-                `;
-            },
-
-            renderStudentsManagement: () => {
-                return `
-                    <div class="content-header">
-                        <h1 class="page-title">Student Management</h1>
-                        <p class="page-subtitle">Approve and manage student accounts</p>
-                    </div>
-                    
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="student-search" placeholder="Search students..." oninput="app.filterStudents(this.value)">
-                    </div>
-                    
-                    <div class="table-container">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Student Name</th>
-                                    <th>Class</th>
-                                    <th>Email</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="students-table-body">
-                                <tr>
-                                    <td colspan="5" style="text-align: center; padding: 40px;">
-                                        <div class="spinner" style="margin: 0 auto;"></div>
-                                        <p style="margin-top: 12px; color: var(--text-secondary);">Loading students...</p>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-            },
-
-            renderAnnouncementsManagement: () => {
-                return `
-                    <div class="content-header">
-                        <h1 class="page-title">Announcements</h1>
-                        <p class="page-subtitle">Broadcast messages to students</p>
-                    </div>
-                    
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title">Create Announcement</h2>
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label">Announcement Message</label>
-                            <textarea class="input-field" id="announcement-text" rows="4" placeholder="Enter your announcement message..."></textarea>
-                        </div>
-                        <button class="btn btn-primary" onclick="app.postAnnouncement()">
-                            <i class="fas fa-paper-plane"></i> Post Announcement
-                        </button>
-                    </div>
-                    
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title">Recent Announcements</h2>
-                            <button class="btn btn-secondary btn-sm" onclick="app.loadAnnouncements()">
-                                <i class="fas fa-sync-alt"></i> Refresh
-                            </button>
-                        </div>
-                        <div id="announcements-list-container">
-                            <div class="empty-state">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                <p>Loading announcements...</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            },
-
-            renderSettings: () => {
-                return `
-                    <div class="content-header">
-                        <h1 class="page-title">System Settings</h1>
-                        <p class="page-subtitle">Configure system preferences</p>
-                    </div>
-                    
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title">General Settings</h2>
-                        </div>
-                        
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border-color);">
-                            <div>
-                                <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">Leaderboard Visibility</h3>
-                                <p style="font-size: 13px; color: var(--text-secondary);">Show or hide leaderboard from students</p>
-                            </div>
-                            <label class="switch">
-                                <input type="checkbox" id="leaderboard-toggle" onchange="app.toggleLeaderboard()">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border-color);">
-                            <div>
-                                <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">Dark Mode</h3>
-                                <p style="font-size: 13px; color: var(--text-secondary);">Toggle dark/light theme</p>
-                            </div>
-                            <label class="switch">
-                                <input type="checkbox" id="dark-mode-toggle" onchange="app.toggleDarkMode()">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
-                `;
-            },
-
-            // ===== STUDENT RENDER FUNCTIONS =====
-            
-            renderStudentDashboard: () => {
-                return `
-                    <div class="content-header">
-                        <h1 class="page-title">Welcome, ${currentUser.displayName}</h1>
-                        <p class="page-subtitle">Class ${currentUser.class}-${currentUser.division}</p>
-                    </div>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-value" id="exams-taken">0</div>
-                            <div class="stat-label">Exams Taken</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="average-score">0%</div>
-                            <div class="stat-label">Average Score</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="accuracy-rate">0%</div>
-                            <div class="stat-label">Accuracy</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="current-rank">-</div>
-                            <div class="stat-label">Current Rank</div>
-                        </div>
-                    </div>
-                    
-                    <div class="grid-2">
-                        <div class="card">
-                            <div class="card-header">
-                                <h2 class="card-title">Recent Announcements</h2>
-                                <button class="btn btn-secondary btn-sm" onclick="app.loadStudentAnnouncements()">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                            </div>
-                            <div id="student-announcements">
-                                <div class="empty-state">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                    <p>Loading announcements...</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="card">
-                            <div class="card-header">
-                                <h2 class="card-title">Upcoming Exams</h2>
-                                <button class="btn btn-secondary btn-sm" onclick="app.navigateTo('available-exams')">View All</button>
-                            </div>
-                            <div id="upcoming-exams-list">
-                                <div class="empty-state">
-                                    <i class="fas fa-calendar"></i>
-                                    <p>No upcoming exams</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card" id="leaderboard-card">
-                        <div class="card-header">
-                            <h2 class="card-title">Leaderboard</h2>
-                            <span class="badge badge-success">Live</span>
-                        </div>
-                        <div id="leaderboard-container">
-                            <div class="empty-state">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                <p>Loading leaderboard...</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            },
-
-            renderAvailableExams: () => {
-                return `
-                    <div class="content-header">
-                        <h1 class="page-title">Available Exams</h1>
-                        <p class="page-subtitle">Take exams assigned to your class</p>
-                    </div>
-                    
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="available-exams-search" placeholder="Search exams..." oninput="app.filterAvailableExams(this.value)">
-                    </div>
-                    
-                    <div id="available-exams-container">
-                        <div class="empty-state">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <p>Loading available exams...</p>
-                        </div>
-                    </div>
-                `;
-            },
-
-            renderStudentResults: () => {
-                return `
-                    <div class="content-header">
-                        <h1 class="page-title">My Results</h1>
-                        <p class="page-subtitle">View your examination performance</p>
-                    </div>
-                    
-                    <div class="tabs">
-                        <button class="tab-btn active" onclick="app.switchResultsTab('published')">Published Results</button>
-                        <button class="tab-btn" onclick="app.switchResultsTab('pending')">Pending Review</button>
-                    </div>
-                    
-                    <div id="published-results-tab">
-                        <div id="published-results-container">
-                            <div class="empty-state">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                <p>Loading published results...</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div id="pending-results-tab" class="hidden">
-                        <div id="pending-results-container">
-                            <div class="empty-state">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                <p>Loading pending results...</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            },
-
-            renderStudentProfile: () => {
-                return `
-                    <div class="content-header">
-                        <h1 class="page-title">My Profile</h1>
-                        <p class="page-subtitle">Manage your account information</p>
-                    </div>
-                    
-                    <div class="card" style="text-align: center;">
-                        <div style="margin-bottom: 24px;">
-                            <img src="${currentUser.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(currentUser.displayName) + '&background=007AFF&color=fff'}" 
-                                 class="avatar" id="profile-avatar">
-                            <div style="margin-top: 12px;">
-                                <label for="avatar-upload" class="btn btn-secondary btn-sm" style="cursor: pointer;">
-                                    <i class="fas fa-camera"></i> Change Photo
-                                </label>
-                                <input type="file" id="avatar-upload" accept="image/*" class="hidden" onchange="app.uploadProfilePhoto(this)">
-                            </div>
-                        </div>
-                        
-                        <h2 style="margin-bottom: 8px; color: var(--text-primary);">${currentUser.displayName}</h2>
-                        <div class="badge badge-info" style="margin-bottom: 24px;">Class ${currentUser.class}-${currentUser.division}</div>
-                        
-                        <div style="text-align: left; background: var(--bg-sidebar); padding: 20px; border-radius: var(--radius-md); margin-bottom: 24px;">
-                            <div style="display: flex; align-items: center; margin-bottom: 16px;">
-                                <i class="fas fa-envelope" style="width: 20px; color: var(--text-secondary); margin-right: 12px;"></i>
-                                <div>
-                                    <div style="font-size: 12px; color: var(--text-secondary);">Email</div>
-                                    <div style="font-weight: 500;">${currentUser.email}</div>
-                                </div>
-                            </div>
-                            
-                            <div style="display: flex; align-items: center; margin-bottom: 16px;">
-                                <i class="fas fa-phone" style="width: 20px; color: var(--text-secondary); margin-right: 12px;"></i>
-                                <div>
-                                    <div style="font-size: 12px; color: var(--text-secondary);">Phone</div>
-                                    <div style="font-weight: 500;">${currentUser.phone || 'Not provided'}</div>
-                                </div>
-                            </div>
-                            
-                            <div style="display: flex; align-items: center;">
-                                <i class="fas fa-user-check" style="width: 20px; color: var(--text-secondary); margin-right: 12px;"></i>
-                                <div>
-                                    <div style="font-size: 12px; color: var(--text-secondary);">Account Status</div>
-                                    <div style="font-weight: 500; color: var(--accent-green);">Verified ✓</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <button class="btn btn-danger btn-full" onclick="app.logout()">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </button>
-                    </div>
-                `;
-            },
-
-            // ===== DATA LOADING FUNCTIONS =====
-            
-            loadExamsCache: async () => {
-                try {
-                    const examsSnapshot = await getDocs(collection(db, "exams"));
-                    examsCache = examsSnapshot.docs.map(doc => ({
-                        id: doc.id,
-                        ...doc.data()
-                    }));
-                } catch (error) {
-                    console.error('Error loading exams cache:', error);
-                }
-            },
-
-            loadAdminDashboardData: async () => {
-                try {
-                    // Load total students
-                    const studentsSnapshot = await getDocs(query(collection(db, "users"), where("role", "==", "student")));
-                    document.getElementById('total-students').textContent = studentsSnapshot.size;
-                    
-                    // Load total exams
-                    const examsSnapshot = await getDocs(collection(db, "exams"));
-                    document.getElementById('total-exams').textContent = examsSnapshot.size;
-                    
-                    // Load pending approvals
-                    const pendingSnapshot = await getDocs(query(collection(db, "users"), where("role", "==", "student"), where("isApproved", "==", false)));
-                    document.getElementById('pending-approvals').textContent = pendingSnapshot.size;
-                    
-                    // Load total results
-                    const resultsSnapshot = await getDocs(collection(db, "results"));
-                    document.getElementById('total-results').textContent = resultsSnapshot.size;
-                    
-                    // Load recent exams
-                    const recentExams = examsSnapshot.docs.slice(0, 5);
-                    const recentExamsList = document.getElementById('recent-exams-list');
-                    if (recentExams.length > 0) {
-                        recentExamsList.innerHTML = recentExams.map(doc => {
-                            const exam = doc.data();
-                            return `
-                                <div class="leaderboard-item" style="margin-bottom: 8px;">
-                                    <div style="flex: 1;">
-                                        <div style="font-weight: 500; margin-bottom: 4px;">${exam.title}</div>
-                                        <div style="font-size: 12px; color: var(--text-secondary);">
-                                            Class ${exam.targetClass} • ${exam.questions?.length || 0} questions
-                                        </div>
-                                    </div>
-                                    <button class="btn btn-secondary btn-sm" onclick="app.editExam('${doc.id}')">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                </div>
-                            `;
-                        }).join('');
-                    } else {
-                        recentExamsList.innerHTML = `
-                            <div class="empty-state">
-                                <i class="fas fa-file-alt"></i>
-                                <p>No exams created yet</p>
-                            </div>
-                        `;
-                    }
-                    
-                    // Load pending approvals list
-                    const pendingList = document.getElementById('pending-approvals-list');
-                    if (pendingSnapshot.size > 0) {
-                        pendingList.innerHTML = pendingSnapshot.docs.slice(0, 5).map(doc => {
-                            const student = doc.data();
-                            return `
-                                <div class="leaderboard-item" style="margin-bottom: 8px;">
-                                    <div style="flex: 1;">
-                                        <div style="font-weight: 500; margin-bottom: 4px;">${student.displayName}</div>
-                                        <div style="font-size: 12px; color: var(--text-secondary);">
-                                            ${student.email} • Class ${student.class}-${student.division}
-                                        </div>
-                                    </div>
-                                    <button class="btn btn-success btn-sm" onclick="app.approveStudent('${doc.id}')">
-                                        <i class="fas fa-check"></i> Approve
-                                    </button>
-                                </div>
-                            `;
-                        }).join('');
-                    } else {
-                        pendingList.innerHTML = `
-                            <div class="empty-state">
-                                <i class="fas fa-user-check"></i>
-                                <p>All students approved</p>
-                            </div>
-                        `;
-                    }
-                } catch (error) {
-                    console.error('Error loading dashboard data:', error);
-                    Toast.show('Error loading dashboard data', 'error');
-                }
-            },
-
-            loadExamsList: async () => {
-                try {
-                    const container = document.getElementById('exams-list-container');
-                    const examsSnapshot = await getDocs(collection(db, "exams"));
-                    
-                    if (examsSnapshot.empty) {
-                        container.innerHTML = `
-                            <div class="empty-state">
-                                <i class="fas fa-file-alt"></i>
-                                <p>No exams created yet</p>
-                                <button class="btn btn-primary" onclick="app.switchExamTab('create')" style="margin-top: 16px;">
-                                    <i class="fas fa-plus"></i> Create First Exam
-                                </button>
-                            </div>
-                        `;
-                        return;
-                    }
-                    
-                    const exams = examsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    
-                    container.innerHTML = exams.map(exam => `
-                        <div class="card" style="margin-bottom: 12px;">
-                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
-                                <div>
-                                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 4px;">${exam.title}</h3>
-                                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                        <span class="badge badge-info">Class ${exam.targetClass}</span>
-                                        <span class="badge">${exam.time} minutes</span>
-                                        <span class="badge">${exam.questions?.length || 0} questions</span>
-                                        ${exam.pin ? '<span class="badge badge-warning">PIN Protected</span>' : ''}
-                                        ${exam.pdf ? '<span class="badge badge-danger"><i class="fas fa-file-pdf"></i> PDF</span>' : ''}
-                                    </div>
-                                </div>
-                                <div style="display: flex; gap: 8px;">
-                                    <button class="btn btn-secondary btn-sm" onclick="app.editExam('${exam.id}')">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" onclick="app.deleteExam('${exam.id}')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div style="display: flex; gap: 12px; margin-top: 12px;">
-                                <button class="btn btn-primary btn-sm" onclick="app.viewExamResults('${exam.id}')">
-                                    <i class="fas fa-chart-bar"></i> View Results
-                                </button>
-                                <button class="btn btn-secondary btn-sm" onclick="app.copyExamLink('${exam.id}')">
-                                    <i class="fas fa-link"></i> Copy Link
-                                </button>
-                            </div>
-                        </div>
-                    `).join('');
-                    
-                    // Store exams in cache for search
-                    examsCache = exams;
-                } catch (error) {
-                    console.error('Error loading exams list:', error);
-                    Toast.show('Error loading exams', 'error');
-                }
-            },
-
-            loadAvailableExamsList: async () => {
-                try {
-                    const container = document.getElementById('available-exams-container');
-                    const examsSnapshot = await getDocs(query(
-                        collection(db, "exams"),
-                        where("targetClass", "==", currentUser.class)
-                    ));
-                    
-                    if (examsSnapshot.empty) {
-                        container.innerHTML = `
-                            <div class="empty-state">
-                                <i class="fas fa-graduation-cap"></i>
-                                <p>No exams available for your class</p>
-                                <p style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">
-                                    Check back later for new exams
-                                </p>
-                            </div>
-                        `;
-                        return;
-                    }
-                    
-                    const exams = examsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    
-                    // Check which exams the student has already taken
-                    const resultsSnapshot = await getDocs(query(
-                        collection(db, "results"),
-                        where("uid", "==", currentUser.uid)
-                    ));
-                    
-                    const takenExamIds = resultsSnapshot.docs.map(doc => doc.data().examId);
-                    
-                    container.innerHTML = exams.map(exam => {
-                        const isTaken = takenExamIds.includes(exam.id);
-                        const isAvailable = !isTaken;
-                        
-                        return `
-                            <div class="card" style="margin-bottom: 16px;">
-                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
-                                    <div>
-                                        <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 4px;">${exam.title}</h3>
-                                        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
-                                            <span class="badge">${exam.time} minutes</span>
-                                            <span class="badge">${exam.questions?.length || 0} questions</span>
-                                            ${exam.negMark ? `<span class="badge badge-warning">-${exam.negMark} per wrong</span>` : ''}
-                                            ${exam.pdf ? '<span class="badge badge-danger"><i class="fas fa-file-pdf"></i> PDF Included</span>' : ''}
-                                        </div>
-                                    </div>
-                                    ${isTaken ? 
-                                        '<span class="badge badge-success"><i class="fas fa-check"></i> Completed</span>' :
-                                        '<span class="badge badge-info">Available</span>'
-                                    }
-                                </div>
-                                
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px;">
-                                    ${isTaken ? 
-                                        `<button class="btn btn-secondary" onclick="app.viewExamResult('${exam.id}')">
-                                            <i class="fas fa-eye"></i> View Result
-                                        </button>` :
-                                        `<button class="btn btn-primary" onclick="app.startExam('${exam.id}')">
-                                            <i class="fas fa-play-circle"></i> Start Exam
-                                        </button>`
-                                    }
-                                    <button class="btn btn-secondary" onclick="app.viewExamDetails('${exam.id}')">
-                                        <i class="fas fa-info-circle"></i> Details
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-                } catch (error) {
-                    console.error('Error loading available exams:', error);
-                    Toast.show('Error loading available exams', 'error');
-                }
-            },
-
-            loadStudentDashboardData: async () => {
-                try {
-                    // Load student stats
-                    const resultsSnapshot = await getDocs(query(
-                        collection(db, "results"),
-                        where("uid", "==", currentUser.uid)
-                    ));
-                    
-                    const results = resultsSnapshot.docs.map(doc => doc.data());
-                    const examsTaken = results.length;
-                    
-                    let totalScore = 0;
-                    let totalQuestions = 0;
-                    let correctAnswers = 0;
-                    
-                    results.forEach(result => {
-                        totalScore += parseFloat(result.score) || 0;
-                        totalQuestions += result.total || 0;
-                        // Calculate correct answers from score (assuming 1 point per correct answer)
-                        correctAnswers += parseFloat(result.score) || 0;
-                    });
-                    
-                    const averageScore = examsTaken > 0 ? Math.round((totalScore / examsTaken) * 10) / 10 : 0;
-                    const accuracyRate = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
-                    
-                    document.getElementById('exams-taken').textContent = examsTaken;
-                    document.getElementById('average-score').textContent = `${averageScore}%`;
-                    document.getElementById('accuracy-rate').textContent = `${accuracyRate}%`;
-                    
-                    // Load leaderboard
-                    await app.loadLeaderboard();
-                    
-                    // Load announcements
-                    await app.loadStudentAnnouncements();
-                    
-                    // Load upcoming exams
-                    await app.loadUpcomingExams();
-                } catch (error) {
-                    console.error('Error loading student dashboard:', error);
-                    Toast.show('Error loading dashboard data', 'error');
-                }
-            },
-
-            loadLeaderboard: async () => {
-                try {
-                    const container = document.getElementById('leaderboard-container');
-                    
-                    // Check if leaderboard is enabled
-                    const configDoc = await getDoc(doc(db, "system", "config"));
-                    const config = configDoc.exists() ? configDoc.data() : { leaderboardVisible: true };
-                    
-                    if (!config.leaderboardVisible) {
-                        container.innerHTML = `
-                            <div class="empty-state">
-                                <i class="fas fa-eye-slash"></i>
-                                <p>Leaderboard is currently disabled</p>
-                                <p style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">
-                                    Contact your administrator for more information
-                                </p>
-                            </div>
-                        `;
-                        return;
-                    }
-                    
-                    // Get top 10 results from published exams
-                    const publishedExams = await getDocs(query(
-                        collection(db, "exams"),
-                        where("resultsReleased", "==", true)
-                    ));
-                    
-                    const publishedExamIds = publishedExams.docs.map(doc => doc.id);
-                    
-                    if (publishedExamIds.length === 0) {
-                        container.innerHTML = `
-                            <div class="empty-state">
-                                <i class="fas fa-trophy"></i>
-                                <p>No published results yet</p>
-                                <p style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">
-                                    Check back after exams are graded
-                                </p>
-                            </div>
-                        `;
-                        return;
-                    }
-                    
-                    const resultsSnapshot = await getDocs(query(
-                        collection(db, "results"),
-                        where("examId", "in", publishedExamIds),
-                        orderBy("score", "desc"),
-                        limit(10)
-                    ));
-                    
-                    if (resultsSnapshot.empty) {
-                        container.innerHTML = `
-                            <div class="empty-state">
-                                <i class="fas fa-trophy"></i>
-                                <p>No results available</p>
-                            </div>
-                        `;
-                        return;
-                    }
-                    
-                    const leaderboardData = [];
-                    for (const docSnap of resultsSnapshot.docs) {
-                        const result = docSnap.data();
-                        const examDoc = await getDoc(doc(db, "exams", result.examId));
-                        if (examDoc.exists()) {
-                            leaderboardData.push({
-                                ...result,
-                                examTitle: examDoc.data().title
-                            });
-                        }
-                    }
-                    
-                    // Sort by score descending
-                    leaderboardData.sort((a, b) => b.score - a.score);
-                    
-                    container.innerHTML = leaderboardData.slice(0, 10).map((item, index) => `
-                        <div class="leaderboard-item" style="margin-bottom: 8px; ${item.uid === currentUser.uid ? 'border: 2px solid var(--accent-blue);' : ''}">
-                            <div class="leaderboard-rank">${index + 1}</div>
-                            <div style="flex: 1;">
-                                <div style="font-weight: 500; margin-bottom: 4px; ${item.uid === currentUser.uid ? 'color: var(--accent-blue);' : ''}">
-                                    ${item.studentName} ${item.uid === currentUser.uid ? '(You)' : ''}
-                                </div>
-                                <div style="font-size: 12px; color: var(--text-secondary);">
-                                    ${item.examTitle} • Score: ${item.score}/${item.total}
-                                </div>
-                            </div>
-                            <div style="font-weight: 600; color: var(--accent-green);">
-                                ${Math.round((item.score / item.total) * 100)}%
-                            </div>
-                        </div>
-                    `).join('');
-                    
-                    // Update current rank if student is in top 10
-                    const studentRank = leaderboardData.findIndex(item => item.uid === currentUser.uid) + 1;
-                    if (studentRank > 0) {
-                        document.getElementById('current-rank').textContent = `#${studentRank}`;
-                    }
-                } catch (error) {
-                    console.error('Error loading leaderboard:', error);
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <p>Error loading leaderboard</p>
-                        </div>
-                    `;
-                }
-            },
-
-            // ===== EXAM FUNCTIONS =====
-            
-            addQuestion: (questionData = null) => {
-                const container = document.getElementById('question-container');
-                const index = container.children.length + 1;
-                
-                const questionCard = document.createElement('div');
-                questionCard.className = 'card q-card';
-                questionCard.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <h3 style="font-size: 16px; font-weight: 600;">Question ${index}</h3>
-                        <button class="btn btn-danger btn-sm" onclick="this.parentElement.parentElement.remove(); app.updateQuestionNumbers();">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label class="input-label">Question Text</label>
-                        <textarea class="input-field q-text" placeholder="Enter question text..." rows="3">${questionData?.text || ''}</textarea>
-                    </div>
-                    
-                    <div class="option-grid">
-                        <div class="input-group">
-                            <label class="input-label">Option A</label>
-                            <input type="text" class="input-field option-a" placeholder="Option A" value="${questionData?.options?.[0] || ''}">
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label">Option B</label>
-                            <input type="text" class="input-field option-b" placeholder="Option B" value="${questionData?.options?.[1] || ''}">
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label">Option C</label>
-                            <input type="text" class="input-field option-c" placeholder="Option C" value="${questionData?.options?.[2] || ''}">
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label">Option D</label>
-                            <input type="text" class="input-field option-d" placeholder="Option D" value="${questionData?.options?.[3] || ''}">
-                        </div>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label class="input-label">Correct Answer</label>
-                        <select class="input-field correct-answer">
-                            <option value="0" ${questionData?.correct === 0 ? 'selected' : ''}>Option A</option>
-                            <option value="1" ${questionData?.correct === 1 ? 'selected' : ''}>Option B</option>
-                            <option value="2" ${questionData?.correct === 2 ? 'selected' : ''}>Option C</option>
-                            <option value="3" ${questionData?.correct === 3 ? 'selected' : ''}>Option D</option>
-                        </select>
-                    </div>
-                `;
-                
-                container.appendChild(questionCard);
-            },
-
-            updateQuestionNumbers: () => {
-                const container = document.getElementById('question-container');
-                const questions = container.querySelectorAll('.q-card');
-                questions.forEach((card, index) => {
-                    card.querySelector('h3').textContent = `Question ${index + 1}`;
-                });
-            },
-
-            switchExamTab: (tab) => {
-                document.querySelectorAll('#exam-tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
-                event.target.classList.add('active');
-                
-                document.getElementById('exam-create-tab').classList.toggle('hidden', tab !== 'create');
-                document.getElementById('exam-list-tab').classList.toggle('hidden', tab !== 'list');
-                
-                if (tab === 'list') {
-                    app.loadExamsList();
-                }
-            },
-
-            switchBuilderMode: (mode) => {
-                document.querySelectorAll('#exam-create-tab .tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
-                event.target.classList.add('active');
-                
-                document.getElementById('builder-manual').classList.toggle('hidden', mode !== 'manual');
-                document.getElementById('builder-json').classList.toggle('hidden', mode !== 'json');
-            },
-
-            importJSONQuestions: () => {
-                try {
-                    const jsonInput = document.getElementById('json-input').value;
-                    const questions = JSON.parse(jsonInput);
-                    
-                    if (!Array.isArray(questions)) {
-                        throw new Error('JSON must be an array of questions');
-                    }
-                    
-                    const container = document.getElementById('question-container');
-                    container.innerHTML = '';
-                    
-                    questions.forEach((q, index) => {
-                        app.addQuestion(q);
-                    });
-                    
-                    Toast.show(`Imported ${questions.length} questions successfully`, 'success');
-                    app.switchBuilderMode('manual');
-                } catch (error) {
-                    Toast.show('Invalid JSON format: ' + error.message, 'error');
-                }
-            },
-
-            handlePDFUpload: (input) => {
-                const file = input.files[0];
-                if (!file) return;
-                
-                if (file.type !== 'application/pdf') {
-                    Toast.show('Please upload a PDF file', 'error');
-                    return;
-                }
-                
-                if (file.size > 10 * 1024 * 1024) { // 10MB limit
-                    Toast.show('File size must be less than 10MB', 'error');
-                    return;
-                }
-                
-                const area = document.getElementById('pdf-upload-area');
-                area.classList.add('active');
-                area.innerHTML = `
-                    <i class="fas fa-file-pdf" style="font-size: 32px; margin-bottom: 12px; color: var(--accent-red);"></i>
-                    <p style="color: var(--text-secondary); margin-bottom: 8px;">${file.name}</p>
-                    <small style="color: var(--text-tertiary);">${(file.size / 1024 / 1024).toFixed(2)} MB</small>
-                `;
-                
-                // In a real app, you would upload to Cloudinary here
-                // For now, we'll just store the file reference
-                Toast.show('PDF file selected. Will be uploaded when exam is saved.', 'info');
-            },
-
-            saveExam: async () => {
-                const title = document.getElementById('exam-title').value.trim();
-                const targetClass = document.getElementById('exam-class').value;
-                const time = document.getElementById('exam-time').value;
-                const negMark = document.getElementById('exam-neg').value || 0;
-                const pin = document.getElementById('exam-pin').value.trim();
-                
-                if (!title || !targetClass || !time) {
-                    Toast.show('Please fill in all required fields', 'error');
-                    return;
-                }
-                
-                const questions = [];
-                const questionCards = document.querySelectorAll('.q-card');
-                
-                if (questionCards.length === 0) {
-                    Toast.show('Please add at least one question', 'error');
-                    return;
-                }
-                
-                let hasError = false;
-                questionCards.forEach((card, index) => {
-                    const text = card.querySelector('.q-text').value.trim();
-                    const options = [
-                        card.querySelector('.option-a').value.trim(),
-                        card.querySelector('.option-b').value.trim(),
-                        card.querySelector('.option-c').value.trim(),
-                        card.querySelector('.option-d').value.trim()
-                    ];
-                    const correct = parseInt(card.querySelector('.correct-answer').value);
-                    
-                    if (!text || options.some(opt => !opt)) {
-                        Toast.show(`Question ${index + 1} has empty fields`, 'error');
-                        hasError = true;
-                        return;
-                    }
-                    
-                    questions.push({ text, options, correct });
-                });
-                
-                if (hasError) return;
-                
-                const saveBtn = document.getElementById('save-exam-btn');
-                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-                saveBtn.disabled = true;
-                
-                try {
-                    const examData = {
-                        title,
-                        targetClass,
-                        time: parseInt(time),
-                        negMark: parseFloat(negMark),
-                        pin: pin || null,
-                        pdf: document.getElementById('exam-pdf-url').value || null,
-                        questions,
-                        createdAt: Timestamp.now(),
-                        updatedAt: Timestamp.now(),
-                        resultsReleased: false
-                    };
-                    
-                    // Check if we're editing an existing exam
-                    const editExamId = document.getElementById('edit-exam-id')?.value;
-                    
-                    if (editExamId) {
-                        await updateDoc(doc(db, "exams", editExamId), examData);
-                        Toast.show('Exam updated successfully', 'success');
-                    } else {
-                        await addDoc(collection(db, "exams"), examData);
-                        Toast.show('Exam created successfully', 'success');
-                    }
-                    
-                    // Reset form and switch to list view
-                    app.clearExamForm();
-                    app.switchExamTab('list');
-                    await app.loadExamsList();
-                    await app.loadExamsCache();
-                    
-                } catch (error) {
-                    console.error('Error saving exam:', error);
-                    Toast.show('Error saving exam: ' + error.message, 'error');
-                } finally {
-                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Exam';
-                    saveBtn.disabled = false;
-                }
-            },
-
-            editExam: async (examId) => {
-                try {
-                    const examDoc = await getDoc(doc(db, "exams", examId));
-                    if (!examDoc.exists()) {
-                        Toast.show('Exam not found', 'error');
-                        return;
-                    }
-                    
-                    const exam = examDoc.data();
-                    
-                    // Fill form with exam data
-                    document.getElementById('exam-title').value = exam.title;
-                    document.getElementById('exam-class').value = exam.targetClass;
-                    document.getElementById('exam-time').value = exam.time;
-                    document.getElementById('exam-neg').value = exam.negMark || 0;
-                    document.getElementById('exam-pin').value = exam.pin || '';
-                    
-                    if (exam.pdf) {
-                        document.getElementById('exam-pdf-url').value = exam.pdf;
-                        const area = document.getElementById('pdf-upload-area');
-                        area.classList.add('active');
-                        area.innerHTML = `
-                            <i class="fas fa-file-pdf" style="font-size: 32px; margin-bottom: 12px; color: var(--accent-red);"></i>
-                            <p style="color: var(--text-secondary); margin-bottom: 8px;">Attached PDF</p>
-                            <small style="color: var(--text-tertiary);">Click to change</small>
-                        `;
-                    }
-                    
-                    // Clear existing questions and add exam questions
-                    document.getElementById('question-container').innerHTML = '';
-                    exam.questions?.forEach(q => app.addQuestion(q));
-                    
-                    // Set edit mode
-                    document.getElementById('edit-mode-badge').style.display = 'inline-flex';
-                    document.getElementById('cancel-edit-btn').style.display = 'inline-flex';
-                    document.getElementById('save-exam-btn').innerHTML = '<i class="fas fa-save"></i> Update Exam';
-                    
-                    // Store exam ID in hidden field
-                    let editIdField = document.getElementById('edit-exam-id');
-                    if (!editIdField) {
-                        editIdField = document.createElement('input');
-                        editIdField.type = 'hidden';
-                        editIdField.id = 'edit-exam-id';
-                        document.getElementById('exam-create-tab').appendChild(editIdField);
-                    }
-                    editIdField.value = examId;
-                    
-                    // Switch to create tab
-                    app.switchExamTab('create');
-                    
-                    // Scroll to top
-                    window.scrollTo(0, 0);
-                    
-                    Toast.show('Editing exam: ' + exam.title, 'info');
-                } catch (error) {
-                    console.error('Error loading exam for edit:', error);
-                    Toast.show('Error loading exam', 'error');
-                }
-            },
-
-            clearExamForm: () => {
-                document.getElementById('exam-title').value = '';
-                document.getElementById('exam-class').value = '';
-                document.getElementById('exam-time').value = '';
-                document.getElementById('exam-neg').value = '0';
-                document.getElementById('exam-pin').value = '';
-                document.getElementById('exam-pdf-url').value = '';
-                document.getElementById('json-input').value = '';
-                
-                const area = document.getElementById('pdf-upload-area');
-                area.classList.remove('active');
-                area.innerHTML = `
-                    <i class="fas fa-file-pdf" style="font-size: 32px; margin-bottom: 12px; color: var(--accent-red);"></i>
-                    <p style="color: var(--text-secondary); margin-bottom: 8px;">Click to upload PDF question paper</p>
-                    <small style="color: var(--text-tertiary);">Max file size: 10MB</small>
-                `;
-                
-                document.getElementById('question-container').innerHTML = '';
-                
-                // Reset edit mode
-                document.getElementById('edit-mode-badge').style.display = 'none';
-                document.getElementById('cancel-edit-btn').style.display = 'none';
-                document.getElementById('save-exam-btn').innerHTML = '<i class="fas fa-save"></i> Save Exam';
-                
-                const editIdField = document.getElementById('edit-exam-id');
-                if (editIdField) editIdField.value = '';
-                
-                Toast.show('Form cleared', 'info');
-            },
-
-            cancelEdit: () => {
-                app.clearExamForm();
-                Toast.show('Edit cancelled', 'info');
-            },
-
-            deleteExam: async (examId) => {
-                if (!confirm('Are you sure you want to delete this exam? This action cannot be undone.')) {
-                    return;
-                }
-                
-                try {
-                    // Also delete associated results
-                    const resultsQuery = query(collection(db, "results"), where("examId", "==", examId));
-                    const resultsSnapshot = await getDocs(resultsQuery);
-                    
-                    const deletePromises = resultsSnapshot.docs.map(doc => deleteDoc(doc.ref));
-                    deletePromises.push(deleteDoc(doc(db, "exams", examId)));
-                    
-                    await Promise.all(deletePromises);
-                    
-                    Toast.show('Exam deleted successfully', 'success');
-                    await app.loadExamsList();
-                    await app.loadExamsCache();
-                } catch (error) {
-                    console.error('Error deleting exam:', error);
-                    Toast.show('Error deleting exam', 'error');
-                }
-            },
-
-            // ===== STUDENT EXAM FUNCTIONS =====
-            
-            startExam: async (examId) => {
-                try {
-                    const examDoc = await getDoc(doc(db, "exams", examId));
-                    if (!examDoc.exists()) {
-                        Toast.show('Exam not found', 'error');
-                        return;
-                    }
-                    
-                    const exam = { id: examId, ...examDoc.data() };
-                    
-                    // Check if PIN is required
-                    if (exam.pin) {
-                        const enteredPin = prompt('Enter exam PIN:');
-                        if (enteredPin !== exam.pin) {
-                            Toast.show('Incorrect PIN', 'error');
-                            return;
-                        }
-                    }
-                    
-                    // Hide main app and show exam view
-                    document.getElementById('app-main').classList.add('hidden');
-                    
-                    // Create exam view
-                    const examView = document.getElementById('exam-view');
-                    examView.classList.remove('hidden');
-                    examView.innerHTML = `
-                        <div class="window-controls">
-                            <div class="app-logo">
-                                <div class="logo-icon">
-                                    <i class="fas fa-graduation-cap"></i>
-                                </div>
-                                <span>Exam: ${exam.title}</span>
-                            </div>
-                            <div class="exam-timer" id="exam-timer">${exam.time}:00</div>
-                        </div>
-                        
-                        <div class="main-content">
-                            ${exam.pdf ? `
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h2 class="card-title">Question Paper</h2>
-                                    </div>
-                                    <div class="pdf-viewer">
-                                        <iframe src="${exam.pdf}" id="pdf-frame"></iframe>
-                                    </div>
-                                </div>
-                            ` : ''}
-                            
-                            <div class="card">
-                                <div class="card-header">
-                                    <h2 class="card-title">Questions</h2>
-                                    <div style="color: var(--text-secondary); font-size: 14px;">
-                                        <i class="fas fa-clock"></i> Time Remaining: <span id="time-remaining">${exam.time}:00</span>
-                                    </div>
-                                </div>
-                                
-                                <div id="exam-questions-container"></div>
-                                
-                                <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-                                    <button class="btn btn-primary btn-full" onclick="app.submitExam()">
-                                        <i class="fas fa-paper-plane"></i> Submit Exam
-                                    </button>
-                                    <p style="text-align: center; color: var(--text-secondary); font-size: 12px; margin-top: 12px;">
-                                        You can submit early. Remaining time will be forfeited.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    
-                    // Render questions
-                    const container = document.getElementById('exam-questions-container');
-                    exam.questions.forEach((q, index) => {
-                        const questionCard = document.createElement('div');
-                        questionCard.className = 'card';
-                        questionCard.style.marginBottom = '20px';
-                        questionCard.innerHTML = `
-                            <h3 style="margin-bottom: 16px; font-size: 16px; font-weight: 600;">Question ${index + 1}</h3>
-                            <p style="margin-bottom: 20px; line-height: 1.6;">${q.text}</p>
-                            
-                            <div class="option-grid">
-                                ${q.options.map((option, optIndex) => `
-                                    <label style="cursor: pointer;">
-                                        <input type="radio" name="q${index}" value="${optIndex}" style="margin-right: 8px;">
-                                        <span style="font-weight: 500; margin-right: 4px;">${String.fromCharCode(65 + optIndex)}.</span>
-                                        ${option}
-                                    </label>
-                                `).join('')}
-                            </div>
-                        `;
-                        container.appendChild(questionCard);
-                    });
-                    
-                    // Start timer
-                    let timeLeft = exam.time * 60; // Convert to seconds
-                    examTimer = setInterval(() => {
-                        timeLeft--;
-                        
-                        const minutes = Math.floor(timeLeft / 60);
-                        const seconds = timeLeft % 60;
-                        
-                        document.getElementById('exam-timer').textContent = 
-                            `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-                        document.getElementById('time-remaining').textContent = 
-                            `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-                        
-                        if (timeLeft <= 0) {
-                            clearInterval(examTimer);
-                            app.submitExam();
-                        }
-                        
-                        // Warning at 5 minutes
-                        if (timeLeft === 300) {
-                            Toast.show('5 minutes remaining!', 'warning');
-                        }
-                        
-                        // Warning at 1 minute
-                        if (timeLeft === 60) {
-                            Toast.show('1 minute remaining!', 'warning');
-                        }
-                    }, 1000);
-                    
-                    // Store active exam
-                    activeExam = exam;
-                    
-                    // Add visibility change handler for tab switching detection
-                    document.addEventListener('visibilitychange', app.handleTabSwitch);
-                    
-                    // Show warning about tab switching
-                    Toast.show('Exam started! Do not switch tabs during the exam.', 'warning');
-                    
-                } catch (error) {
-                    console.error('Error starting exam:', error);
-                    Toast.show('Error starting exam', 'error');
-                }
-            },
-
-            handleTabSwitch: () => {
-                if (document.hidden && activeExam) {
-                    warningCount++;
-                    Toast.show(`Warning ${warningCount}/3: Please stay on the exam tab`, 'error');
-                    
-                    if (warningCount >= 3) {
-                        clearInterval(examTimer);
-                        Toast.show('Exam terminated due to multiple tab switches', 'error');
-                        app.submitExam();
-                    }
-                }
-            },
-
-            submitExam: async () => {
-                if (!activeExam) return;
-                
-                clearInterval(examTimer);
-                document.removeEventListener('visibilitychange', app.handleTabSwitch);
-                
-                // Calculate score
-                let score = 0;
-                const negMark = activeExam.negMark || 0;
-                const userAnswers = [];
-                
-                activeExam.questions.forEach((q, index) => {
-                    const selectedOption = document.querySelector(`input[name="q${index}"]:checked`);
-                    const selectedIndex = selectedOption ? parseInt(selectedOption.value) : -1;
-                    
-                    userAnswers.push({
-                        question: q.text,
-                        options: q.options,
-                        correct: q.correct,
-                        selected: selectedIndex
-                    });
-                    
-                    if (selectedIndex === q.correct) {
-                        score += 1;
-                    } else if (selectedIndex !== -1) {
-                        score -= negMark;
-                    }
-                });
-                
-                // Ensure score is not negative
-                score = Math.max(0, score);
-                
-                // Submit to Firebase
-                try {
-                    await addDoc(collection(db, "results"), {
-                        uid: currentUser.uid,
-                        studentName: currentUser.displayName,
-                        studentEmail: currentUser.email,
-                        examId: activeExam.id,
-                        examTitle: activeExam.title,
-                        score: score.toFixed(2),
-                        total: activeExam.questions.length,
-                        date: Timestamp.now(),
-                        isReleased: false,
-                        details: userAnswers
-                    });
-                    
-                    // Show results
-                    alert(`Exam submitted!\n\nYour score: ${score.toFixed(2)}/${activeExam.questions.length}\n\nYou will be notified when results are published.`);
-                    
-                    // Return to main app
-                    document.getElementById('exam-view').classList.add('hidden');
-                    document.getElementById('app-main').classList.remove('hidden');
-                    
-                    // Reset variables
-                    activeExam = null;
-                    warningCount = 0;
-                    
-                    // Reload student dashboard
-                    if (currentRole === 'student') {
-                        await app.navigateTo('home');
-                    }
-                    
-                } catch (error) {
-                    console.error('Error submitting exam:', error);
-                    Toast.show('Error submitting exam', 'error');
-                }
-            },
-
-            // ===== UTILITY FUNCTIONS =====
-            
-            toggleDarkMode: () => {
-                const currentTheme = document.documentElement.getAttribute('data-theme');
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                
-                document.documentElement.setAttribute('data-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
-                
-                Toast.show(`Switched to ${newTheme} mode`, 'info');
-                
-                // Update toggle switch
-                const toggle = document.getElementById('dark-mode-toggle');
-                if (toggle) {
-                    toggle.checked = newTheme === 'dark';
-                }
-            },
-
-            filterExams: (searchTerm) => {
-                const container = document.getElementById('exams-list-container');
-                const cards = container.querySelectorAll('.card');
-                
-                cards.forEach(card => {
-                    const text = card.textContent.toLowerCase();
-                    card.style.display = text.includes(searchTerm.toLowerCase()) ? 'block' : 'none';
-                });
-            },
-
-            filterAvailableExams: (searchTerm) => {
-                const container = document.getElementById('available-exams-container');
-                const cards = container.querySelectorAll('.card');
-                
-                cards.forEach(card => {
-                    const text = card.textContent.toLowerCase();
-                    card.style.display = text.includes(searchTerm.toLowerCase()) ? 'block' : 'none';
-                });
-            },
-
-            viewExamDetails: async (examId) => {
-                try {
-                    const examDoc = await getDoc(doc(db, "exams", examId));
-                    if (!examDoc.exists()) {
-                        Toast.show('Exam not found', 'error');
-                        return;
-                    }
-                    
-                    const exam = examDoc.data();
-                    
-                    // Create modal with exam details
-                    const modal = document.createElement('div');
-                    modal.className = 'modal';
-                    modal.innerHTML = `
-                        <div class="modal-content">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                                <h2 style="color: var(--text-primary);">${exam.title}</h2>
-                                <button class="btn btn-secondary btn-sm" onclick="this.parentElement.parentElement.parentElement.remove()">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            
-                            <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
-                                <span class="badge">Class ${exam.targetClass}</span>
-                                <span class="badge">${exam.time} minutes</span>
-                                <span class="badge">${exam.questions?.length || 0} questions</span>
-                                ${exam.negMark ? `<span class="badge badge-warning">-${exam.negMark} per wrong answer</span>` : ''}
-                                ${exam.pin ? '<span class="badge badge-info">PIN Protected</span>' : ''}
-                            </div>
-                            
-                            ${exam.pdf ? `
-                                <div style="margin-bottom: 20px;">
-                                    <p style="color: var(--text-secondary); margin-bottom: 8px;">Question Paper:</p>
-                                    <a href="${exam.pdf}" target="_blank" class="btn btn-secondary btn-sm">
-                                        <i class="fas fa-file-pdf"></i> View PDF
-                                    </a>
-                                </div>
-                            ` : ''}
-                            
-                            <div>
-                                <p style="color: var(--text-secondary); margin-bottom: 8px;">Instructions:</p>
-                                <ul style="color: var(--text-secondary); padding-left: 20px;">
-                                    <li>Complete all questions within the time limit</li>
-                                    <li>Each correct answer scores 1 point</li>
-                                    ${exam.negMark ? `<li>Each wrong answer deducts ${exam.negMark} points</li>` : ''}
-                                    <li>Do not refresh or close the browser during the exam</li>
-                                    <li>Results will be published after grading</li>
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                    
-                    document.body.appendChild(modal);
-                    
-                } catch (error) {
-                    console.error('Error viewing exam details:', error);
-                    Toast.show('Error loading exam details', 'error');
-                }
-            },
-
-            // ===== INITIALIZATION =====
-            
-            initializeSettings: async () => {
-                // Load saved theme
-                const savedTheme = localStorage.getItem('theme') || 'light';
-                document.documentElement.setAttribute('data-theme', savedTheme);
-                
-                // Set dark mode toggle
-                const darkModeToggle = document.getElementById('dark-mode-toggle');
-                if (darkModeToggle) {
-                    darkModeToggle.checked = savedTheme === 'dark';
-                }
-                
-                // Load leaderboard setting
-                try {
-                    const configDoc = await getDoc(doc(db, "system", "config"));
-                    if (configDoc.exists()) {
-                        const config = configDoc.data();
-                        const leaderboardToggle = document.getElementById('leaderboard-toggle');
-                        if (leaderboardToggle) {
-                            leaderboardToggle.checked = config.leaderboardVisible !== false;
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error loading settings:', error);
-                }
-            },
-
             toggleLeaderboard: async () => {
-                try {
-                    const toggle = document.getElementById('leaderboard-toggle');
-                    const isVisible = toggle.checked;
-                    
-                    await setDoc(doc(db, "system", "config"), {
-                        leaderboardVisible: isVisible
-                    }, { merge: true });
-                    
-                    Toast.show(`Leaderboard ${isVisible ? 'enabled' : 'disabled'}`, 'success');
-                } catch (error) {
-                    console.error('Error toggling leaderboard:', error);
-                    Toast.show('Error updating setting', 'error');
+                const status = document.getElementById('admin-lb-toggle').checked;
+                await setDoc(doc(db, "system", "config"), { leaderboardVisible: status }, {merge: true});
+            },
+            postAnnounce: async () => {
+                const t = document.getElementById('ann-input').value;
+                if(t) { await addDoc(collection(db,"announcements"),{text:t, date:new Date()}); document.getElementById('ann-input').value=""; app.toast("Posted"); }
+            },
+
+            // EXAMS
+            addQ: (d=null) => {
+                const div = document.createElement('div'); div.className='card q-card'; div.style.padding='15px';
+                div.innerHTML = `
+                    <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><small>MCQ</small><i class="fas fa-times" onclick="this.parentElement.parentElement.remove()" style="color:var(--danger)"></i></div>
+                    <textarea class="q-t" placeholder="Question">${d?d.text:''}</textarea>
+                    <div class="grid-2"><input class="o0" placeholder="A" value="${d?d.options[0]:''}"><input class="o1" placeholder="B" value="${d?d.options[1]:''}"><input class="o2" placeholder="C" value="${d?d.options[2]:''}"><input class="o3" placeholder="D" value="${d?d.options[3]:''}"></div>
+                    <select class="q-c"><option value="0">Ans A</option><option value="1">Ans B</option><option value="2">Ans C</option><option value="3">Ans D</option></select>
+                `;
+                if(d) div.querySelector('.q-c').value = d.correct;
+                document.getElementById('q-box').appendChild(div);
+            },
+            saveExam: async () => {
+                const btn=document.getElementById('btn-save'); btn.disabled=true; btn.innerText="Saving...";
+                const id = document.getElementById('ex-id').value;
+                const pdf = document.getElementById('ex-pdf').files[0];
+                let pdfUrl = document.getElementById('ex-pdf-url').value;
+                
+                if(pdf) {
+                    const fd = new FormData(); fd.append('file', pdf); fd.append('upload_preset', CLOUD_PRESET);
+                    try { pdfUrl = (await (await fetch(CLOUD_URL,{method:'POST',body:fd})).json()).secure_url; } catch(e){}
                 }
+
+                let qs = [];
+                document.querySelectorAll('.q-card').forEach(c => {
+                    qs.push({
+                        text:c.querySelector('.q-t').value,
+                        options:[c.querySelector('.o0').value,c.querySelector('.o1').value,c.querySelector('.o2').value,c.querySelector('.o3').value],
+                        correct:parseInt(c.querySelector('.q-c').value)
+                    });
+                });
+
+                const data = {
+                    title: document.getElementById('ex-title').value,
+                    targetClass: document.getElementById('ex-class').value,
+                    time: parseInt(document.getElementById('ex-time').value),
+                    negMark: parseFloat(document.getElementById('ex-neg').value)||0,
+                    pin: document.getElementById('ex-pin').value,
+                    pdf: pdfUrl, questions: qs, updatedAt: new Date(), resultsReleased: false
+                };
+
+                if(!data.title || !data.targetClass) { app.toast("Missing Info",'error'); btn.disabled=false; return; }
+
+                if(id) { delete data.resultsReleased; await updateDoc(doc(db,"exams",id), data); }
+                else { data.createdAt=new Date(); await addDoc(collection(db,"exams"), data); }
+                
+                app.resetForm(); app.loadExams(); app.toast("Published"); btn.disabled=false; btn.innerText="DEPLOY";
+            },
+            resetForm: () => {
+                document.getElementById('ex-id').value=""; document.getElementById('q-box').innerHTML="";
+                document.getElementById('ex-title').value="";
+            },
+            loadExams: async () => {
+                const c = document.getElementById('admin-exam-list'); c.innerHTML="Loading...";
+                const s = await getDocs(collection(db,"exams"));
+                c.innerHTML="";
+                s.forEach(d=>{
+                    const e=d.data();
+                    c.innerHTML+=`<div class="card"><div style="display:flex;justify-content:space-between;"><div><b>${e.title}</b> <span class="badge" style="color:var(--neon-blue)">${e.targetClass}</span></div><div><i class="fas fa-edit" onclick="app.edtEx('${d.id}')"></i> <i class="fas fa-trash" style="color:var(--danger);margin-left:10px;" onclick="app.delEx('${d.id}')"></i></div></div></div>`;
+                });
+                window.examsCache = s.docs.map(x=>({id:x.id,...x.data()}));
+            },
+            edtEx: (id) => {
+                const e = window.examsCache.find(x=>x.id===id);
+                document.getElementById('ex-id').value=id; document.getElementById('ex-title').value=e.title;
+                document.getElementById('ex-class').value=e.targetClass; document.getElementById('ex-time').value=e.time;
+                document.getElementById('ex-neg').value=e.negMark; document.getElementById('ex-pin').value=e.pin;
+                document.getElementById('ex-pdf-url').value=e.pdf||""; document.getElementById('q-box').innerHTML="";
+                e.questions.forEach(q=>app.addQ(q)); window.scrollTo(0,0);
+            },
+            delEx: async(id)=>{ if(confirm("Delete?")){await deleteDoc(doc(db,"exams",id)); app.loadExams();} },
+
+            // RESULTS
+            loadResGroup: async () => {
+                const c = document.getElementById('results-list'); c.innerHTML="Loading...";
+                const s = await getDocs(collection(db,"exams"));
+                c.innerHTML="";
+                s.forEach(d=>{
+                    const e=d.data();
+                    const st = e.resultsReleased ? '<span style="color:lime">LIVE</span>' : '<span style="color:#777">HIDDEN</span>';
+                    c.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center;"><div><b>${e.title}</b><br>${st}</div><button class="btn-secondary btn-sm" onclick="app.viewRes('${d.id}','${e.title}',${e.resultsReleased})">Open</button></div>`;
+                });
+            },
+            viewRes: async (eid, t, rel) => {
+                curExamId = eid;
+                document.getElementById('res-list-view').classList.add('hidden');
+                document.getElementById('res-detail-view').classList.remove('hidden');
+                document.getElementById('res-title').innerText = t;
+                const c = document.getElementById('res-rows'); c.innerHTML="<tr><td>Loading...</td></tr>";
+                const s = await getDocs(query(collection(db,"results"), where("examId","==",eid)));
+                c.innerHTML="";
+                s.forEach(d=>{
+                    const r=d.data();
+                    const vis = (rel || r.isReleased);
+                    const eye = vis ? 'fa-eye' : 'fa-eye-slash';
+                    const col = vis ? 'var(--success)' : 'var(--warning)';
+                    c.innerHTML += `<tr><td style="padding:10px;">${r.studentName}</td><td>${r.score}</td><td><i class="fas ${eye}" style="color:${col}; cursor:pointer;" onclick="app.togRes('${d.id}',${!vis})"></i> <i class="fas fa-trash" style="color:var(--danger); margin-left:10px; cursor:pointer;" onclick="app.delRes('${d.id}')"></i></td></tr>`;
+                });
+            },
+            closeResDetail: () => { document.getElementById('res-detail-view').classList.add('hidden'); document.getElementById('res-list-view').classList.remove('hidden'); app.loadResGroup(); },
+            pubAll: async (s) => {
+                if(confirm(s?"Publish All?":"Hide All?")) {
+                    await updateDoc(doc(db,"exams",curExamId),{resultsReleased:s});
+                    app.viewRes(curExamId, document.getElementById('res-title').innerText, s);
+                }
+            },
+            togRes: async (id, s) => {
+                await updateDoc(doc(db,"results",id),{isReleased:s});
+                // Reload
+                const e = await getDoc(doc(db,"exams",curExamId));
+                app.viewRes(curExamId, e.data().title, e.data().resultsReleased);
+            },
+            delRes: async (id) => {
+                if(confirm("Delete result?")) {
+                    await deleteDoc(doc(db,"results",id));
+                    const e = await getDoc(doc(db,"exams",curExamId));
+                    app.viewRes(curExamId, e.data().title, e.data().resultsReleased);
+                }
+            },
+
+            // ADMIN STUDENTS
+            loadAllStu: async () => {
+                const c = document.getElementById('stu-rows'); c.innerHTML="Loading...";
+                const s = await getDocs(query(collection(db,"users"), where("role","==","student")));
+                c.innerHTML="";
+                s.forEach(d=>{
+                    const u=d.data();
+                    const btn = u.isApproved ? `<i class="fas fa-ban" style="color:var(--danger); cursor:pointer;" onclick="app.apprStu('${d.id}',false)"></i>` : `<i class="fas fa-check" style="color:var(--success); cursor:pointer;" onclick="app.apprStu('${d.id}',true)"></i>`;
+                    c.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #333;"><div><b>${u.displayName}</b><br><small>${u.email}</small></div><div>${btn} <i class="fas fa-cog" style="margin-left:15px; color:var(--primary); cursor:pointer;" onclick="app.edtStu('${d.id}')"></i></div></div>`;
+                });
+            },
+            apprStu: async(id,s)=>{ await updateDoc(doc(db,"users",id),{isApproved:s}); app.loadAllStu(); },
+            edtStu: async(id)=>{
+                const u = (await getDoc(doc(db,"users",id))).data();
+                document.getElementById('edt-uid').value=id; document.getElementById('edt-name').value=u.displayName;
+                document.getElementById('edt-phone').value=u.phone; document.getElementById('edt-class').value=u.class;
+                document.getElementById('edt-div').value=u.division; document.getElementById('modal-edit-student').classList.remove('hidden');
+            },
+            saveStudentEdit: async()=>{
+                const id = document.getElementById('edt-uid').value;
+                const m = document.getElementById('edt-msg').value;
+                await updateDoc(doc(db,"users",id), {
+                    displayName:document.getElementById('edt-name').value, phone:document.getElementById('edt-phone').value,
+                    class:document.getElementById('edt-class').value, division:document.getElementById('edt-div').value
+                });
+                if(m) await addDoc(collection(db,`users/${id}/messages`),{text:m, date:new Date()});
+                document.getElementById('modal-edit-student').classList.add('hidden'); app.loadAllStu(); app.toast("Saved");
+            },
+            filter: (id, v) => {
+                document.getElementById(id).childNodes.forEach(e => e.style.display = e.innerText.toLowerCase().includes(v.toLowerCase())?'flex':'none');
+            },
+
+            // STUDENT FEATURES
+            loadAnn: async () => {
+                const c = document.getElementById('ann-box'); c.innerHTML="";
+                const s = await getDocs(query(collection(db,"announcements"), orderBy("date","desc"), limit(5)));
+                if(s.empty) c.innerHTML="<small>No news.</small>";
+                s.forEach(d=>c.innerHTML+=`<div style="margin-bottom:10px; padding:10px; background:rgba(255,255,255,0.05); border-radius:10px;"><small style="color:var(--primary)">${new Date(d.data().date.seconds*1000).toLocaleDateString()}</small><br>${d.data().text}</div>`);
+            },
+            loadMsg: async () => {
+                const c = document.getElementById('msg-box'); c.innerHTML="";
+                const s = await getDocs(query(collection(db,`users/${user.uid}/messages`), orderBy("date","desc"), limit(5)));
+                if(s.empty) c.innerHTML="<small>No messages.</small>";
+                s.forEach(d=>c.innerHTML+=`<div style="margin-bottom:5px; color:var(--warning);"><i class="fas fa-envelope"></i> ${d.data().text}</div>`);
+            },
+            loadLeaderboard: async () => {
+                const c = document.getElementById('leaderboard-list'); c.innerHTML="Loading...";
+                const configSnap = await getDoc(doc(db, "system", "config"));
+                if(configSnap.exists() && configSnap.data().leaderboardVisible === false) {
+                    document.getElementById('leaderboard-card').classList.add('hidden');
+                    document.getElementById('leaderboard-disabled').classList.remove('hidden');
+                    return;
+                }
+                document.getElementById('leaderboard-card').classList.remove('hidden');
+                document.getElementById('leaderboard-disabled').classList.add('hidden');
+
+                const exSnap = await getDocs(query(collection(db,"exams"), where("resultsReleased","==",true)));
+                if(exSnap.empty) { c.innerHTML="<small>No data.</small>"; return; }
+                const q = query(collection(db,"results"), orderBy("score", "desc"), limit(5));
+                const rSnap = await getDocs(q);
+                c.innerHTML="";
+                let rank=1;
+                rSnap.forEach(d => {
+                    const r = d.data();
+                    if(exSnap.docs.find(e=>e.id===r.examId)) {
+                        c.innerHTML += `<div style="padding:10px; margin-bottom:5px; border-bottom:1px solid #333; display:flex; align-items:center;"><b style="color:var(--warning); margin-right:10px; font-size:18px;">#${rank++}</b> <div><b>${r.studentName}</b><br><small style="color:#888">${r.examTitle}: ${r.score}</small></div></div>`;
+                    }
+                });
+            },
+            loadStuExams: async () => {
+                const c = document.getElementById('stu-exam-list'); c.innerHTML="Loading...";
+                const s = await getDocs(query(collection(db,"exams"), where("targetClass","==",user.class)));
+                c.innerHTML="";
+                if(s.empty) c.innerHTML="<p>No exams.</p>";
+                s.forEach(d=>{
+                    const e=d.data();
+                    c.innerHTML += `<div class="card exam-card"><h3>${e.title}</h3><p>${e.time} mins • ${e.questions.length} Qs</p><button class="btn-primary" onclick="app.take('${d.id}')">START MISSION</button></div>`;
+                });
+            },
+            resFilter: (mode, btn) => {
+                document.querySelectorAll('#stu-tab-results .tab-btn').forEach(b => b.classList.remove('active'));
+                if(btn) btn.classList.add('active');
+                document.getElementById('stu-res-list').childNodes.forEach(e => {
+                    e.style.display = e.dataset.type === mode ? 'block' : 'none';
+                });
+            },
+            loadStuRes: async () => {
+                const c = document.getElementById('stu-res-list'); c.innerHTML="Loading...";
+                const s = await getDocs(query(collection(db,"results"), where("uid","==",user.uid), orderBy("date","desc")));
+                c.innerHTML="";
+                for(const d of s.docs){
+                    const r=d.data();
+                    let show = r.isReleased;
+                    if(!show) {
+                        const es = await getDoc(doc(db,"exams",r.examId));
+                        if(es.exists() && es.data().resultsReleased) show=true;
+                    }
+                    const type = show ? 'pub' : 'pen';
+                    const css = show ? 'res-card-pub' : 'res-card-pen';
+                    const st = show ? `<b style="color:var(--success)">${r.score}</b>` : `<span style="color:var(--warning)">Pending</span>`;
+                    c.innerHTML += `<div class="card ${css}" data-type="${type}"><div><b>${r.examTitle}</b></div><div style="display:flex; justify-content:space-between;"><span>${new Date(r.date.seconds*1000).toLocaleDateString()}</span>${st}</div></div>`;
+                }
+                app.resFilter('pub', document.querySelector('#stu-tab-results .tab-btn')); 
+            },
+            loadPro: () => {
+                document.getElementById('p-name').innerText=user.displayName;
+                document.getElementById('p-email').innerText=user.email;
+                document.getElementById('p-phone').innerText=user.phone;
+                document.getElementById('p-class').innerText=user.class;
+                if(user.photoURL) document.getElementById('p-img').src=user.photoURL;
+                const avg = parseFloat(document.getElementById('st-avg').innerText);
+                let b = "Recruit"; let col = "#888";
+                if(avg>80) {b="Elite"; col="var(--success)";}
+                else if(avg>60) {b="Soldier"; col="var(--primary)";}
+                document.getElementById('p-badge').innerHTML=`<span class="badge" style="background:${col}; color:black;">${b}</span>`;
+            },
+            uplPhoto: async (inp) => {
+                const f = inp.files[0]; if(!f) return;
+                const fd=new FormData(); fd.append('file',f); fd.append('upload_preset',CLOUD_PRESET);
+                try {
+                    app.toast("Uploading...");
+                    const r = await(await fetch(CLOUD_URL,{method:'POST',body:fd})).json();
+                    await updateDoc(doc(db,"users",user.uid),{photoURL:r.secure_url});
+                    document.getElementById('p-img').src=r.secure_url; app.toast("Updated");
+                } catch(e){ app.toast("Error",'error'); }
+            },
+
+            // ENGINE
+            take: (id) => {
+                getDoc(doc(db,"exams",id)).then(s=>{
+                    activeExam={id:s.id,...s.data()};
+                    if(activeExam.pin) { if(prompt("PIN")!==activeExam.pin) return app.toast("Wrong PIN",'error'); }
+                    
+                    document.getElementById('view-student').classList.add('hidden');
+                    document.getElementById('view-paper').classList.remove('hidden');
+                    document.getElementById('q-title').innerText=activeExam.title;
+                    if(activeExam.pdf) { document.getElementById('pdf-view').src=activeExam.pdf; document.getElementById('pdf-view').classList.remove('hidden'); }
+                    else document.getElementById('pdf-view').classList.add('hidden');
+
+                    let qs = [...activeExam.questions];
+                    if(activeExam.shuffle) qs.sort(()=>Math.random()-0.5);
+                    activeExam._shuffled=qs;
+
+                    const c = document.getElementById('q-area'); c.innerHTML="";
+                    qs.forEach((q,i)=>{
+                        c.innerHTML += `<div class="card"><p><b>${i+1}.</b> ${q.text}</p><div class="grid-2">${q.options.map((o,x)=>`<label style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;"><input type="radio" name="q${i}" value="${x}"> ${o}</label>`).join('')}</div></div>`;
+                    });
+
+                    let t=activeExam.time*60;
+                    timer = setInterval(()=>{
+                        let m=Math.floor(t/60), s=t%60;
+                        document.getElementById('q-timer').innerText = `${m}:${s<10?'0'+s:s}`;
+                        if(t-- < 0) app.submit();
+                    },1000);
+                    
+                    warn=0; document.addEventListener("visibilitychange", app.vis);
+                });
+            },
+            vis: () => {
+                if(document.hidden) { warn++; alert(`Warning ${warn}/3`); if(warn>=3) app.submit(); }
+            },
+            submit: async () => {
+                document.removeEventListener("visibilitychange", app.vis); clearInterval(timer);
+                let score=0, dets=[];
+                activeExam._shuffled.forEach((q,i)=>{
+                    const s = document.querySelector(`input[name="q${i}"]:checked`);
+                    let v = -1;
+                    if(s) { v=parseInt(s.value); if(v===q.correct) score++; else score-=activeExam.negMark||0; }
+                    dets.push({q:q.text, opts:q.options, correct:q.correct, selected:v});
+                });
+                await addDoc(collection(db,"results"), {
+                    uid:user.uid, studentName:user.displayName, studentEmail:user.email,
+                    examId:activeExam.id, examTitle:activeExam.title, score:score.toFixed(2), total:activeExam.questions.length,
+                    date:new Date(), isReleased:false, details:dets
+                });
+                alert("Submitted!"); location.reload();
             }
         };
 
-        // Initialize the app when DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            app.init();
-            app.initializeSettings();
-        });
+        onAuthStateChanged(auth, async (u) => {
+            if(u) {
+                user = {uid:u.uid, ...(await getDoc(doc(db,"users",u.uid))).data()};
+                document.getElementById('view-auth').classList.add('hidden');
+                
+                // Presence
+                await updateDoc(doc(db,"users",u.uid),{lastActive:new Date()});
+                if(activeInterval) clearInterval(activeInterval);
+                activeInterval = setInterval(()=>updateDoc(doc(db,"users",u.uid),{lastActive:new Date()}), 60000);
 
-        // Add helper functions to window for inline event handlers
-        window.handlePDFUpload = (input) => app.handlePDFUpload(input);
-        window.uploadProfilePhoto = (input) => {
-            // This would upload to Cloudinary in a real implementation
-            Toast.show('Photo upload would be implemented with Cloudinary', 'info');
-        };
+                if(user.role==='admin') {
+                    document.getElementById('view-admin').classList.remove('hidden');
+                    app.nav('admin-home', document.querySelector('.bottom-nav .nav-item'));
+                } else if(user.isApproved) {
+                    document.getElementById('view-student').classList.remove('hidden');
+                    document.getElementById('stu-name').innerText=user.displayName;
+                    document.getElementById('stu-class').innerText=user.class;
+                    
+                    // Calc Stats
+                    const s = await getDocs(query(collection(db,"results"), where("uid","==",user.uid)));
+                    let cnt=0, tot=0;
+                    s.forEach(d=>{ cnt++; tot+=(d.data().score/d.data().total)*100; });
+                    document.getElementById('st-count').innerText=cnt;
+                    const avg = cnt>0 ? (tot/cnt).toFixed(0) : 0;
+                    document.getElementById('st-avg').innerText = avg+"%";
+                    
+                    app.nav('stu-home', document.querySelector('.bottom-nav .nav-item'));
+                } else {
+                    if(u.emailVerified) document.getElementById('pend-msg').innerText = "Verified. Waiting for Admin.";
+                    else document.getElementById('pend-msg').innerText = "Check your email inbox.";
+                    document.getElementById('view-pending').classList.remove('hidden');
+                }
+            } else {
+                document.querySelectorAll('.container').forEach(c=>c.classList.add('hidden'));
+                document.getElementById('view-auth').classList.remove('hidden');
+            }
+        });
     </script>
 </body>
 </html>

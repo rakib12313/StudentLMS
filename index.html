@@ -12,7 +12,7 @@
         :root {
             /* macOS Dark Palette */
             --bg-body: #000000;
-            --bg-card: rgba(30, 30, 30, 0.65);
+            --bg-card: rgba(30, 30, 30, 0.75);
             --bg-glass: rgba(45, 45, 45, 0.85);
             --border: rgba(255, 255, 255, 0.12);
             --primary: #0A84FF; /* Apple Blue */
@@ -37,7 +37,7 @@
             overflow-x: hidden;
         }
 
-        .container { max-width: 850px; margin: 0 auto; padding: 20px; animation: fade In 0.4s ease; }
+        .container { max-width: 850px; margin: 0 auto; padding: 20px; animation: fadeIn 0.4s ease; }
         .hidden { display: none !important; }
         .flex-center { display: flex; justify-content: center; align-items: center; min-height: 90vh; }
 
@@ -51,6 +51,7 @@
             padding: 20px;
             margin-bottom: 16px;
             box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
         }
 
         h1, h2, h3 { margin: 0 0 10px 0; font-weight: 600; letter-spacing: -0.5px; }
@@ -83,8 +84,8 @@
         /* Floating Dock (Bottom Nav) */
         .dock {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 400px;
-            background: rgba(28, 28, 30, 0.75);
+            width: 90%; max-width: 450px;
+            background: rgba(28, 28, 30, 0.85);
             backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: var(--dock-radius);
@@ -95,10 +96,11 @@
         .dock-item {
             display: flex; flex-direction: column; align-items: center;
             color: #636366; font-size: 10px; cursor: pointer; transition: 0.3s;
+            width: 20%;
         }
         .dock-item i { font-size: 20px; margin-bottom: 4px; }
         .dock-item.active { color: var(--primary); }
-        .dock-item.active i { transform: translateY(-2px); }
+        .dock-item.active i { transform: translateY(-3px); }
 
         /* Tables & Lists */
         .list-item {
@@ -107,15 +109,25 @@
         }
         .list-item:last-child { border-bottom: none; }
         
-        /* Badges */
+        /* Badges & Stats */
         .badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
         .status-ok { background: rgba(48, 209, 88, 0.2); color: var(--success); }
         .status-wait { background: rgba(255, 214, 10, 0.2); color: var(--warning); }
+        
+        .stat-card { background:rgba(255,255,255,0.05); padding:15px; border-radius:16px; text-align:center; }
+        .stat-num { font-size: 24px; font-weight: 700; display: block; margin-bottom: 5px; }
 
         /* Utilities */
         .profile-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         
+        /* Exam Card Styling */
+        .exam-card-stu {
+            border-left: 4px solid var(--primary);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
         /* Loading & Toasts */
         #loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; }
         .spinner { width: 30px; height: 30px; border: 3px solid #333; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
@@ -195,8 +207,40 @@
             <button class="btn-danger btn-sm" onclick="app.logout()">Log Out</button>
         </div>
 
+        <!-- Admin: Home (Dashboard) -->
+        <div id="tab-admin-home">
+            <div class="grid-2" style="margin-bottom:15px;">
+                <div class="card stat-card">
+                    <span class="stat-num" id="adm-tot-stu" style="color:var(--text-main)">0</span>
+                    <small>Total Students</small>
+                </div>
+                <div class="card stat-card">
+                    <span class="stat-num" id="adm-live" style="color:var(--success)">0</span>
+                    <small>Live Now</small>
+                </div>
+            </div>
+            <div class="grid-2" style="margin-bottom:15px;">
+                <div class="card stat-card">
+                     <span class="stat-num" id="adm-pending" style="color:var(--warning)">0</span>
+                     <small>Pending Approval</small>
+                </div>
+                <div class="card stat-card">
+                    <span class="stat-num" id="adm-offline" style="color:var(--text-sub)">0</span>
+                    <small>Offline</small>
+               </div>
+            </div>
+            
+            <div class="card">
+                <h3>Quick Actions</h3>
+                <div class="grid-2">
+                    <button class="btn-secondary" onclick="app.nav('admin-exams', document.querySelector('.dock-item:nth-child(2)'))"><i class="fas fa-plus"></i> Create Exam</button>
+                    <button class="btn-secondary" onclick="app.nav('admin-students', document.querySelector('.dock-item:nth-child(4)'))"><i class="fas fa-check"></i> Approvals</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Admin: Exams -->
-        <div id="tab-admin-exams">
+        <div id="tab-admin-exams" class="hidden">
             <div class="card" id="exam-editor">
                 <h3>New Exam</h3>
                 <input type="hidden" id="ex-id">
@@ -231,7 +275,7 @@
                 </div>
 
                 <div class="grid-2" style="margin-top:20px;">
-                    <button class="btn-primary" onclick="app.saveExam()">Publish</button>
+                    <button class="btn-primary" onclick="app.saveExam()"><span id="btn-save-text">Publish</span></button>
                     <button class="btn-secondary" onclick="app.resetForm()">Clear</button>
                 </div>
             </div>
@@ -243,7 +287,7 @@
         <div id="tab-admin-results" class="hidden">
             <div id="res-main">
                 <h3>Exam Reports</h3>
-                <div id="res-list"></div>
+                <div id="results-list"></div>
             </div>
             <div id="res-det" class="hidden">
                 <button class="btn-secondary btn-sm" onclick="app.closeRes()" style="margin-bottom:10px;">Back</button>
@@ -269,7 +313,8 @@
 
         <!-- Admin Dock -->
         <div class="dock">
-            <div class="dock-item active" onclick="app.nav('admin-exams', this)"><i class="fas fa-file-alt"></i>Exams</div>
+            <div class="dock-item active" onclick="app.nav('admin-home', this)"><i class="fas fa-home"></i>Home</div>
+            <div class="dock-item" onclick="app.nav('admin-exams', this)"><i class="fas fa-file-alt"></i>Exams</div>
             <div class="dock-item" onclick="app.nav('admin-results', this)"><i class="fas fa-chart-bar"></i>Results</div>
             <div class="dock-item" onclick="app.nav('admin-students', this)"><i class="fas fa-users"></i>Students</div>
         </div>
@@ -306,15 +351,18 @@
 
         <!-- Exams -->
         <div id="tab-stu-exams" class="hidden">
-            <h3>Exams</h3>
-            <div id="stu-exam-list"></div>
+            <h2 style="margin-left:5px;">Available Exams</h2>
+            <div id="stu-exam-list" style="margin-top:15px;"></div>
         </div>
 
         <!-- Results -->
         <div id="tab-stu-results" class="hidden">
-            <div class="grid-2" style="margin-bottom:15px;">
-                <button class="btn-secondary" onclick="app.resFilter('pub')">Published</button>
-                <button class="btn-secondary" onclick="app.resFilter('pen')">Pending</button>
+            <h2 style="margin-left:5px;">My Performance</h2>
+            <div class="card" style="padding:10px;">
+                <div class="grid-2">
+                    <button class="btn-secondary btn-sm" onclick="app.resFilter('pub')" id="btn-res-pub" style="background:var(--bg-glass)">Published</button>
+                    <button class="btn-secondary btn-sm" onclick="app.resFilter('pen')" id="btn-res-pen">Pending</button>
+                </div>
             </div>
             <div id="stu-res-list"></div>
         </div>
@@ -322,11 +370,15 @@
         <!-- Profile -->
         <div id="tab-stu-profile" class="hidden">
             <div class="card" style="text-align:center;">
-                <img id="p-img" class="profile-img" src="https://via.placeholder.com/100">
-                <label for="p-file" style="display:block; margin:10px 0; color:var(--primary); font-size:12px;">Edit Photo</label>
+                <div style="position:relative; width:80px; height:80px; margin:0 auto;">
+                    <img id="p-img" class="profile-img" src="https://via.placeholder.com/100">
+                    <div style="position:absolute; bottom:0; right:0; background:var(--primary); width:25px; height:25px; border-radius:50%; display:flex; justify-content:center; align-items:center;">
+                         <label for="p-file" style="color:white; cursor:pointer;"><i class="fas fa-camera" style="font-size:12px;"></i></label>
+                    </div>
+                </div>
                 <input type="file" id="p-file" hidden accept="image/*" onchange="app.uplPhoto(this)">
                 
-                <h2 id="p-name">Name</h2>
+                <h2 id="p-name" style="margin-top:15px;">Name</h2>
                 <div id="p-badge" style="margin-bottom:15px;"></div>
                 
                 <div style="text-align:left; background:rgba(0,0,0,0.2); padding:15px; border-radius:12px;">
@@ -387,6 +439,14 @@
 
         document.getElementById('loader').style.display = 'none';
 
+        // Heartbeat to update last seen
+        const heartbeat = async () => {
+            if(user && user.uid) {
+                try { await updateDoc(doc(db, "users", user.uid), { lastSeen: new Date() }); } catch(e){}
+            }
+        };
+        setInterval(heartbeat, 300000); // Every 5 mins
+
         window.app = {
             toast: (m, t='success') => {
                 const d=document.createElement('div'); d.className='toast'; 
@@ -408,7 +468,7 @@
                     const r = await signInWithPopup(auth, new GoogleAuthProvider());
                     const ref = doc(db,"users",r.user.uid);
                     if(!(await getDoc(ref)).exists()) {
-                        await setDoc(ref, {email:r.user.email, displayName:r.user.displayName, phone:'N/A', role:r.user.email===ADMIN_EMAIL?'admin':'student', class:'9', division:'A', isApproved:r.user.email===ADMIN_EMAIL});
+                        await setDoc(ref, {email:r.user.email, displayName:r.user.displayName, phone:'N/A', role:r.user.email===ADMIN_EMAIL?'admin':'student', class:'9', division:'A', isApproved:r.user.email===ADMIN_EMAIL, lastSeen: new Date()});
                     }
                 } catch(e){ app.toast(e.message,'error'); }
             },
@@ -419,7 +479,7 @@
                 try {
                     const r = await createUserWithEmailAndPassword(auth, e, p);
                     const role = e===ADMIN_EMAIL?'admin':'student';
-                    await setDoc(doc(db,"users",r.user.uid), {email:e, displayName:n, phone:document.getElementById('reg-phone').value, role, class:c, division:d, isApproved:role==='admin'});
+                    await setDoc(doc(db,"users",r.user.uid), {email:e, displayName:n, phone:document.getElementById('reg-phone').value, role, class:c, division:d, isApproved:role==='admin', lastSeen: new Date()});
                     if(role!=='admin') app.toast('Wait for approval.');
                 } catch(e){ app.toast(e.message,'error'); }
             },
@@ -428,9 +488,11 @@
             // NAV
             nav: (t, el) => {
                 document.querySelectorAll('.dock-item').forEach(i=>i.classList.remove('active')); el.classList.add('active');
+                heartbeat(); // Update online status on nav
                 if(t.startsWith('admin')) {
-                    ['admin-exams','admin-results','admin-students'].forEach(i=>document.getElementById(`tab-${i}`).classList.add('hidden'));
+                    ['admin-home','admin-exams','admin-results','admin-students'].forEach(i=>document.getElementById(`tab-${i}`).classList.add('hidden'));
                     document.getElementById(`tab-${t}`).classList.remove('hidden');
+                    if(t==='admin-home') app.loadAdminHome();
                     if(t==='admin-students') app.loadAllStu();
                     if(t==='admin-exams') app.loadExams();
                     if(t==='admin-results') app.loadResGroup();
@@ -444,12 +506,29 @@
                 }
             },
 
-            // ADMIN
-            postAnnounce: async () => {
-                const t = document.getElementById('ann-input').value;
-                if(t) { await addDoc(collection(db,"announcements"),{text:t, date:new Date()}); document.getElementById('ann-input').value=""; app.toast("Posted"); }
+            // ADMIN HOME
+            loadAdminHome: async () => {
+                // Fetch stats
+                const stus = await getDocs(query(collection(db, "users"), where("role", "==", "student")));
+                let total=0, pending=0, live=0;
+                const now = new Date();
+                
+                stus.forEach(d => {
+                    total++;
+                    const u = d.data();
+                    if(!u.isApproved) pending++;
+                    if(u.lastSeen) {
+                        const diff = (now - u.lastSeen.toDate()) / 1000 / 60; // mins
+                        if(diff < 5) live++;
+                    }
+                });
+
+                document.getElementById('adm-tot-stu').innerText = total;
+                document.getElementById('adm-pending').innerText = pending;
+                document.getElementById('adm-live').innerText = live;
+                document.getElementById('adm-offline').innerText = total - live;
             },
-            
+
             // EXAM
             toggleBuilder: (m) => {
                 document.getElementById('build-man').classList.toggle('hidden', m!=='manual');
@@ -471,7 +550,8 @@
                 catch(e){ app.toast("Invalid JSON",'error'); }
             },
             saveExam: async () => {
-                const btn=document.getElementById('btn-save'); btn.disabled=true; btn.innerText="Saving...";
+                const btn=document.getElementById('btn-save-text'); 
+                if(btn) btn.innerText="Saving...";
                 const id = document.getElementById('ex-id').value;
                 const pdf = document.getElementById('ex-pdf').files[0];
                 let pdfUrl = document.getElementById('ex-pdf-url').value;
@@ -500,12 +580,12 @@
                     pdf: pdfUrl, questions: qs, updatedAt: new Date(), resultsReleased: false
                 };
 
-                if(!data.title || !data.targetClass) { app.toast("Missing Info",'error'); btn.disabled=false; return; }
+                if(!data.title || !data.targetClass) { app.toast("Missing Info",'error'); if(btn) btn.innerText="Publish"; return; }
 
                 if(id) { delete data.resultsReleased; await updateDoc(doc(db,"exams",id), data); }
                 else { data.createdAt=new Date(); await addDoc(collection(db,"exams"), data); }
                 
-                app.resetForm(); app.loadExams(); app.toast("Published"); btn.disabled=false; btn.innerText="Publish";
+                app.resetForm(); app.loadExams(); app.toast("Published"); if(btn) btn.innerText="Publish";
             },
             resetForm: () => {
                 document.getElementById('ex-id').value=""; document.getElementById('q-box').innerHTML="";
@@ -633,37 +713,78 @@
                 document.getElementById('st-avg').innerText = cnt>0 ? (tot/cnt).toFixed(0)+"%" : "0%";
             },
             loadStuExams: async () => {
-                const c = document.getElementById('stu-exam-list'); c.innerHTML="Loading...";
+                const c = document.getElementById('stu-exam-list'); c.innerHTML='<div style="text-align:center; padding:20px;"><div class="spinner"></div></div>';
                 const s = await getDocs(query(collection(db,"exams"), where("targetClass","==",user.class)));
                 c.innerHTML="";
-                if(s.empty) c.innerHTML="<p>No exams.</p>";
+                if(s.empty) c.innerHTML="<p style='text-align:center;'>No active exams for your class.</p>";
                 s.forEach(d=>{
                     const e=d.data();
-                    c.innerHTML += `<div class="card"><h3>${e.title}</h3><p>${e.time} mins • ${e.questions.length} Qs</p><button class="btn-primary" onclick="app.take('${d.id}')">Start</button></div>`;
+                    // Customize Exam Card
+                    c.innerHTML += `
+                    <div class="card exam-card-stu">
+                        <div>
+                            <h3 style="margin-bottom:5px;">${e.title}</h3>
+                            <div style="display:flex; gap:10px; font-size:12px; color:var(--text-sub);">
+                                <span><i class="fas fa-clock"></i> ${e.time}m</span>
+                                <span><i class="fas fa-list"></i> ${e.questions.length} Qs</span>
+                            </div>
+                        </div>
+                        <button class="btn-primary btn-sm" onclick="app.take('${d.id}')">Start <i class="fas fa-chevron-right"></i></button>
+                    </div>`;
                 });
             },
             resFilter: (mode) => {
                 document.querySelectorAll('.res-card').forEach(e => {
                     e.style.display = e.dataset.type === mode ? 'block' : 'none';
                 });
+                // Toggle Button Style
+                document.getElementById('btn-res-pub').style.background = mode==='pub' ? 'var(--bg-glass)' : 'rgba(255,255,255,0.05)';
+                document.getElementById('btn-res-pen').style.background = mode==='pen' ? 'var(--bg-glass)' : 'rgba(255,255,255,0.05)';
             },
             loadStuRes: async () => {
-                const c = document.getElementById('stu-res-list'); c.innerHTML="Loading...";
-                const s = await getDocs(query(collection(db,"results"), where("uid","==",user.uid), orderBy("date","desc")));
-                c.innerHTML="";
-                for(const d of s.docs){
-                    const r=d.data();
-                    let show = r.isReleased;
-                    if(!show) {
-                        const es = await getDoc(doc(db,"exams",r.examId));
-                        if(es.exists() && es.data().resultsReleased) show=true;
+                const c = document.getElementById('stu-res-list'); 
+                c.innerHTML='<div style="text-align:center; padding:20px;"><div class="spinner"></div></div>';
+                
+                try {
+                    const s = await getDocs(query(collection(db,"results"), where("uid","==",user.uid), orderBy("date","desc")));
+                    c.innerHTML="";
+                    if(s.empty) { c.innerHTML="<p style='text-align:center; color:var(--text-sub);'>No results found.</p>"; return; }
+
+                    for(const d of s.docs){
+                        const r=d.data();
+                        let show = r.isReleased;
+                        // Double check if exam was released globally later
+                        if(!show) {
+                            try {
+                                const es = await getDoc(doc(db,"exams",r.examId));
+                                if(es.exists() && es.data().resultsReleased) show=true;
+                            } catch(err) {}
+                        }
+                        
+                        const type = show ? 'pub' : 'pen';
+                        const scoreDisp = show ? `<span style="font-size:18px; font-weight:bold; color:var(--success);">${r.score}</span><small>/${r.total}</small>` : `<span class="badge status-wait">Pending</span>`;
+                        const action = (show && r.details) ? `<button class="btn-secondary btn-sm" onclick="app.rev('${d.id}')" style="width:100%;">Review Key</button>` : '';
+                        
+                        // Custom Result Card
+                        c.innerHTML += `
+                        <div class="card res-card" data-type="${type}" style="border-left:4px solid ${show ? 'var(--success)' : 'var(--warning)'};">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+                                <div>
+                                    <h4 style="margin:0;">${r.examTitle}</h4>
+                                    <small>${new Date(r.date.seconds*1000).toLocaleDateString()}</small>
+                                </div>
+                                <div style="text-align:right;">
+                                    ${scoreDisp}
+                                </div>
+                            </div>
+                            ${action}
+                        </div>`;
                     }
-                    const type = show ? 'pub' : 'pen';
-                    const st = show ? `<b style="color:var(--success)">${r.score}</b>` : `<span style="color:var(--warning)">Pending</span>`;
-                    const rev = (show && r.details) ? `<button class="btn-secondary btn-sm" onclick="app.rev('${d.id}')" style="margin-top:10px;">Review</button>` : '';
-                    c.innerHTML += `<div class="card res-card" data-type="${type}"><div><b>${r.examTitle}</b></div><div style="display:flex; justify-content:space-between;"><span>${new Date(r.date.seconds*1000).toLocaleDateString()}</span>${st}</div>${rev}</div>`;
+                    app.resFilter('pub'); // Default
+                } catch(e) {
+                    console.error(e);
+                    c.innerHTML="<p>Error loading results.</p>";
                 }
-                app.resFilter('pub'); // Default show published
             },
             loadPro: () => {
                 document.getElementById('p-name').innerText=user.displayName;
@@ -672,8 +793,8 @@
                 document.getElementById('p-class').innerText=user.class;
                 if(user.photoURL) document.getElementById('p-img').src=user.photoURL;
                 // Reuse stats logic for badge
-                const avg = parseFloat(document.getElementById('st-avg').innerText);
-                let b = "Recruit"; let col = "#888";
+                const avg = parseFloat(document.getElementById('st-avg').innerText) || 0;
+                let b = "Recruit", col = "#888";
                 if(avg>80) {b="Elite"; col="var(--success)";}
                 else if(avg>60) {b="Soldier"; col="var(--primary)";}
                 document.getElementById('p-badge').innerHTML=`<span class="badge" style="background:${col}; color:black;">${b}</span>`;
@@ -681,12 +802,25 @@
             uplPhoto: async (inp) => {
                 const f = inp.files[0]; if(!f) return;
                 const fd=new FormData(); fd.append('file',f); fd.append('upload_preset',CLOUD_PRESET);
+                
+                app.toast("Uploading...");
+                
                 try {
-                    app.toast("Uploading...");
-                    const r = await(await fetch(CLOUD_URL,{method:'POST',body:fd})).json();
+                    const req = await fetch(CLOUD_URL, {method:'POST', body:fd});
+                    const r = await req.json();
+                    
+                    if(r.error) {
+                        console.error(r.error);
+                        throw new Error(r.error.message);
+                    }
+                    
                     await updateDoc(doc(db,"users",user.uid),{photoURL:r.secure_url});
-                    document.getElementById('p-img').src=r.secure_url; app.toast("Updated");
-                } catch(e){ app.toast("Error",'error'); }
+                    document.getElementById('p-img').src=r.secure_url; 
+                    app.toast("Updated");
+                } catch(e){ 
+                    console.error("Upload Error:", e);
+                    app.toast("Upload failed. Check console.",'error'); 
+                }
             },
 
             // ENGINE
@@ -763,10 +897,11 @@
         onAuthStateChanged(auth, async (u) => {
             if(u) {
                 user = {uid:u.uid, ...(await getDoc(doc(db,"users",u.uid))).data()};
+                heartbeat(); // Init heartbeat
                 document.getElementById('view-auth').classList.add('hidden');
                 if(user.role==='admin') {
                     document.getElementById('view-admin').classList.remove('hidden');
-                    app.nav('admin-exams', document.querySelector('.dock-item'));
+                    app.nav('admin-home', document.querySelector('.dock-item'));
                 } else if(user.isApproved) {
                     document.getElementById('view-student').classList.remove('hidden');
                     document.getElementById('stu-name').innerText=user.displayName;

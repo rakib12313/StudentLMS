@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LMS - macOS Lite</title>
+    <title>LMS - macOS Stable</title>
     
     <!-- System Fonts & Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
-            /* macOS Dark Palette */
-            --bg-body: #000000;
-            --bg-card: rgba(30, 30, 30, 0.65);
-            --bg-glass: rgba(50, 50, 50, 0.70);
-            --border: rgba(255, 255, 255, 0.12);
-            --primary: #0A84FF; /* Apple Blue */
-            --danger: #FF453A;  /* Apple Red */
-            --success: #30D158; /* Apple Green */
-            --warning: #FFD60A; /* Apple Yellow */
+            /* macOS Dark Theme Palette - Optimized for Readability */
+            --bg-body: #050505;
+            --bg-card: rgba(35, 35, 35, 0.85); /* Darker, less transparent for readability */
+            --bg-input: rgba(0, 0, 0, 0.5);
+            --border: rgba(255, 255, 255, 0.15);
+            --primary: #0A84FF; /* iOS Blue */
+            --danger: #FF453A;  /* iOS Red */
+            --success: #30D158; /* iOS Green */
+            --warning: #FFD60A; /* iOS Yellow */
             --text-main: #FFFFFF;
-            --text-sub: #98989D;
+            --text-sub: #D1D1D6; /* Lighter gray for better contrast */
             --radius: 18px;
         }
 
@@ -29,83 +29,83 @@
         body {
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: url('https://images.unsplash.com/photo-1621360841012-3f9e673a4bcf?q=80&w=2000&auto=format&fit=crop') no-repeat center center fixed;
+            background: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2000&auto=format&fit=crop') no-repeat center center fixed;
             background-size: cover;
             color: var(--text-main);
             min-height: 100vh;
-            padding-bottom: 100px;
+            padding-bottom: 120px; /* Space for Dock */
             overflow-x: hidden;
         }
         
         /* Dark overlay for readability */
         body::before {
-            content: ""; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: -1;
+            content: ""; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: -1;
         }
 
         .container { max-width: 850px; margin: 0 auto; padding: 20px; animation: scaleIn 0.3s ease; }
         .hidden { display: none !important; }
         .flex-center { display: flex; justify-content: center; align-items: center; min-height: 90vh; }
 
-        /* macOS Glass Card */
+        /* macOS Glass Card - Readable */
         .card {
             background: var(--bg-card);
-            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
             border: 1px solid var(--border);
             border-radius: var(--radius);
             padding: 20px; margin-bottom: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
         }
 
-        h1, h2, h3 { margin: 0 0 10px 0; font-weight: 600; letter-spacing: -0.5px; }
+        h1, h2, h3 { margin: 0 0 10px 0; font-weight: 700; letter-spacing: -0.5px; color: white; }
         p, small { color: var(--text-sub); }
 
-        /* iOS Inputs */
+        /* Inputs - High Contrast */
         input, select, textarea {
-            width: 100%; padding: 12px 16px; margin-bottom: 12px;
-            background: rgba(0,0,0,0.2); border: 1px solid var(--border);
+            width: 100%; padding: 14px 16px; margin-bottom: 12px;
+            background: var(--bg-input); border: 1px solid var(--border);
             border-radius: 12px; color: white; font-size: 16px; transition: 0.2s;
         }
-        input:focus, select:focus, textarea:focus { border-color: var(--primary); background: rgba(0,0,0,0.4); }
-        option { background: #1c1c1e; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); background: rgba(0,0,0,0.8); }
+        option { background: #1c1c1e; color: white; }
 
         /* iOS Buttons */
         button {
             width: 100%; padding: 14px; border: none; border-radius: 12px;
-            font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.2s;
+            font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s;
             display: flex; justify-content: center; align-items: center; gap: 8px;
         }
         button:active { transform: scale(0.96); opacity: 0.8; }
         
         .btn-primary { background: var(--primary); color: white; }
-        .btn-secondary { background: rgba(255,255,255,0.1); color: white; backdrop-filter: blur(10px); }
+        .btn-secondary { background: rgba(255,255,255,0.15); color: white; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
         .btn-danger { background: rgba(255, 69, 58, 0.2); color: var(--danger); border: 1px solid var(--danger); }
         .btn-success { background: rgba(48, 209, 88, 0.2); color: var(--success); border: 1px solid var(--success); }
-        .btn-sm { padding: 6px 12px; width: auto; font-size: 13px; border-radius: 18px; }
+        .btn-sm { padding: 8px 16px; width: auto; font-size: 13px; border-radius: 18px; }
 
         /* Floating Dock */
         .dock {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             width: 90%; max-width: 400px;
-            background: rgba(40, 40, 40, 0.6);
-            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(30, 30, 30, 0.8);
+            backdrop-filter: blur(50px); -webkit-backdrop-filter: blur(50px);
+            border: 1px solid rgba(255,255,255,0.2);
             border-radius: 24px;
             display: flex; justify-content: space-around;
             padding: 12px 0; z-index: 1000;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
         }
         .dock-item {
             display: flex; flex-direction: column; align-items: center;
-            color: rgba(255,255,255,0.5); font-size: 10px; cursor: pointer; transition: 0.3s;
+            color: rgba(255,255,255,0.6); font-size: 11px; cursor: pointer; transition: 0.3s;
         }
-        .dock-item i { font-size: 22px; margin-bottom: 3px; transition: 0.3s; }
+        .dock-item i { font-size: 24px; margin-bottom: 4px; transition: 0.3s; }
         .dock-item.active { color: white; }
         .dock-item.active i { transform: translateY(-3px); color: var(--primary); text-shadow: 0 0 15px var(--primary); }
 
         /* Tabs */
-        .tabs { display: flex; background: rgba(0,0,0,0.2); padding: 4px; border-radius: 14px; margin-bottom: 15px; }
-        .tab-btn { flex: 1; padding: 8px; border-radius: 10px; text-align: center; cursor: pointer; color: var(--text-sub); font-size: 13px; font-weight: 500; transition: 0.2s; border: none; background: transparent; }
-        .tab-btn.active { background: rgba(255,255,255,0.15); color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .tabs { display: flex; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 14px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; padding: 10px; border-radius: 10px; text-align: center; cursor: pointer; color: var(--text-sub); font-size: 14px; font-weight: 600; transition: 0.2s; border: none; background: transparent; }
+        .tab-btn.active { background: rgba(255,255,255,0.2); color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
 
         /* Utilities */
         .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
@@ -113,56 +113,84 @@
         .status-wait { background: rgba(255, 214, 10, 0.2); color: var(--warning); }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         
-        /* Stats & Profile */
-        .stat-box { text-align: center; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 14px; }
-        .profile-img { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid var(--bg-card); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        /* Profile & Stats */
+        .stat-box { text-align: center; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 14px; border: 1px solid var(--border); }
+        .profile-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
 
-        /* Loader & Toast */
-        #loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
-        .spinner { width: 35px; height: 35px; border: 3px solid rgba(255,255,255,0.1); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        /* Loading & Toasts */
+        #loader { position: fixed; inset: 0; background: #050505; z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+        .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
         #toast-box { position: fixed; top: 20px; right: 20px; z-index: 9999; }
-        .toast { background: rgba(40,40,40,0.9); border: 1px solid var(--border); backdrop-filter: blur(10px); padding: 12px 20px; margin-bottom: 10px; border-radius: 12px; font-size: 14px; display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .toast { background: rgba(30,30,30,0.95); border-left: 4px solid var(--primary); padding: 15px 20px; margin-bottom: 10px; border-radius: 12px; font-size: 14px; display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: white; }
         
         @keyframes spin { 100% { transform: rotate(360deg); } }
         @keyframes scaleIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
         
-        /* Formatting Toolbar */
+        /* Exam Elements */
+        .option-label { display: block; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 8px; cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
+        .option-label:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+        input[type="radio"]:checked + span { color: var(--primary); font-weight: bold; }
+        
+        /* Toggle Switch */
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.2); transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        input:checked + .slider { background-color: var(--success); }
+        input:checked + .slider:before { transform: translateX(20px); }
+        
+        /* Formatting */
         .fmt-bar { display: flex; gap: 5px; margin-bottom: 8px; }
-        .fmt-btn { background: rgba(255,255,255,0.1); border: none; border-radius: 6px; padding: 4px 8px; color: #aaa; font-size: 12px; cursor: pointer; width: auto; }
+        .fmt-btn { background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; color: #ccc; font-size: 12px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="loader">
         <div class="spinner"></div>
-        <p style="margin-top:15px; font-size:12px; letter-spacing:1px; color:#666;">LOADING OS...</p>
+        <p style="margin-top:15px; font-size:12px; letter-spacing:1px; color:#888;">INITIALIZING SYSTEM...</p>
     </div>
     <div id="toast-box"></div>
 
+    <!-- === EDIT STUDENT MODAL (ADMIN) === -->
+    <div id="modal-edit" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(5px); z-index:2000; display:flex; justify-content:center; align-items:center;">
+        <div class="card" style="width:90%; max-width:400px;">
+            <h3>Edit Student</h3>
+            <input type="hidden" id="edt-uid">
+            <input type="text" id="edt-name" placeholder="Full Name">
+            <input type="tel" id="edt-phone" placeholder="Phone Number">
+            <div class="grid-2">
+                <select id="edt-class"><option value="8">Class 8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
+                <select id="edt-div"><option value="A">Div A</option><option value="B">B</option><option value="C">C</option></select>
+            </div>
+            <textarea id="edt-msg" placeholder="Send Personal Message..." rows="2"></textarea>
+            <div class="grid-2">
+                <button class="btn-secondary" onclick="document.getElementById('modal-edit').classList.add('hidden')">Cancel</button>
+                <button class="btn-primary" onclick="app.saveStudent()">Save</button>
+            </div>
+        </div>
+    </div>
+
     <!-- === AUTH SCREEN === -->
     <div id="view-auth" class="container flex-center hidden">
-        <div class="card" style="width:100%; max-width:360px; text-align:center;">
-            <div style="width:70px; height:70px; background:linear-gradient(135deg, #0A84FF, #5E5CE6); border-radius:18px; margin:0 auto 20px; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 25px rgba(10,132,255,0.4);">
-                <i class="fas fa-graduation-cap" style="font-size:30px; color:white;"></i>
-            </div>
+        <div class="card" style="width:100%; max-width:380px; text-align:center;">
+            <i class="fas fa-graduation-cap" style="font-size:50px; color:var(--primary); margin-bottom:20px;"></i>
             <h2>LMS Portal</h2>
-            <p>Secure Academic Access</p>
-            
+            <p>Sign in to continue</p>
             <div id="login-form">
-                <input type="email" id="email" placeholder="Apple ID (Email)">
+                <input type="email" id="email" placeholder="Email Address">
                 <input type="password" id="password" placeholder="Password">
                 <button class="btn-primary" onclick="app.login()">Sign In</button>
                 <button class="btn-secondary" onclick="app.loginGoogle()" style="margin-top:10px;"><i class="fab fa-google"></i> Sign in with Google</button>
-                <p style="margin-top:20px; font-size:13px; cursor:pointer;" onclick="app.toggleAuth('reg')">Create Apple ID</p>
+                <p style="margin-top:20px; font-size:13px; cursor:pointer; color:var(--primary);" onclick="app.toggleAuth('reg')">Create Account</p>
             </div>
-
             <div id="reg-form" class="hidden">
                 <input type="text" id="reg-name" placeholder="Full Name">
-                <input type="tel" id="reg-phone" placeholder="Phone">
+                <input type="tel" id="reg-phone" placeholder="Phone Number">
                 <div class="grid-2">
                     <select id="reg-class"><option disabled selected>Class</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
-                    <select id="reg-div"><option value="A">A</option><option value="B">B</option></select>
+                    <select id="reg-div"><option value="A">Section A</option><option value="B">B</option></select>
                 </div>
                 <input type="email" id="reg-email" placeholder="Real Email Address">
                 <input type="password" id="reg-pass" placeholder="Create Password">
@@ -172,10 +200,10 @@
         </div>
     </div>
 
-    <!-- === PENDING (LOCKED) === -->
+    <!-- === PENDING SCREEN === -->
     <div id="view-pending" class="container flex-center hidden">
         <div class="card" style="text-align:center;">
-            <i class="fas fa-lock" style="font-size:40px; color:var(--warning); margin-bottom:15px;"></i>
+            <i class="fas fa-lock" style="font-size:50px; color:var(--warning); margin-bottom:20px;"></i>
             <h3>Access Locked</h3>
             <p id="pend-msg">Email verification required.</p>
             <button class="btn-secondary" onclick="app.logout()" style="margin-top:20px;">Sign Out</button>
@@ -185,10 +213,10 @@
     <!-- === ADMIN PANEL === -->
     <div id="view-admin" class="container hidden">
         <div class="dock">
-            <div class="dock-item active" onclick="app.nav('admin-home', this)"><i class="fas fa-th-large"></i>Home</div>
-            <div class="dock-item" onclick="app.nav('admin-exams', this)"><i class="fas fa-file-signature"></i>Exams</div>
-            <div class="dock-item" onclick="app.nav('admin-results', this)"><i class="fas fa-poll"></i>Results</div>
-            <div class="dock-item" onclick="app.nav('admin-students', this)"><i class="fas fa-user-friends"></i>Users</div>
+            <div class="dock-item active" onclick="app.adminNav('admin-home', this)"><i class="fas fa-th-large"></i>Home</div>
+            <div class="dock-item" onclick="app.adminNav('admin-exams', this)"><i class="fas fa-file-signature"></i>Exams</div>
+            <div class="dock-item" onclick="app.adminNav('admin-results', this)"><i class="fas fa-poll"></i>Results</div>
+            <div class="dock-item" onclick="app.adminNav('admin-students', this)"><i class="fas fa-user-friends"></i>Users</div>
         </div>
 
         <!-- Admin Home -->
@@ -206,9 +234,16 @@
                     <h2 id="stat-online" style="margin:0; color:var(--success);">0</h2><small>Online Now</small>
                 </div>
             </div>
-            
             <div class="stat-box" style="margin-bottom:15px;">
                 <h2 id="stat-offline" style="margin:0; color:#666;">0</h2><small>Offline</small>
+            </div>
+
+            <div class="card">
+                <h3>Settings</h3>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>Public Leaderboard</span>
+                    <label class="switch"><input type="checkbox" id="admin-lb-toggle" onchange="app.toggleLeaderboard()"><span class="slider"></span></label>
+                </div>
             </div>
 
             <div class="card">
@@ -223,26 +258,27 @@
         <!-- Admin Exams -->
         <div id="tab-admin-exams" class="hidden">
             <div class="card" id="exam-editor">
-                <h3>New Exam</h3>
+                <h3>Create Exam</h3>
                 <input type="hidden" id="ex-id">
                 <div class="grid-2">
                     <input type="text" id="ex-title" placeholder="Title">
-                    <select id="ex-class"><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
+                    <select id="ex-class"><option value="8">Class 8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
                 </div>
                 <div class="grid-2">
                     <input type="number" id="ex-time" placeholder="Mins">
                     <input type="number" id="ex-neg" placeholder="Neg Mark" step="0.25">
                 </div>
-                <input type="text" id="ex-pin" placeholder="PIN (Optional)">
+                <input type="text" id="ex-pin" placeholder="Access PIN (Optional)">
                 <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px; margin-bottom:10px;">
-                    <small style="color:var(--primary); display:block; margin-bottom:5px;"><i class="fas fa-file-pdf"></i> PDF Question</small>
+                    <small style="color:var(--primary); display:block; margin-bottom:5px;"><i class="fas fa-file-pdf"></i> PDF Question (Optional)</small>
                     <input type="file" id="ex-pdf" accept="application/pdf">
                     <input type="hidden" id="ex-pdf-url">
                 </div>
-                <label style="font-size:14px; color:#ccc; display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+                <label style="display:flex; align-items:center; gap:8px; margin-bottom:10px; font-size:14px; color:#ccc;">
                     <input type="checkbox" id="ex-shuffle" style="width:auto; margin:0;"> Shuffle Questions
                 </label>
 
+                <!-- Builder Tabs -->
                 <div class="tabs">
                     <button class="tab-btn active" onclick="app.setBuilder('manual')">Manual</button>
                     <button class="tab-btn" onclick="app.setBuilder('json')">JSON</button>
@@ -262,6 +298,8 @@
                     <button class="btn-secondary" onclick="app.resetForm()">Reset</button>
                 </div>
             </div>
+            
+            <input type="text" placeholder="Search exams..." onkeyup="app.filter('admin-exam-list', this.value)" style="border-radius:20px;">
             <div id="admin-exam-list"></div>
         </div>
 
@@ -301,6 +339,7 @@
 
     <!-- === STUDENT VIEW === -->
     <div id="view-student" class="container hidden">
+        <!-- Student Dock -->
         <div class="dock">
             <div class="dock-item active" onclick="app.stuNav('home', this)"><i class="fas fa-compass"></i>Home</div>
             <div class="dock-item" onclick="app.stuNav('exams', this)"><i class="fas fa-book"></i>Exams</div>
@@ -308,6 +347,7 @@
             <div class="dock-item" onclick="app.stuNav('profile', this)"><i class="fas fa-user-circle"></i>Profile</div>
         </div>
 
+        <!-- Home -->
         <div id="tab-stu-home">
             <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
                 <div><h2 style="margin:0;">Hi, <span id="stu-name">User</span></h2><small>Class <span id="stu-class">--</span></small></div>
@@ -326,11 +366,14 @@
             </div>
         </div>
 
+        <!-- Exams -->
         <div id="tab-stu-exams" class="hidden">
             <h3>Missions</h3>
-            <div id="stu-exam-list"></div>
+            <input type="text" placeholder="Search..." onkeyup="app.filter('stu-exam-list', this.value)" style="border-radius:20px;">
+            <div id="stu-exam-list" style="margin-top:10px;"></div>
         </div>
 
+        <!-- Results -->
         <div id="tab-stu-results" class="hidden">
             <div class="tabs">
                 <button class="tab-btn active" onclick="app.resFilter('pub', this)">Verified</button>
@@ -339,6 +382,7 @@
             <div id="stu-res-list"></div>
         </div>
 
+        <!-- Profile -->
         <div id="tab-stu-profile" class="hidden">
             <div class="card" style="text-align:center;">
                 <img id="pro-img" class="profile-img" src="https://via.placeholder.com/100">
@@ -346,10 +390,12 @@
                 <input type="file" id="pro-file" hidden accept="image/*" onchange="app.uplPhoto(this)">
                 
                 <h2 id="pro-name-2">Name</h2>
+                <div id="pro-status-badge"></div>
+                
                 <div style="text-align:left; background:rgba(0,0,0,0.2); border-radius:12px; padding:15px; margin-top:20px;">
-                    <div class="list-item"><small>Email</small> <span id="pro-email">--</span></div>
-                    <div class="list-item"><small>Phone</small> <span id="pro-phone">--</span></div>
-                    <div class="list-item"><small>Class</small> <span id="pro-class-2">--</span></div>
+                    <div style="margin-bottom:10px;"><small>Email</small><br><span id="pro-email" style="color:white;">--</span></div>
+                    <div style="margin-bottom:10px;"><small>Phone</small><br><span id="pro-phone" style="color:white;">--</span></div>
+                    <div><small>Class</small><br><span id="pro-class-2" style="color:white;">--</span></div>
                 </div>
                 <button class="btn-danger" style="margin-top:20px;" onclick="app.logout()">Sign Out</button>
             </div>
@@ -369,31 +415,12 @@
         </div>
     </div>
 
-    <!-- === EDIT MODAL === -->
-    <div id="modal-edit" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:4000; display:flex; justify-content:center; align-items:center;">
-        <div class="card" style="width:90%; max-width:400px;">
-            <h3>Edit Student</h3>
-            <input type="hidden" id="edt-uid">
-            <input type="text" id="edt-name" placeholder="Name">
-            <input type="tel" id="edt-phone" placeholder="Phone">
-            <div class="grid-2">
-                <select id="edt-class"><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
-                <select id="edt-div"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
-            </div>
-            <textarea id="edt-msg" rows="2" placeholder="Send Message..."></textarea>
-            <div class="grid-2" style="margin-top:10px;">
-                <button class="btn-primary" onclick="app.saveStudent()">Save</button>
-                <button class="btn-secondary" onclick="document.getElementById('modal-edit').classList.add('hidden')">Cancel</button>
-            </div>
-        </div>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, deleteDoc, updateDoc, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // CREDENTIALS - PRE-FILLED
+        // CREDENTIALS (PRE-FILLED)
         const firebaseConfig = {
             apiKey: "AIzaSyBEMPS8vEJztGpoBPJjJIzKKInyt4IY9rQ",
             authDomain: "studentlms-79722.firebaseapp.com",
@@ -416,7 +443,7 @@
             toast: (m, t='success') => {
                 const d=document.createElement('div'); d.className='toast'; 
                 d.style.borderLeftColor = t==='error'?'var(--danger)':'var(--success)';
-                d.innerHTML=m; document.getElementById('toast-box').appendChild(d);
+                d.innerText=m; document.getElementById('toast-box').appendChild(d);
                 setTimeout(()=>d.remove(),3000);
             },
             
@@ -457,7 +484,7 @@
 
             // UTILS
             filter: (id, v) => {
-                document.getElementById(id).childNodes.forEach(e => e.style.display = e.innerText.toLowerCase().includes(v.toLowerCase())?'flex':'none');
+                document.getElementById(id).childNodes.forEach(e => { if(e.style) e.style.display = e.innerText.toLowerCase().includes(v.toLowerCase())?'flex':'none'; });
             },
             insertTag: (btn, tag) => {
                 const ta = btn.parentElement.nextElementSibling;
@@ -470,24 +497,15 @@
                 app.toast("Formatted");
             },
 
-            // ADMIN
-            nav: (t, el) => {
+            // ADMIN NAVIGATION
+            adminNav: (t, el) => {
                 document.querySelectorAll('.dock-item').forEach(i=>i.classList.remove('active')); if(el) el.classList.add('active');
-                if(t.startsWith('admin')) {
-                    ['admin-home','admin-exams','admin-results','admin-students'].forEach(i=>document.getElementById(`tab-${i}`).classList.add('hidden'));
-                    document.getElementById(`tab-${t}`).classList.remove('hidden');
-                    if(t==='admin-home') app.loadStats();
-                    if(t==='admin-students') app.loadAllStu();
-                    if(t==='admin-exams') app.loadExams();
-                    if(t==='admin-results') app.loadResGroup();
-                } else {
-                    ['stu-home','stu-exams','stu-results','stu-profile'].forEach(i=>document.getElementById(`tab-${i}`).classList.add('hidden'));
-                    document.getElementById(`tab-${t}`).classList.remove('hidden');
-                    if(t==='stu-home') { app.loadAnn(); app.loadMsg(); }
-                    if(t==='stu-exams') app.loadStuExams();
-                    if(t==='stu-results') app.loadStuRes();
-                    if(t==='stu-profile') app.loadPro();
-                }
+                ['tab-admin-home','tab-admin-exams','tab-admin-results','tab-admin-students'].forEach(i=>document.getElementById(i).classList.add('hidden'));
+                document.getElementById(`tab-${t}`).classList.remove('hidden');
+                if(t==='admin-home') app.loadStats();
+                if(t==='admin-students') app.loadAllStu();
+                if(t==='admin-exams') app.loadExams();
+                if(t==='admin-results') app.loadResGroup();
             },
 
             // ADMIN STATS
@@ -495,10 +513,20 @@
                 const s = await getDocs(query(collection(db,"users"), where("role","==","student")));
                 let tot=0, on=0;
                 const now = new Date();
-                s.forEach(d => { tot++; if(d.data().lastActive && (now - d.data().lastActive.toDate()) < 300000) on++; });
+                s.forEach(d => {
+                    tot++;
+                    if(d.data().lastActive && (now - d.data().lastActive.toDate()) < 300000) on++; // 5 min
+                });
                 document.getElementById('stat-total').innerText = tot;
                 document.getElementById('stat-online').innerText = on;
                 document.getElementById('stat-offline').innerText = tot - on;
+                
+                const cfg = await getDoc(doc(db,"system","config"));
+                if(cfg.exists()) document.getElementById('admin-lb-toggle').checked = cfg.data().leaderboardVisible;
+            },
+            toggleLeaderboard: async () => {
+                const status = document.getElementById('admin-lb-toggle').checked;
+                await setDoc(doc(db, "system", "config"), { leaderboardVisible: status }, {merge: true});
             },
             postAnnounce: async () => {
                 const t = document.getElementById('ann-input').value;
@@ -596,7 +624,7 @@
                 s.forEach(d=>{
                     const e=d.data();
                     const st = e.resultsReleased ? '<span class="badge status-ok">LIVE</span>' : '<span class="badge status-wait">HIDDEN</span>';
-                    c.innerHTML += `<div class="card list-item"><div><b>${e.title}</b><br>${st}</div><button class="btn-secondary btn-sm" onclick="app.viewRes('${d.id}','${e.title.replace(/'/g,"\\'")}',${e.resultsReleased})">View</button></div>`;
+                    c.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center;"><div><b>${e.title}</b><br>${st}</div><button class="btn-secondary btn-sm" onclick="app.viewRes('${d.id}','${e.title.replace(/'/g,"\\'")}',${e.resultsReleased})">View</button></div>`;
                 });
             },
             viewRes: async (eid, t, rel) => {
@@ -644,7 +672,7 @@
                 s.forEach(d=>{
                     const u=d.data();
                     const btn = u.isApproved ? `<i class="fas fa-ban" style="color:var(--danger); cursor:pointer;" onclick="app.apprStu('${d.id}',false)"></i>` : `<i class="fas fa-check" style="color:var(--success); cursor:pointer;" onclick="app.apprStu('${d.id}',true)"></i>`;
-                    c.innerHTML += `<div class="list-item"><div><b>${u.displayName}</b><br><small>${u.email}</small></div><div>${btn} <i class="fas fa-cog" style="margin-left:15px; color:var(--primary); cursor:pointer;" onclick="app.edtStu('${d.id}')"></i></div></div>`;
+                    c.innerHTML += `<div class="list-item" style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid rgba(255,255,255,0.1);"><div><b>${u.displayName}</b><br><small>${u.email}</small></div><div>${btn} <i class="fas fa-cog" style="margin-left:15px; color:var(--primary); cursor:pointer;" onclick="app.edtStu('${d.id}')"></i></div></div>`;
                 });
             },
             apprStu: async(id,s)=>{ await updateDoc(doc(db,"users",id),{isApproved:s}); app.loadAllStu(); },
@@ -654,7 +682,7 @@
                 document.getElementById('edt-phone').value=u.phone; document.getElementById('edt-class').value=u.class;
                 document.getElementById('edt-div').value=u.division; document.getElementById('modal-edit').classList.remove('hidden');
             },
-            saveStudent: async()=>{
+            saveStudentEdit: async()=>{
                 const id = document.getElementById('edt-uid').value;
                 const m = document.getElementById('edt-msg').value;
                 await updateDoc(doc(db,"users",id), {
@@ -665,14 +693,21 @@
                 document.getElementById('modal-edit').classList.add('hidden'); app.loadAllStu(); app.toast("Saved");
             },
 
-            // STUDENT FEATURES
+            // STUDENT NAVIGATION
+            stuNav: (t, el) => {
+                document.querySelectorAll('.dock-item').forEach(i=>i.classList.remove('active')); if(el) el.classList.add('active');
+                ['tab-stu-home','tab-stu-exams','tab-stu-results','tab-stu-profile'].forEach(i=>document.getElementById(i).classList.add('hidden'));
+                document.getElementById(`tab-${t}`).classList.remove('hidden');
+                if(t==='stu-home') { app.loadAnn(); app.loadMsg(); }
+                if(t==='stu-exams') app.loadStuExams();
+                if(t==='stu-results') app.loadStuRes();
+                if(t==='stu-profile') app.loadPro();
+            },
             loadAnn: async () => {
                 const c = document.getElementById('ann-box'); c.innerHTML="";
-                // Fix: Sort in memory to avoid missing index error
-                const s = await getDocs(query(collection(db,"announcements"), limit(5)));
-                const data = s.docs.map(d=>d.data()).sort((a,b)=>b.date-a.date);
-                if(data.length === 0) c.innerHTML="<small>No news.</small>";
-                data.forEach(d=>c.innerHTML+=`<div style="margin-bottom:10px; padding:10px; background:rgba(255,255,255,0.05); border-radius:10px;"><small style="color:var(--primary)">${new Date(d.date.seconds*1000).toLocaleDateString()}</small><br>${d.text}</div>`);
+                const s = await getDocs(query(collection(db,"announcements"), orderBy("date","desc"), limit(5)));
+                if(s.empty) c.innerHTML="<small>No news.</small>";
+                s.forEach(d=>c.innerHTML+=`<div style="margin-bottom:10px; padding:10px; background:rgba(255,255,255,0.05); border-radius:10px;"><small style="color:var(--primary)">${new Date(d.data().date.seconds*1000).toLocaleDateString()}</small><br>${d.data().text}</div>`);
             },
             loadMsg: async () => {
                 const c = document.getElementById('msg-box'); c.innerHTML="";
@@ -703,6 +738,7 @@
                 const s = await getDocs(query(collection(db,"results"), where("uid","==",user.uid)));
                 const data = s.docs.map(d=>{return{id:d.id, ...d.data()}}).sort((a,b)=>b.date-a.date);
                 c.innerHTML="";
+                if(data.length === 0) { c.innerHTML = "<p>No results yet.</p>"; return; }
                 for(const r of data){
                     let show = r.isReleased;
                     if(!show) {
@@ -710,10 +746,9 @@
                         if(es.exists() && es.data().resultsReleased) show=true;
                     }
                     const type = show ? 'pub' : 'pen';
-                    const css = show ? 'res-card-pub' : 'res-card-pen';
+                    const css = show ? 'status-ok' : 'status-wait';
                     const st = show ? `<b style="color:var(--success)">${r.score}</b>` : `<span style="color:var(--warning)">Pending</span>`;
-                    const rev = (show && r.details) ? `<button class="btn-secondary btn-sm" onclick="app.rev('${r.id}')" style="margin-top:10px;">Review</button>` : '';
-                    c.innerHTML += `<div class="card ${css}" data-type="${type}"><div><b>${r.examTitle}</b></div><div style="display:flex; justify-content:space-between;"><span>${new Date(r.date.seconds*1000).toLocaleDateString()}</span>${st}</div>${rev}</div>`;
+                    c.innerHTML += `<div class="card" data-type="${type}"><div><b>${r.examTitle}</b></div><div style="display:flex; justify-content:space-between; margin-top:5px;"><span>${new Date(r.date.seconds*1000).toLocaleDateString()}</span>${st}</div></div>`;
                 }
                 app.resFilter('pub', document.querySelector('#tab-stu-results .tab-btn')); 
             },
@@ -758,7 +793,7 @@
 
                     const c = document.getElementById('q-area'); c.innerHTML="";
                     qs.forEach((q,i)=>{
-                        c.innerHTML += `<div class="card"><p><b>${i+1}.</b> ${q.text}</p><div class="grid-2">${q.options.map((o,x)=>`<label style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;"><input type="radio" name="q${i}" value="${x}"> ${o}</label>`).join('')}</div></div>`;
+                        c.innerHTML += `<div class="card"><p><b>${i+1}.</b> ${q.text}</p><div class="grid-2">${q.options.map((o,x)=>`<label class="option-label"><input type="radio" name="q${i}" value="${x}"> ${o}</label>`).join('')}</div></div>`;
                     });
 
                     let t=activeExam.time*60;
@@ -789,24 +824,6 @@
                     date:new Date(), isReleased:false, details:dets
                 });
                 alert("Submitted!"); location.reload();
-            },
-            rev: async(rid) => {
-                const r = (await getDoc(doc(db,"results",rid))).data();
-                document.getElementById('view-student').classList.add('hidden');
-                document.getElementById('view-paper').classList.remove('hidden');
-                document.getElementById('q-title').innerText="REVIEW: "+r.examTitle;
-                document.getElementById('q-timer').innerText=r.score;
-                document.querySelector('button[onclick="app.submit()"]').innerText="CLOSE";
-                document.querySelector('button[onclick="app.submit()"]').onclick=()=>location.reload();
-                
-                const c = document.getElementById('q-area'); c.innerHTML="";
-                r.details.forEach((q,i)=>{
-                    c.innerHTML += `<div class="card"><p><b>${i+1}.</b> ${q.q}</p><div class="grid-2">${q.opts.map((o,x)=>{
-                        let st=""; if(x===q.correct) st="border:1px solid lime; color:lime;";
-                        else if(x===q.selected) st="border:1px solid red; color:red;";
-                        return `<div style="padding:10px; border-radius:8px; background:rgba(255,255,255,0.05); ${st}">${o}</div>`;
-                    }).join('')}</div></div>`;
-                });
             }
         };
 
@@ -839,8 +856,7 @@
                     
                     app.nav('stu-home', document.querySelector('.dock-item'));
                 } else {
-                    if(u.emailVerified) document.getElementById('pend-msg').innerText = "Verified. Waiting for Admin.";
-                    else document.getElementById('pend-msg').innerText = "Check your email inbox.";
+                    document.getElementById('pend-msg').innerText = "Waiting for Admin Approval.";
                     document.getElementById('view-pending').classList.remove('hidden');
                 }
             } else {

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeonLMS - Admin OS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-body: #000; --bg-glass: rgba(28,28,30,0.85); --primary: #0A84FF; --danger: #FF453A; --success: #30D158; --text: #FFF;
+        }
+        body { margin:0; font-family:'Inter',sans-serif; background:radial-gradient(circle at 50% 0%, #1c1c1e, #000); color:var(--text); min-height:100vh; padding-bottom:100px; }
+        .container { max-width:1000px; margin:0 auto; padding:20px; }
+        .hidden { display:none!important; }
+        .card { background:var(--bg-glass); backdrop-filter:blur(30px); border:1px solid rgba(255,255,255,0.1); border-radius:18px; padding:20px; margin-bottom:15px; }
+        input, select, textarea { width:100%; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1); padding:12px; border-radius:10px; color:white; margin-bottom:10px; }
+        button { width:100%; padding:12px; border-radius:10px; border:none; cursor:pointer; font-weight:bold; transition:0.2s; display:flex; justify-content:center; align-items:center; gap:8px; }
+        .btn-primary { background:var(--primary); color:white; }
+        .btn-danger { background:rgba(255,69,58,0.2); color:var(--danger); }
+        .btn-sec { background:rgba(255,255,255,0.1); color:white; }
+        .dock { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:rgba(40,40,40,0.8); backdrop-filter:blur(20px); padding:15px; border-radius:24px; display:flex; gap:30px; box-shadow:0 10px 40px rgba(0,0,0,0.5); z-index:1000; border:1px solid rgba(255,255,255,0.1); }
+        .dock i { font-size:24px; color:rgba(255,255,255,0.5); cursor:pointer; transition:0.3s; }
+        .dock i.active { color:var(--primary); transform:translateY(-5px); }
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+        .badge { padding:4px 8px; border-radius:4px; font-size:11px; font-weight:bold; background:#333; }
+        table { width:100%; border-collapse:collapse; font-size:13px; }
+        td, th { padding:10px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1); }
+        #loader { position:fixed; inset:0; background:#000; z-index:9999; display:flex; align-items:center; justify-content:center; }
+    </style>
+</head>
+<body>
+    <div id="loader">Loading Admin OS...</div>
+
+    <div class="container" id="app-ui">
+        <!-- HEADER -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h2><i class="fas fa-terminal"></i> Command Center</h2>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-sec" onclick="window.location.href='user.html'" style="width:auto">Go to App</button>
+                <button class="btn-danger" onclick="app.logout()" style="width:auto">Logout</button>
+            </div>
+        </div>
+
+        <!-- TAB: HOME -->
+        <div id="tab-home">
+            <div class="grid-4" style="margin-bottom:20px;">
+                <div class="card" style="text-align:center;"><h2><i class="fas fa-users"></i></h2><h3 id="st-users">0</h3><small>Users</small></div>
+                <div class="card" style="text-align:center;"><h2><i class="fas fa-file-alt"></i></h2><h3 id="st-exams">0</h3><small>Exams</small></div>
+                <div class="card" style="text-align:center;"><h2><i class="fas fa-wifi"></i></h2><h3 id="st-online" style="color:var(--success)">0</h3><small>Online</small></div>
+                <div class="card" style="text-align:center;"><h2><i class="fas fa-school"></i></h2><h3 id="st-classes">0</h3><small>Classes</small></div>
+            </div>
+            <div class="card">
+                <h3>Global Announcement</h3>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="ann-txt" placeholder="Write message...">
+                    <button class="btn-primary" style="width:auto" onclick="app.postAnn()">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: ACADEMICS (Classes/Subjects) -->
+        <div id="tab-academic" class="hidden">
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Manage Classes</h3>
+                    <div style="display:flex; gap:5px;">
+                        <input type="text" id="new-class" placeholder="e.g. Class 10">
+                        <button class="btn-primary" style="width:auto" onclick="app.addClass()">+</button>
+                    </div>
+                    <div id="class-list" style="margin-top:10px;"></div>
+                </div>
+                <div class="card">
+                    <h3>Manage Subjects</h3>
+                    <div style="display:flex; gap:5px;">
+                        <input type="text" id="new-sub" placeholder="e.g. Physics">
+                        <button class="btn-primary" style="width:auto" onclick="app.addSub()">+</button>
+                    </div>
+                    <div id="sub-list" style="margin-top:10px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: EXAMS -->
+        <div id="tab-exams" class="hidden">
+            <div class="card">
+                <h3>Create Exam</h3>
+                <div class="grid-2">
+                    <input type="text" id="ex-title" placeholder="Title">
+                    <select id="ex-class"><option>Loading Classes...</option></select>
+                </div>
+                <div class="grid-2">
+                    <select id="ex-sub"><option>Loading Subjects...</option></select>
+                    <input type="number" id="ex-time" placeholder="Minutes">
+                </div>
+                <div class="grid-2">
+                    <input type="number" id="ex-neg" placeholder="Neg Mark (e.g. 0.25)">
+                    <label style="display:flex; align-items:center; gap:10px; background:rgba(0,0,0,0.3); padding:0 10px; border-radius:10px; border:1px solid rgba(255,255,255,0.1);">
+                        <input type="checkbox" id="ex-prem" style="width:auto;"> Premium (Paid)
+                    </label>
+                </div>
+                
+                <div style="margin-top:10px; padding:10px; border:1px dashed #555; border-radius:10px;">
+                    <small>Question Builder</small>
+                    <div id="q-box"></div>
+                    <button class="btn-sec" onclick="app.addQ()" style="margin-top:5px;">+ MCQ</button>
+                    <textarea id="json-in" placeholder="Paste JSON here..." rows="3" style="margin-top:10px; font-family:monospace;"></textarea>
+                    <button class="btn-sec" onclick="app.parseJSON()">Import JSON</button>
+                </div>
+
+                <button class="btn-primary" style="margin-top:15px;" onclick="app.saveExam()">PUBLISH EXAM</button>
+            </div>
+            <div id="exam-list"></div>
+        </div>
+
+        <!-- TAB: USERS -->
+        <div id="tab-users" class="hidden">
+            <div class="card">
+                <h3>User Management</h3>
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <input type="file" id="csv-file" accept=".csv" style="display:none;" onchange="app.parseCSV(this)">
+                    <button class="btn-sec" onclick="document.getElementById('csv-file').click()"><i class="fas fa-file-csv"></i> Batch Import Students</button>
+                    <input type="text" placeholder="Search..." onkeyup="app.filterTable('user-table', this.value)">
+                </div>
+                <div style="overflow-x:auto;">
+                    <table id="user-table"><thead><tr><th>Name</th><th>Role</th><th>Action</th></tr></thead><tbody></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: RESULTS -->
+        <div id="tab-results" class="hidden">
+            <div class="card">
+                <h3>Exam Results</h3>
+                <div id="res-list"></div>
+            </div>
+        </div>
+
+        <!-- DOCK -->
+        <div class="dock">
+            <i class="fas fa-home active" onclick="app.nav('home', this)"></i>
+            <i class="fas fa-graduation-cap" onclick="app.nav('academic', this)"></i>
+            <i class="fas fa-file-signature" onclick="app.nav('exams', this)"></i>
+            <i class="fas fa-users" onclick="app.nav('users', this)"></i>
+            <i class="fas fa-chart-pie" onclick="app.nav('results', this)"></i>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, getDoc, query, where, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // CREDENTIALS
+        const firebaseConfig = { apiKey: "AIzaSyBEMPS8vEJztGpoBPJjJIzKKInyt4IY9rQ", authDomain: "studentlms-79722.firebaseapp.com", projectId: "studentlms-79722", storageBucket: "studentlms-79722.firebasestorage.app", messagingSenderId: "1029623857004", appId: "1:1029623857004:web:fa07cb3de1270990a87d49" };
+        const appInit = initializeApp(firebaseConfig);
+        const auth = getAuth(appInit);
+        const db = getFirestore(appInit);
+        let qs = [];
+
+        window.app = {
+            nav: (t, el) => {
+                document.querySelectorAll('.dock i').forEach(x=>x.classList.remove('active')); el.classList.add('active');
+                document.querySelectorAll('[id^="tab-"]').forEach(x=>x.classList.add('hidden'));
+                document.getElementById(`tab-${t}`).classList.remove('hidden');
+                if(t==='users') app.loadUsers();
+                if(t==='exams') app.loadExams();
+                if(t==='results') app.loadResults();
+                if(t==='academic') app.loadAcademic();
+                if(t==='home') app.loadStats();
+            },
+            logout: () => { signOut(auth).then(()=>window.location.href='user.html'); },
+
+            // ACADEMIC
+            loadAcademic: async () => {
+                // Classes
+                const cs = await getDocs(collection(db,"classes"));
+                let h = ""; 
+                const sel = document.getElementById('ex-class'); sel.innerHTML="";
+                cs.forEach(d=>{
+                    h+=`<span class="badge" style="margin-right:5px;cursor:pointer;" onclick="app.delClass('${d.id}')">${d.data().name} ×</span>`;
+                    sel.innerHTML+=`<option value="${d.data().name}">${d.data().name}</option>`;
+                });
+                document.getElementById('class-list').innerHTML=h;
+                
+                // Subjects
+                const ss = await getDocs(collection(db,"subjects"));
+                let sh = ""; 
+                const subSel = document.getElementById('ex-sub'); subSel.innerHTML="";
+                ss.forEach(d=>{
+                    sh+=`<span class="badge" style="margin-right:5px;cursor:pointer;" onclick="app.delSub('${d.id}')">${d.data().name} ×</span>`;
+                    subSel.innerHTML+=`<option value="${d.data().name}">${d.data().name}</option>`;
+                });
+                document.getElementById('sub-list').innerHTML=sh;
+            },
+            addClass: async()=>{ const n=document.getElementById('new-class').value; if(n){await addDoc(collection(db,"classes"),{name:n}); app.loadAcademic();} },
+            delClass: async(id)=>{ if(confirm("Del?")) {await deleteDoc(doc(db,"classes",id)); app.loadAcademic();} },
+            addSub: async()=>{ const n=document.getElementById('new-sub').value; if(n){await addDoc(collection(db,"subjects"),{name:n}); app.loadAcademic();} },
+            delSub: async(id)=>{ if(confirm("Del?")) {await deleteDoc(doc(db,"subjects",id)); app.loadAcademic();} },
+
+            // USERS & BATCH IMPORT
+            loadUsers: async () => {
+                const s = await getDocs(collection(db,"users"));
+                const t = document.querySelector('#user-table tbody'); t.innerHTML="";
+                s.forEach(d=>{
+                    const u=d.data();
+                    const teachBtn = u.role==='student' ? `<button class="btn-sec btn-sm" onclick="app.promote('${d.id}')">Make Teacher</button>` : `<span class="badge" style="background:gold;color:black">TEACHER</span>`;
+                    t.innerHTML += `<tr><td>${u.displayName}<br><small>${u.email}</small></td><td>${u.role}</td><td>${teachBtn}</td></tr>`;
+                });
+            },
+            promote: async(id)=>{ await updateDoc(doc(db,"users",id),{role:'teacher'}); app.loadUsers(); },
+            parseCSV: (inp) => {
+                const file = inp.files[0];
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const lines = e.target.result.split('\n');
+                    let count = 0;
+                    for(let line of lines) {
+                        const [email, name, cls] = line.split(',');
+                        if(email && name) {
+                            // Pre-register user in Firestore
+                            // Note: This doesn't create auth, but sets data so when they register, they get approved.
+                            const dummyId = email.replace(/[^a-zA-Z0-9]/g,''); // simplified ID
+                            // In real app, we can't guess UID. So we create a "whitelist" collection
+                            await addDoc(collection(db,"whitelist"), {email: email.trim(), name: name.trim(), class: cls?cls.trim():'9'});
+                            count++;
+                        }
+                    }
+                    alert(`Imported ${count} students to Whitelist.`);
+                };
+                reader.readAsText(file);
+            },
+
+            // EXAMS
+            addQ: () => {
+                qs.push({q:"",a:"",b:"",c:"",d:"",cor:0});
+                app.renderQs();
+            },
+            renderQs: () => {
+                const c = document.getElementById('q-box'); c.innerHTML="";
+                qs.forEach((q,i)=>{
+                    c.innerHTML+=`<div style="margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:10px;">
+                        <input placeholder="Question" onchange="app.updQ(${i},'q',this.value)" value="${q.q}">
+                        <div class="grid-2">
+                            <input placeholder="A" onchange="app.updQ(${i},'a',this.value)" value="${q.a}">
+                            <input placeholder="B" onchange="app.updQ(${i},'b',this.value)" value="${q.b}">
+                            <input placeholder="C" onchange="app.updQ(${i},'c',this.value)" value="${q.c}">
+                            <input placeholder="D" onchange="app.updQ(${i},'d',this.value)" value="${q.d}">
+                        </div>
+                        <select onchange="app.updQ(${i},'cor',this.value)">
+                            <option value="0" ${q.cor==0?'selected':''}>Correct: A</option>
+                            <option value="1" ${q.cor==1?'selected':''}>Correct: B</option>
+                            <option value="2" ${q.cor==2?'selected':''}>Correct: C</option>
+                            <option value="3" ${q.cor==3?'selected':''}>Correct: D</option>
+                        </select>
+                    </div>`;
+                });
+            },
+            updQ: (i,k,v)=>{ qs[i][k]=v; },
+            parseJSON: () => {
+                try {
+                    const j = JSON.parse(document.getElementById('json-in').value);
+                    j.forEach(x=>qs.push({q:x.text, a:x.options[0], b:x.options[1], c:x.options[2], d:x.options[3], cor:x.correct}));
+                    app.renderQs();
+                } catch(e){ alert("Invalid JSON"); }
+            },
+            saveExam: async () => {
+                const data = {
+                    title: document.getElementById('ex-title').value,
+                    class: document.getElementById('ex-class').value,
+                    subject: document.getElementById('ex-sub').value,
+                    time: parseInt(document.getElementById('ex-time').value),
+                    negMark: parseFloat(document.getElementById('ex-neg').value)||0,
+                    isPremium: document.getElementById('ex-prem').checked,
+                    questions: qs.map(x=>({text:x.q, options:[x.a,x.b,x.c,x.d], correct:parseInt(x.cor)})),
+                    published: false, createdAt: new Date()
+                };
+                if(!data.title) return alert("Title required");
+                await addDoc(collection(db,"exams"), data);
+                alert("Created!"); qs=[]; app.renderQs(); app.loadExams();
+            },
+            loadExams: async () => {
+                const d = await getDocs(collection(db,"exams"));
+                const c = document.getElementById('exam-list'); c.innerHTML="";
+                d.forEach(doc=>{
+                    const e=doc.data();
+                    const btn = e.published ? `<button class="btn-sec" onclick="app.pub('${doc.id}',false)">Unpublish</button>` : `<button class="btn-primary" onclick="app.pub('${doc.id}',true)">Publish</button>`;
+                    c.innerHTML += `<div class="card"><b>${e.title}</b> (${e.class})<br><small>${e.subject}</small><div style="margin-top:10px;">${btn}</div></div>`;
+                });
+            },
+            pub: async(id,s)=>{ await updateDoc(doc(db,"exams",id),{published:s}); app.loadExams(); },
+
+            // RESULTS
+            loadResults: async () => {
+                const s = await getDocs(collection(db,"exams"));
+                const c = document.getElementById('res-list'); c.innerHTML="";
+                s.forEach(d=>{
+                    c.innerHTML += `<div class="card"><b>${d.data().title}</b><br><button class="btn-sec" onclick="app.viewRes('${d.id}')">View Results</button></div>`;
+                });
+            },
+            viewRes: async (eid) => {
+                const s = await getDocs(query(collection(db,"results"), where("examId","==",eid)));
+                let h = `<div class="card"><h3>Report</h3><button class="btn-sec" onclick="app.loadResults()">Close</button><table style="margin-top:10px;"><tr><th>Name</th><th>Score</th></tr>`;
+                s.forEach(d=>{ h+=`<tr><td>${d.data().studentName}</td><td>${d.data().score}</td></tr>`; });
+                h+="</table></div>";
+                document.getElementById('res-list').innerHTML=h;
+            },
+            
+            // STATS
+            loadStats: async () => {
+                const u = await getDocs(collection(db,"users"));
+                const e = await getDocs(collection(db,"exams"));
+                const c = await getDocs(collection(db,"classes"));
+                document.getElementById('st-users').innerText = u.size;
+                document.getElementById('st-exams').innerText = e.size;
+                document.getElementById('st-classes').innerText = c.size;
+                // Online count logic (simple)
+                let on=0; const now=new Date();
+                u.forEach(d=>{ if(d.data().lastActive && (now-d.data().lastActive.toDate())<300000) on++; });
+                document.getElementById('st-online').innerText=on;
+            },
+            postAnn: async()=>{
+                const t=document.getElementById('ann-txt').value;
+                if(t){ await addDoc(collection(db,"announcements"),{text:t, date:new Date()}); alert("Posted"); }
+            },
+            filterTable: (id, term) => {
+                document.querySelectorAll(`#${id} tbody tr`).forEach(row => {
+                    row.style.display = row.innerText.toLowerCase().includes(term.toLowerCase()) ? 'table-row' : 'none';
+                });
+            }
+        };
+
+        // INIT
+        onAuthStateChanged(auth, async (u) => {
+            document.getElementById('loader').style.display='none';
+            if(!u) window.location.href='user.html';
+            else {
+                const d = await getDoc(doc(db,"users",u.uid));
+                if(d.exists() && (d.data().role==='admin' || d.data().role==='teacher')) {
+                    app.loadAcademic(); app.loadStats();
+                } else {
+                    window.location.href='user.html';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -270,7 +270,7 @@
                     <button class="btn-secondary" onclick="app.addQ()" style="margin-top:10px;">+ Question</button>
                 </div>
                 <div id="build-json" class="hidden">
-                    <textarea id="json-in" rows="5" placeholder='[{"text":"Q","options":["A","B","C","D"],"correct":0}]'></textarea>
+                    <textarea id="json-in" rows="5" placeholder='Paste your JSON here...'></textarea>
                     <button class="btn-success" onclick="app.parseJSON()">Import</button>
                 </div>
 
@@ -545,10 +545,49 @@
                 if(d) div.querySelector('.q-c').value = d.correct;
                 document.getElementById('q-box').appendChild(div);
             },
+            
+            // --- UPDATED PARSE JSON FUNCTION ---
             parseJSON: () => {
-                try { JSON.parse(document.getElementById('json-in').value).forEach(q=>app.addQ(q)); app.toggleBuilder('manual'); }
-                catch(e){ app.toast("Invalid JSON",'error'); }
+                try {
+                    const val = document.getElementById('json-in').value;
+                    if(!val) return;
+                    let data = JSON.parse(val);
+                    
+                    // 1. Handle "questions" wrapper
+                    if(!Array.isArray(data) && data.questions) data = data.questions;
+                    if(!Array.isArray(data)) throw new Error("Not an array");
+
+                    // 2. Map and Add
+                    data.forEach(q => {
+                        // Map 'question' to 'text'
+                        const text = q.text || q.question || "";
+                        
+                        // Options usually match
+                        const opts = q.options || ["","","",""];
+                        
+                        // Map 'answer' string to index
+                        let corr = 0;
+                        if(typeof q.correct !== 'undefined') corr = q.correct;
+                        else if(typeof q.answer !== 'undefined') {
+                            // If answer is string, find index in options
+                            if(typeof q.answer === 'string') {
+                                const idx = opts.indexOf(q.answer);
+                                if(idx !== -1) corr = idx;
+                            } else {
+                                corr = parseInt(q.answer);
+                            }
+                        }
+
+                        app.addQ({ text: text, options: opts, correct: corr });
+                    });
+
+                    app.toggleBuilder('manual');
+                    app.toast(`Imported ${data.length} Qs`);
+                }
+                catch(e){ console.log(e); app.toast("Invalid JSON Format",'error'); }
             },
+            // ------------------------------------
+
             saveExam: async () => {
                 const btn=document.getElementById('btn-save-text'); 
                 if(btn) btn.innerText="Saving...";

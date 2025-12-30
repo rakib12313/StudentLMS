@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LMS - Final</title>
+    <title>LMS - MasterOS</title>
     
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -11,12 +11,11 @@
 
     <style>
         :root {
-            /* macOS Dark Theme (CSS Only) */
-            --bg-body: #000000;
+            /* macOS Dark Theme */
             --bg-gradient: radial-gradient(circle at 50% 0%, #1c1c1e 0%, #000000 100%);
-            --bg-card: rgba(28, 28, 30, 0.75);
+            --bg-card: rgba(28, 28, 30, 0.70);
             --bg-input: rgba(0, 0, 0, 0.5);
-            --border: rgba(255, 255, 255, 0.1);
+            --border: rgba(255, 255, 255, 0.12);
             
             /* Apple Colors */
             --primary: #0A84FF;
@@ -38,7 +37,7 @@
             background-attachment: fixed;
             color: var(--text-main);
             min-height: 100vh;
-            padding-bottom: 110px; /* Space for Dock */
+            padding-bottom: 110px;
             overflow-x: hidden;
         }
 
@@ -49,11 +48,11 @@
         /* Glass Card */
         .card {
             background: var(--bg-card);
-            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
             border: 1px solid var(--border);
             border-radius: var(--radius);
             padding: 20px; margin-bottom: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
         }
 
         h1, h2, h3 { margin: 0 0 10px 0; font-weight: 700; letter-spacing: -0.5px; }
@@ -65,7 +64,7 @@
             background: var(--bg-input); border: 1px solid var(--border);
             border-radius: 12px; color: white; font-size: 15px; font-family: inherit; transition: 0.2s;
         }
-        input:focus, select:focus, textarea:focus { border-color: var(--primary); background: rgba(20,20,20,0.8); }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); background: rgba(20,20,20,0.9); }
         option { background: #1c1c1e; }
 
         /* Buttons */
@@ -92,7 +91,7 @@
             border-radius: 26px;
             display: flex; justify-content: space-around;
             padding: 12px 0; z-index: 1000;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
         }
         .dock-item {
             display: flex; flex-direction: column; align-items: center;
@@ -126,7 +125,7 @@
         @keyframes spin { 100% { transform: rotate(360deg); } }
         @keyframes fadeUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         
-        /* Elements */
+        /* Exam Elements */
         .option-label { display: block; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 8px; cursor: pointer; transition: 0.2s; border: 1px solid var(--border); }
         .option-label:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.3); }
         input[type="radio"]:checked + span { color: var(--primary); font-weight: bold; }
@@ -136,20 +135,23 @@
         .fmt-btn { background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; color: #ccc; font-size: 12px; cursor: pointer; }
         
         /* Review Colors */
-        .opt-right { border-color: var(--success); background: rgba(48, 209, 88, 0.1); }
-        .opt-wrong { border-color: var(--danger); background: rgba(255, 69, 58, 0.1); }
+        .opt-right { border-color: var(--success); background: rgba(48, 209, 88, 0.1); color: var(--success); }
+        .opt-wrong { border-color: var(--danger); background: rgba(255, 69, 58, 0.1); color: var(--danger); }
+        
+        /* Lists */
+        .list-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
 <body>
 
     <div id="loader">
         <div class="spinner"></div>
-        <p style="margin-top:15px; font-size:12px; letter-spacing:1px; color:#666;">LOADING SYSTEM...</p>
+        <p style="margin-top:15px; font-size:12px; letter-spacing:1px; color:#666;">STARTING OS...</p>
     </div>
     <div id="toast-box"></div>
 
-    <!-- === EDIT STUDENT MODAL (ADMIN) === -->
-    <div id="modal-edit" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(5px); z-index:2000; display:flex; justify-content:center; align-items:center;">
+    <!-- === EDIT STUDENT MODAL === -->
+    <div id="modal-edit" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(10px); z-index:2000; display:flex; justify-content:center; align-items:center;">
         <div class="card" style="width:90%; max-width:400px;">
             <h3>Edit Student</h3>
             <input type="hidden" id="edt-uid">
@@ -172,7 +174,7 @@
         <div class="card" style="width:100%; max-width:380px; text-align:center;">
             <i class="fas fa-graduation-cap" style="font-size:50px; color:var(--primary); margin-bottom:20px;"></i>
             <h2>LMS Portal</h2>
-            <p>Sign in to continue</p>
+            <p>Access Control</p>
             <div id="login-form">
                 <input type="email" id="email" placeholder="Email Address">
                 <input type="password" id="password" placeholder="Password">
@@ -214,7 +216,6 @@
             <div class="dock-item" onclick="app.adminNav('admin-students', this)"><i class="fas fa-user-friends"></i>Users</div>
         </div>
 
-        <!-- Admin Home -->
         <div id="tab-admin-home">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                 <h2 style="margin:0;">Dashboard</h2>
@@ -222,16 +223,10 @@
             </div>
             
             <div class="grid-2" style="margin-bottom:15px;">
-                <div class="stat-box">
-                    <h2 id="stat-total" style="margin:0;">0</h2><small>Total Users</small>
-                </div>
-                <div class="stat-box">
-                    <h2 id="stat-online" style="margin:0; color:var(--success);">0</h2><small>Online Now</small>
-                </div>
+                <div class="stat-box"><h2 id="stat-total" style="margin:0;">0</h2><small>Total Users</small></div>
+                <div class="stat-box"><h2 id="stat-online" style="margin:0; color:var(--success);">0</h2><small>Online Now</small></div>
             </div>
-            <div class="stat-box" style="margin-bottom:15px;">
-                <h2 id="stat-offline" style="margin:0; color:var(--text-sub);">0</h2><small>Offline</small>
-            </div>
+            <div class="stat-box" style="margin-bottom:15px;"><h2 id="stat-offline" style="margin:0; color:var(--text-sub);">0</h2><small>Offline</small></div>
 
             <div class="card">
                 <h3>Broadcast</h3>
@@ -242,7 +237,6 @@
             </div>
         </div>
 
-        <!-- Admin Exams -->
         <div id="tab-admin-exams" class="hidden">
             <div class="card" id="exam-editor">
                 <h3>Create Exam</h3>
@@ -261,11 +255,10 @@
                     <input type="file" id="ex-pdf" accept="application/pdf">
                     <input type="hidden" id="ex-pdf-url">
                 </div>
-                <label style="display:flex; align-items:center; gap:8px; margin-bottom:10px; font-size:14px; color:var(--text-sub);">
+                <label style="font-size:14px; color:var(--text-sub); display:flex; align-items:center; gap:8px; margin-bottom:10px;">
                     <input type="checkbox" id="ex-shuffle" style="width:auto; margin:0;"> Shuffle Questions
                 </label>
 
-                <!-- Builder Tabs -->
                 <div class="tabs">
                     <button class="tab-btn active" onclick="app.setBuilder('manual')">Manual</button>
                     <button class="tab-btn" onclick="app.setBuilder('json')">JSON</button>
@@ -285,12 +278,10 @@
                     <button class="btn-secondary" onclick="app.resetForm()">Reset</button>
                 </div>
             </div>
-            
-            <input type="text" placeholder="Search exams..." onkeyup="app.filter('admin-exam-list', this.value)" style="border-radius:20px;">
+            <input type="text" placeholder="Search exams..." onkeyup="app.filter('admin-exam-list', this.value, '.card')">
             <div id="admin-exam-list"></div>
         </div>
 
-        <!-- Admin Results -->
         <div id="tab-admin-results" class="hidden">
             <div id="res-list-view">
                 <h3>Exam Reports</h3>
@@ -304,21 +295,15 @@
                         <button class="btn-primary btn-sm" onclick="app.pubAll(true)">Publish All</button>
                         <button class="btn-secondary btn-sm" onclick="app.pubAll(false)">Hide All</button>
                     </div>
-                    <div style="overflow-x:auto;">
-                        <table style="width:100%;">
-                            <thead><tr><th style="text-align:left;">Student</th><th>Score</th><th>Action</th></tr></thead>
-                            <tbody id="res-rows"></tbody>
-                        </table>
-                    </div>
+                    <div id="res-rows"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Admin Students -->
         <div id="tab-admin-students" class="hidden">
             <div class="card">
                 <h3>Directory</h3>
-                <input type="text" placeholder="Search users..." onkeyup="app.filter('stu-rows', this.value)" style="border-radius:20px;">
+                <input type="text" placeholder="Search users..." onkeyup="app.filter('stu-rows', this.value, '.list-row')">
                 <div id="stu-rows"></div>
             </div>
         </div>
@@ -326,7 +311,6 @@
 
     <!-- === STUDENT VIEW === -->
     <div id="view-student" class="container hidden">
-        <!-- Student Dock -->
         <div class="dock">
             <div class="dock-item active" onclick="app.stuNav('home', this)"><i class="fas fa-compass"></i>Home</div>
             <div class="dock-item" onclick="app.stuNav('exams', this)"><i class="fas fa-book"></i>Exams</div>
@@ -334,18 +318,15 @@
             <div class="dock-item" onclick="app.stuNav('profile', this)"><i class="fas fa-user-circle"></i>Profile</div>
         </div>
 
-        <!-- Home -->
         <div id="tab-stu-home">
             <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
                 <div><h2 style="margin:0;">Hi, <span id="stu-name">User</span></h2><small>Class <span id="stu-class">--</span></small></div>
                 <div id="stu-badge" class="badge status-wait">--</div>
             </div>
-            
             <div class="grid-2" style="margin-bottom:15px;">
                 <div class="stat-box"><h2 id="quick-count" style="margin:0;">0</h2><small>Exams</small></div>
                 <div class="stat-box"><h2 id="quick-avg" style="margin:0; color:var(--primary);">0%</h2><small>Average</small></div>
             </div>
-
             <div class="card">
                 <h3>Updates</h3>
                 <div id="ann-box"></div>
@@ -353,14 +334,12 @@
             </div>
         </div>
 
-        <!-- Exams -->
         <div id="tab-stu-exams" class="hidden">
             <h3>Missions</h3>
-            <input type="text" placeholder="Search..." onkeyup="app.filter('stu-exam-list', this.value)" style="border-radius:20px;">
-            <div id="stu-exam-list" style="margin-top:10px;"></div>
+            <input type="text" placeholder="Search..." onkeyup="app.filter('stu-exam-list', this.value, '.card')" style="margin-bottom:15px;">
+            <div id="stu-exam-list"></div>
         </div>
 
-        <!-- Results -->
         <div id="tab-stu-results" class="hidden">
             <div class="tabs">
                 <button class="tab-btn active" onclick="app.resFilter('pub', this)">Verified</button>
@@ -369,7 +348,6 @@
             <div id="stu-res-list"></div>
         </div>
 
-        <!-- Profile -->
         <div id="tab-stu-profile" class="hidden">
             <div class="card" style="text-align:center;">
                 <img id="pro-img" class="profile-img" src="https://via.placeholder.com/100">
@@ -380,9 +358,9 @@
                 <div id="pro-status-badge"></div>
                 
                 <div style="text-align:left; background:rgba(0,0,0,0.2); border-radius:12px; padding:15px; margin-top:20px;">
-                    <div class="list-item"><small>Email</small> <span id="pro-email" style="color:white;">--</span></div>
-                    <div class="list-item"><small>Phone</small> <span id="pro-phone" style="color:white;">--</span></div>
-                    <div class="list-item"><small>Class</small> <span id="pro-class-2" style="color:white;">--</span></div>
+                    <div class="list-row"><small>Email</small> <span id="pro-email" style="color:white;">--</span></div>
+                    <div class="list-row"><small>Phone</small> <span id="pro-phone" style="color:white;">--</span></div>
+                    <div class="list-row"><small>Class</small> <span id="pro-class-2" style="color:white;">--</span></div>
                 </div>
                 <button class="btn-danger" style="margin-top:20px;" onclick="app.logout()">Sign Out</button>
             </div>
@@ -407,7 +385,6 @@
         import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, deleteDoc, updateDoc, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // CONFIGURATION - PRE-FILLED
         const firebaseConfig = {
             apiKey: "AIzaSyBEMPS8vEJztGpoBPJjJIzKKInyt4IY9rQ",
             authDomain: "studentlms-79722.firebaseapp.com",
@@ -470,8 +447,8 @@
             logout: () => signOut(auth),
 
             // UTILS
-            filter: (id, v) => {
-                document.getElementById(id).childNodes.forEach(e => { if(e.style) e.style.display = e.innerText.toLowerCase().includes(v.toLowerCase())?'flex':'none'; });
+            filter: (id, v, selector) => {
+                document.querySelectorAll(`#${id} ${selector}`).forEach(e => { e.style.display = e.innerText.toLowerCase().includes(v.toLowerCase())?'flex':'none'; });
             },
             insertTag: (btn, tag) => {
                 const ta = btn.parentElement.nextElementSibling;
@@ -484,7 +461,7 @@
                 app.toast("Formatted");
             },
 
-            // ADMIN NAVIGATION
+            // ADMIN NAV
             adminNav: (t, el) => {
                 document.querySelectorAll('.dock-item').forEach(i=>i.classList.remove('active')); if(el) el.classList.add('active');
                 ['tab-admin-home','tab-admin-exams','tab-admin-results','tab-admin-students'].forEach(i=>document.getElementById(i).classList.add('hidden'));
@@ -502,7 +479,7 @@
                 const now = new Date();
                 s.forEach(d => {
                     tot++;
-                    if(d.data().lastActive && (now - d.data().lastActive.toDate()) < 300000) on++; // 5 min activity
+                    if(d.data().lastActive && (now - d.data().lastActive.toDate()) < 300000) on++; 
                 });
                 document.getElementById('stat-total').innerText = tot;
                 document.getElementById('stat-online').innerText = on;
@@ -511,6 +488,9 @@
             postAnnounce: async () => {
                 const t = document.getElementById('ann-input').value;
                 if(t) { await addDoc(collection(db,"announcements"),{text:t, date:new Date()}); document.getElementById('ann-input').value=""; app.toast("Posted"); }
+            },
+            delAnnounce: async (id, el) => {
+                if(confirm("Delete?")) { await deleteDoc(doc(db,"announcements",id)); el.parentElement.remove(); }
             },
 
             // EXAMS
@@ -576,7 +556,7 @@
                 document.getElementById('ex-title').value="";
             },
             loadExams: async () => {
-                const c = document.getElementById('admin-exam-list'); c.innerHTML="Loading...";
+                const c = document.getElementById('admin-exam-list'); c.innerHTML="<p>Loading...</p>";
                 const s = await getDocs(collection(db,"exams"));
                 c.innerHTML="";
                 s.forEach(d=>{
@@ -604,7 +584,7 @@
                 s.forEach(d=>{
                     const e=d.data();
                     const st = e.resultsReleased ? '<span class="badge status-ok">LIVE</span>' : '<span class="badge status-wait">HIDDEN</span>';
-                    c.innerHTML += `<div class="card list-item"><div><b>${e.title}</b><br>${st}</div><button class="btn-secondary btn-sm" onclick="app.viewRes('${d.id}','${e.title.replace(/'/g,"\\'")}',${e.resultsReleased})">View</button></div>`;
+                    c.innerHTML += `<div class="card list-row"><div><b>${e.title}</b><br>${st}</div><button class="btn-secondary btn-sm" onclick="app.viewRes('${d.id}','${e.title.replace(/'/g,"\\'")}',${e.resultsReleased})">View</button></div>`;
                 });
             },
             viewRes: async (eid, t, rel) => {
@@ -612,7 +592,7 @@
                 document.getElementById('res-list-view').classList.add('hidden');
                 document.getElementById('res-detail-view').classList.remove('hidden');
                 document.getElementById('res-title').innerText = t;
-                const c = document.getElementById('res-rows'); c.innerHTML="<tr><td>Loading...</td></tr>";
+                const c = document.getElementById('res-rows'); c.innerHTML="<p>Loading...</p>";
                 const s = await getDocs(query(collection(db,"results"), where("examId","==",eid)));
                 c.innerHTML="";
                 s.forEach(d=>{
@@ -620,7 +600,7 @@
                     const vis = (rel || r.isReleased);
                     const eye = vis ? 'fa-eye' : 'fa-eye-slash';
                     const col = vis ? 'var(--success)' : 'var(--warning)';
-                    c.innerHTML += `<tr><td style="padding:10px;">${r.studentName}</td><td>${r.score}</td><td><i class="fas ${eye}" style="color:${col}; cursor:pointer;" onclick="app.togRes('${d.id}',${!vis})"></i> <i class="fas fa-trash" style="color:var(--danger); margin-left:10px; cursor:pointer;" onclick="app.delRes('${d.id}')"></i></td></tr>`;
+                    c.innerHTML += `<div class="list-row"><div>${r.studentName}<br><small>${r.score}</small></div><div><i class="fas ${eye}" style="color:${col}; cursor:pointer; margin-right:15px;" onclick="app.togRes('${d.id}',${!vis})"></i> <i class="fas fa-trash" style="color:var(--danger); cursor:pointer;" onclick="app.delRes('${d.id}')"></i></div></div>`;
                 });
             },
             closeResDetail: () => { document.getElementById('res-detail-view').classList.add('hidden'); document.getElementById('res-list-view').classList.remove('hidden'); app.loadResGroup(); },
@@ -632,7 +612,6 @@
             },
             togRes: async (id, s) => {
                 await updateDoc(doc(db,"results",id),{isReleased:s});
-                // Reload
                 const e = await getDoc(doc(db,"exams",curExamId));
                 app.viewRes(curExamId, e.data().title, e.data().resultsReleased);
             },
@@ -652,7 +631,7 @@
                 s.forEach(d=>{
                     const u=d.data();
                     const btn = u.isApproved ? `<i class="fas fa-ban" style="color:var(--danger); cursor:pointer;" onclick="app.apprStu('${d.id}',false)"></i>` : `<i class="fas fa-check" style="color:var(--success); cursor:pointer;" onclick="app.apprStu('${d.id}',true)"></i>`;
-                    c.innerHTML += `<div class="list-item" style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid rgba(255,255,255,0.1);"><div><b>${u.displayName}</b><br><small>${u.email}</small></div><div>${btn} <i class="fas fa-cog" style="margin-left:15px; color:var(--primary); cursor:pointer;" onclick="app.edtStu('${d.id}')"></i></div></div>`;
+                    c.innerHTML += `<div class="list-row"><div><b>${u.displayName}</b><br><small>${u.email}</small></div><div>${btn} <i class="fas fa-cog" style="margin-left:15px; color:var(--primary); cursor:pointer;" onclick="app.edtStu('${d.id}')"></i></div></div>`;
                 });
             },
             apprStu: async(id,s)=>{ await updateDoc(doc(db,"users",id),{isApproved:s}); app.loadAllStu(); },
@@ -673,7 +652,7 @@
                 document.getElementById('modal-edit').classList.add('hidden'); app.loadAllStu(); app.toast("Saved");
             },
 
-            // STUDENT NAVIGATION
+            // STUDENT NAV
             stuNav: (t, el) => {
                 document.querySelectorAll('.dock-item').forEach(i=>i.classList.remove('active')); if(el) el.classList.add('active');
                 ['tab-stu-home','tab-stu-exams','tab-stu-results','tab-stu-profile'].forEach(i=>document.getElementById(i).classList.add('hidden'));
@@ -685,9 +664,14 @@
             },
             loadAnn: async () => {
                 const c = document.getElementById('ann-box'); c.innerHTML="";
-                const s = await getDocs(query(collection(db,"announcements"), orderBy("date","desc"), limit(5)));
-                if(s.empty) c.innerHTML="<small>No news.</small>";
-                s.forEach(d=>c.innerHTML+=`<div style="margin-bottom:10px; padding:10px; background:rgba(255,255,255,0.05); border-radius:10px;"><small style="color:var(--primary)">${new Date(d.data().date.seconds*1000).toLocaleDateString()}</small><br>${d.data().text}</div>`);
+                const s = await getDocs(query(collection(db,"announcements"), limit(5)));
+                const data = s.docs.map(d=>{return{id:d.id, ...d.data()}}).sort((a,b)=>b.date-a.date);
+                if(data.length === 0) c.innerHTML="<small>No news.</small>";
+                data.forEach(d=>{
+                    // Add delete button for admin is handled in admin section, this is student view
+                    // Admin view announcements:
+                    c.innerHTML+=`<div class="card" style="padding:15px; margin-bottom:10px;"><small style="color:var(--primary)">${new Date(d.date.seconds*1000).toLocaleDateString()}</small><br>${d.text}</div>`
+                });
             },
             loadMsg: async () => {
                 const c = document.getElementById('msg-box'); c.innerHTML="";
@@ -728,7 +712,6 @@
                         if(es.exists() && es.data().resultsReleased) show=true;
                     }
                     const type = show ? 'pub' : 'pen';
-                    const css = show ? 'status-ok' : 'status-wait';
                     const st = show ? `<b style="color:var(--success)">${r.score}</b>` : `<span style="color:var(--warning)">Pending</span>`;
                     const rev = (show && r.details) ? `<button class="btn-secondary btn-sm" onclick="app.rev('${r.id}')" style="margin-top:10px;">Review</button>` : '';
                     c.innerHTML += `<div class="card" data-type="${type}"><div><b>${r.examTitle}</b></div><div style="display:flex; justify-content:space-between; margin-top:5px;"><span>${new Date(r.date.seconds*1000).toLocaleDateString()}</span>${st}</div>${rev}</div>`;

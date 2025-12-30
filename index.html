@@ -3,24 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LMS - macOS Stable</title>
+    <title>LMS - Master</title>
     
-    <!-- System Fonts & Icons -->
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
-            /* macOS Dark Theme Palette - Optimized for Readability */
-            --bg-body: #050505;
-            --bg-card: rgba(35, 35, 35, 0.85); /* Darker, less transparent for readability */
+            /* macOS Dark Theme (CSS Only - No Image) */
+            --bg-body: #000000;
+            --bg-gradient: radial-gradient(circle at 50% 0%, #1c1c1e 0%, #000000 100%);
+            --bg-card: rgba(28, 28, 30, 0.75);
             --bg-input: rgba(0, 0, 0, 0.5);
-            --border: rgba(255, 255, 255, 0.15);
-            --primary: #0A84FF; /* iOS Blue */
-            --danger: #FF453A;  /* iOS Red */
-            --success: #30D158; /* iOS Green */
-            --warning: #FFD60A; /* iOS Yellow */
+            --border: rgba(255, 255, 255, 0.1);
+            
+            /* Apple Colors */
+            --primary: #0A84FF;
+            --danger: #FF453A;
+            --success: #30D158;
+            --warning: #FFD60A;
             --text-main: #FFFFFF;
-            --text-sub: #D1D1D6; /* Lighter gray for better contrast */
+            --text-sub: #8E8E93;
+            
             --radius: 18px;
         }
 
@@ -28,84 +33,79 @@
 
         body {
             margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2000&auto=format&fit=crop') no-repeat center center fixed;
-            background-size: cover;
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
             color: var(--text-main);
             min-height: 100vh;
-            padding-bottom: 120px; /* Space for Dock */
+            padding-bottom: 110px; /* Space for Dock */
             overflow-x: hidden;
         }
-        
-        /* Dark overlay for readability */
-        body::before {
-            content: ""; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: -1;
-        }
 
-        .container { max-width: 850px; margin: 0 auto; padding: 20px; animation: scaleIn 0.3s ease; }
+        .container { max-width: 850px; margin: 0 auto; padding: 20px; animation: fadeUp 0.4s ease; }
         .hidden { display: none !important; }
         .flex-center { display: flex; justify-content: center; align-items: center; min-height: 90vh; }
 
-        /* macOS Glass Card - Readable */
+        /* Glass Card */
         .card {
             background: var(--bg-card);
-            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--border);
             border-radius: var(--radius);
             padding: 20px; margin-bottom: 16px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.4);
         }
 
-        h1, h2, h3 { margin: 0 0 10px 0; font-weight: 700; letter-spacing: -0.5px; color: white; }
+        h1, h2, h3 { margin: 0 0 10px 0; font-weight: 700; letter-spacing: -0.5px; }
         p, small { color: var(--text-sub); }
 
-        /* Inputs - High Contrast */
+        /* Inputs */
         input, select, textarea {
             width: 100%; padding: 14px 16px; margin-bottom: 12px;
             background: var(--bg-input); border: 1px solid var(--border);
-            border-radius: 12px; color: white; font-size: 16px; transition: 0.2s;
+            border-radius: 12px; color: white; font-size: 15px; font-family: inherit; transition: 0.2s;
         }
-        input:focus, select:focus, textarea:focus { border-color: var(--primary); background: rgba(0,0,0,0.8); }
-        option { background: #1c1c1e; color: white; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); background: rgba(20,20,20,0.8); }
+        option { background: #1c1c1e; }
 
-        /* iOS Buttons */
+        /* Buttons */
         button {
             width: 100%; padding: 14px; border: none; border-radius: 12px;
-            font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s;
+            font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.2s;
             display: flex; justify-content: center; align-items: center; gap: 8px;
         }
-        button:active { transform: scale(0.96); opacity: 0.8; }
+        button:active { transform: scale(0.97); opacity: 0.8; }
         
         .btn-primary { background: var(--primary); color: white; }
-        .btn-secondary { background: rgba(255,255,255,0.15); color: white; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        .btn-danger { background: rgba(255, 69, 58, 0.2); color: var(--danger); border: 1px solid var(--danger); }
-        .btn-success { background: rgba(48, 209, 88, 0.2); color: var(--success); border: 1px solid var(--success); }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--border); }
+        .btn-danger { background: rgba(255, 69, 58, 0.15); color: var(--danger); border: 1px solid var(--danger); }
+        .btn-success { background: rgba(48, 209, 88, 0.15); color: var(--success); border: 1px solid var(--success); }
         .btn-sm { padding: 8px 16px; width: auto; font-size: 13px; border-radius: 18px; }
 
-        /* Floating Dock */
+        /* Dock Navigation */
         .dock {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             width: 90%; max-width: 400px;
-            background: rgba(30, 30, 30, 0.8);
-            backdrop-filter: blur(50px); -webkit-backdrop-filter: blur(50px);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 24px;
+            background: rgba(30, 30, 30, 0.85);
+            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 26px;
             display: flex; justify-content: space-around;
             padding: 12px 0; z-index: 1000;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
         }
         .dock-item {
             display: flex; flex-direction: column; align-items: center;
-            color: rgba(255,255,255,0.6); font-size: 11px; cursor: pointer; transition: 0.3s;
+            color: rgba(255,255,255,0.5); font-size: 10px; cursor: pointer; transition: 0.3s;
         }
-        .dock-item i { font-size: 24px; margin-bottom: 4px; transition: 0.3s; }
+        .dock-item i { font-size: 22px; margin-bottom: 4px; transition: 0.3s; }
         .dock-item.active { color: white; }
         .dock-item.active i { transform: translateY(-3px); color: var(--primary); text-shadow: 0 0 15px var(--primary); }
 
         /* Tabs */
-        .tabs { display: flex; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 14px; margin-bottom: 15px; }
-        .tab-btn { flex: 1; padding: 10px; border-radius: 10px; text-align: center; cursor: pointer; color: var(--text-sub); font-size: 14px; font-weight: 600; transition: 0.2s; border: none; background: transparent; }
-        .tab-btn.active { background: rgba(255,255,255,0.2); color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .tabs { display: flex; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 12px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; padding: 10px; border-radius: 10px; text-align: center; cursor: pointer; color: var(--text-sub); font-size: 13px; font-weight: 600; transition: 0.2s; border: none; background: transparent; }
+        .tab-btn.active { background: rgba(255,255,255,0.15); color: white; }
 
         /* Utilities */
         .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
@@ -114,70 +114,56 @@
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         
         /* Profile & Stats */
-        .stat-box { text-align: center; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 14px; border: 1px solid var(--border); }
+        .stat-box { text-align: center; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 14px; border: 1px solid var(--border); }
         .profile-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
 
-        /* Loading & Toasts */
-        #loader { position: fixed; inset: 0; background: #050505; z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+        /* Loader & Toasts */
+        #loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
         .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
         #toast-box { position: fixed; top: 20px; right: 20px; z-index: 9999; }
-        .toast { background: rgba(30,30,30,0.95); border-left: 4px solid var(--primary); padding: 15px 20px; margin-bottom: 10px; border-radius: 12px; font-size: 14px; display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: white; }
+        .toast { background: rgba(40,40,40,0.95); border-left: 4px solid var(--primary); padding: 15px 20px; margin-bottom: 10px; border-radius: 12px; font-size: 14px; display: flex; align-items: center; gap: 10px; animation: fadeUp 0.3s; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        @keyframes scaleIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
-        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        @keyframes fadeUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         
-        /* Exam Elements */
-        .option-label { display: block; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 8px; cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
-        .option-label:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+        /* Elements */
+        .option-label { display: block; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 8px; cursor: pointer; transition: 0.2s; border: 1px solid var(--border); }
+        .option-label:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.3); }
         input[type="radio"]:checked + span { color: var(--primary); font-weight: bold; }
         
-        /* Toggle Switch */
+        /* Switch */
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.2); transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--success); }
         input:checked + .slider:before { transform: translateX(20px); }
         
         /* Formatting */
         .fmt-bar { display: flex; gap: 5px; margin-bottom: 8px; }
         .fmt-btn { background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; color: #ccc; font-size: 12px; cursor: pointer; }
+        
+        /* Review Colors */
+        .opt-right { border-color: var(--success); background: rgba(48, 209, 88, 0.1); }
+        .opt-wrong { border-color: var(--danger); background: rgba(255, 69, 58, 0.1); }
     </style>
 </head>
 <body>
 
     <div id="loader">
         <div class="spinner"></div>
-        <p style="margin-top:15px; font-size:12px; letter-spacing:1px; color:#888;">INITIALIZING SYSTEM...</p>
+        <p style="margin-top:15px; font-size:12px; letter-spacing:1px; color:#666;">LOADING SYSTEM...</p>
     </div>
     <div id="toast-box"></div>
-
-    <!-- === EDIT STUDENT MODAL (ADMIN) === -->
-    <div id="modal-edit" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(5px); z-index:2000; display:flex; justify-content:center; align-items:center;">
-        <div class="card" style="width:90%; max-width:400px;">
-            <h3>Edit Student</h3>
-            <input type="hidden" id="edt-uid">
-            <input type="text" id="edt-name" placeholder="Full Name">
-            <input type="tel" id="edt-phone" placeholder="Phone Number">
-            <div class="grid-2">
-                <select id="edt-class"><option value="8">Class 8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
-                <select id="edt-div"><option value="A">Div A</option><option value="B">B</option><option value="C">C</option></select>
-            </div>
-            <textarea id="edt-msg" placeholder="Send Personal Message..." rows="2"></textarea>
-            <div class="grid-2">
-                <button class="btn-secondary" onclick="document.getElementById('modal-edit').classList.add('hidden')">Cancel</button>
-                <button class="btn-primary" onclick="app.saveStudent()">Save</button>
-            </div>
-        </div>
-    </div>
 
     <!-- === AUTH SCREEN === -->
     <div id="view-auth" class="container flex-center hidden">
         <div class="card" style="width:100%; max-width:380px; text-align:center;">
-            <i class="fas fa-graduation-cap" style="font-size:50px; color:var(--primary); margin-bottom:20px;"></i>
+            <div style="width:70px; height:70px; background:linear-gradient(135deg, #0A84FF, #5E5CE6); border-radius:18px; margin:0 auto 20px; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 25px rgba(10,132,255,0.4);">
+                <i class="fas fa-graduation-cap" style="font-size:30px; color:white;"></i>
+            </div>
             <h2>LMS Portal</h2>
-            <p>Sign in to continue</p>
+            <p>Access Control</p>
             <div id="login-form">
                 <input type="email" id="email" placeholder="Email Address">
                 <input type="password" id="password" placeholder="Password">
@@ -190,7 +176,7 @@
                 <input type="tel" id="reg-phone" placeholder="Phone Number">
                 <div class="grid-2">
                     <select id="reg-class"><option disabled selected>Class</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
-                    <select id="reg-div"><option value="A">Section A</option><option value="B">B</option></select>
+                    <select id="reg-div"><option value="A">A</option><option value="B">B</option></select>
                 </div>
                 <input type="email" id="reg-email" placeholder="Real Email Address">
                 <input type="password" id="reg-pass" placeholder="Create Password">
@@ -235,7 +221,7 @@
                 </div>
             </div>
             <div class="stat-box" style="margin-bottom:15px;">
-                <h2 id="stat-offline" style="margin:0; color:#666;">0</h2><small>Offline</small>
+                <h2 id="stat-offline" style="margin:0; color:var(--text-sub);">0</h2><small>Offline</small>
             </div>
 
             <div class="card">
@@ -266,7 +252,7 @@
                 </div>
                 <div class="grid-2">
                     <input type="number" id="ex-time" placeholder="Mins">
-                    <input type="number" id="ex-neg" placeholder="Neg Mark" step="0.25">
+                    <input type="number" id="ex-neg" placeholder="Neg Mark (0.25)" step="0.25">
                 </div>
                 <input type="text" id="ex-pin" placeholder="Access PIN (Optional)">
                 <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px; margin-bottom:10px;">
@@ -274,11 +260,10 @@
                     <input type="file" id="ex-pdf" accept="application/pdf">
                     <input type="hidden" id="ex-pdf-url">
                 </div>
-                <label style="display:flex; align-items:center; gap:8px; margin-bottom:10px; font-size:14px; color:#ccc;">
+                <label style="display:flex; align-items:center; gap:8px; margin-bottom:10px; font-size:14px; color:var(--text-sub);">
                     <input type="checkbox" id="ex-shuffle" style="width:auto; margin:0;"> Shuffle Questions
                 </label>
 
-                <!-- Builder Tabs -->
                 <div class="tabs">
                     <button class="tab-btn active" onclick="app.setBuilder('manual')">Manual</button>
                     <button class="tab-btn" onclick="app.setBuilder('json')">JSON</button>
@@ -339,7 +324,6 @@
 
     <!-- === STUDENT VIEW === -->
     <div id="view-student" class="container hidden">
-        <!-- Student Dock -->
         <div class="dock">
             <div class="dock-item active" onclick="app.stuNav('home', this)"><i class="fas fa-compass"></i>Home</div>
             <div class="dock-item" onclick="app.stuNav('exams', this)"><i class="fas fa-book"></i>Exams</div>
@@ -393,9 +377,9 @@
                 <div id="pro-status-badge"></div>
                 
                 <div style="text-align:left; background:rgba(0,0,0,0.2); border-radius:12px; padding:15px; margin-top:20px;">
-                    <div style="margin-bottom:10px;"><small>Email</small><br><span id="pro-email" style="color:white;">--</span></div>
-                    <div style="margin-bottom:10px;"><small>Phone</small><br><span id="pro-phone" style="color:white;">--</span></div>
-                    <div><small>Class</small><br><span id="pro-class-2" style="color:white;">--</span></div>
+                    <div class="list-item"><small>Email</small> <span id="pro-email" style="color:white;">--</span></div>
+                    <div class="list-item"><small>Phone</small> <span id="pro-phone" style="color:white;">--</span></div>
+                    <div class="list-item"><small>Class</small> <span id="pro-class-2" style="color:white;">--</span></div>
                 </div>
                 <button class="btn-danger" style="margin-top:20px;" onclick="app.logout()">Sign Out</button>
             </div>
@@ -404,7 +388,7 @@
 
     <!-- === EXAM ENGINE === -->
     <div id="view-paper" class="hidden" style="position:fixed; inset:0; background:#000; z-index:3000; overflow-y:auto;">
-        <div style="position:sticky; top:0; background:rgba(20,20,20,0.95); backdrop-filter:blur(10px); padding:15px; display:flex; justify-content:space-between; border-bottom:1px solid #333; z-index:3001;">
+        <div style="position:sticky; top:0; background:rgba(30,30,30,0.95); backdrop-filter:blur(10px); padding:15px; display:flex; justify-content:space-between; border-bottom:1px solid #333; z-index:3001;">
             <span id="q-title" style="font-weight:bold;">Exam</span>
             <span id="q-timer" style="color:var(--danger); font-family:monospace; font-size:18px;">00:00</span>
         </div>
@@ -415,12 +399,31 @@
         </div>
     </div>
 
+    <!-- === ADMIN EDIT STUDENT MODAL === -->
+    <div id="modal-edit-student" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:4000; display:flex; justify-content:center; align-items:center;">
+        <div class="card" style="width:90%; max-width:400px;">
+            <h3>Edit Student</h3>
+            <input type="hidden" id="edt-uid">
+            <input type="text" id="edt-name" placeholder="Name">
+            <input type="tel" id="edt-phone" placeholder="Phone">
+            <div class="grid-2">
+                <select id="edt-class"><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
+                <select id="edt-div"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
+            </div>
+            <textarea id="edt-msg" rows="2" placeholder="Send Message..."></textarea>
+            <div class="grid-2" style="margin-top:10px;">
+                <button class="btn-primary" onclick="app.saveStudentEdit()">Save</button>
+                <button class="btn-secondary" onclick="document.getElementById('modal-edit-student').classList.add('hidden')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, deleteDoc, updateDoc, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // CREDENTIALS (PRE-FILLED)
+        // CONFIGURATION
         const firebaseConfig = {
             apiKey: "AIzaSyBEMPS8vEJztGpoBPJjJIzKKInyt4IY9rQ",
             authDomain: "studentlms-79722.firebaseapp.com",
@@ -443,7 +446,7 @@
             toast: (m, t='success') => {
                 const d=document.createElement('div'); d.className='toast'; 
                 d.style.borderLeftColor = t==='error'?'var(--danger)':'var(--success)';
-                d.innerText=m; document.getElementById('toast-box').appendChild(d);
+                d.innerHTML=m; document.getElementById('toast-box').appendChild(d);
                 setTimeout(()=>d.remove(),3000);
             },
             
@@ -596,7 +599,7 @@
                 document.getElementById('ex-title').value="";
             },
             loadExams: async () => {
-                const c = document.getElementById('admin-exam-list'); c.innerHTML="Loading...";
+                const c = document.getElementById('admin-exam-list'); c.innerHTML="<p>Loading...</p>";
                 const s = await getDocs(collection(db,"exams"));
                 c.innerHTML="";
                 s.forEach(d=>{
@@ -618,13 +621,13 @@
 
             // RESULTS
             loadResGroup: async () => {
-                const c = document.getElementById('results-list'); c.innerHTML="Loading...";
+                const c = document.getElementById('results-list'); c.innerHTML="<p>Loading...</p>";
                 const s = await getDocs(collection(db,"exams"));
                 c.innerHTML="";
                 s.forEach(d=>{
                     const e=d.data();
                     const st = e.resultsReleased ? '<span class="badge status-ok">LIVE</span>' : '<span class="badge status-wait">HIDDEN</span>';
-                    c.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center;"><div><b>${e.title}</b><br>${st}</div><button class="btn-secondary btn-sm" onclick="app.viewRes('${d.id}','${e.title.replace(/'/g,"\\'")}',${e.resultsReleased})">View</button></div>`;
+                    c.innerHTML += `<div class="card list-item"><div><b>${e.title}</b><br>${st}</div><button class="btn-secondary btn-sm" onclick="app.viewRes('${d.id}','${e.title.replace(/'/g,"\\'")}',${e.resultsReleased})">View</button></div>`;
                 });
             },
             viewRes: async (eid, t, rel) => {
@@ -666,7 +669,7 @@
 
             // ADMIN STUDENTS
             loadAllStu: async () => {
-                const c = document.getElementById('stu-rows'); c.innerHTML="Loading...";
+                const c = document.getElementById('stu-rows'); c.innerHTML="<p>Loading...</p>";
                 const s = await getDocs(query(collection(db,"users"), where("role","==","student")));
                 c.innerHTML="";
                 s.forEach(d=>{
@@ -680,7 +683,7 @@
                 const u = (await getDoc(doc(db,"users",id))).data();
                 document.getElementById('edt-uid').value=id; document.getElementById('edt-name').value=u.displayName;
                 document.getElementById('edt-phone').value=u.phone; document.getElementById('edt-class').value=u.class;
-                document.getElementById('edt-div').value=u.division; document.getElementById('modal-edit').classList.remove('hidden');
+                document.getElementById('edt-div').value=u.division; document.getElementById('modal-edit-student').classList.remove('hidden');
             },
             saveStudentEdit: async()=>{
                 const id = document.getElementById('edt-uid').value;
@@ -690,7 +693,7 @@
                     class:document.getElementById('edt-class').value, division:document.getElementById('edt-div').value
                 });
                 if(m) await addDoc(collection(db,`users/${id}/messages`),{text:m, date:new Date()});
-                document.getElementById('modal-edit').classList.add('hidden'); app.loadAllStu(); app.toast("Saved");
+                document.getElementById('modal-edit-student').classList.add('hidden'); app.loadAllStu(); app.toast("Saved");
             },
 
             // STUDENT NAVIGATION
@@ -717,24 +720,26 @@
                 data.forEach(d=>c.innerHTML+=`<div style="margin-bottom:5px; color:var(--warning);"><i class="fas fa-envelope"></i> ${d.text}</div>`);
             },
             loadStuExams: async () => {
-                const c = document.getElementById('stu-exam-list'); c.innerHTML="Loading...";
+                const c = document.getElementById('stu-exam-list'); c.innerHTML="<p>Loading...</p>";
                 const s = await getDocs(query(collection(db,"exams"), where("targetClass","==",user.class)));
                 c.innerHTML="";
                 if(s.empty) c.innerHTML="<p>No exams.</p>";
                 s.forEach(d=>{
                     const e=d.data();
-                    c.innerHTML += `<div class="card exam-card"><h3>${e.title}</h3><p>${e.time} mins • ${e.questions.length} Qs</p><button class="btn-primary" onclick="app.take('${d.id}')">START MISSION</button></div>`;
+                    c.innerHTML += `<div class="card"><h3>${e.title}</h3><p>${e.time} mins • ${e.questions.length} Qs</p><button class="btn-primary" onclick="app.take('${d.id}')">START MISSION</button></div>`;
                 });
             },
             resFilter: (mode, btn) => {
                 document.querySelectorAll('#tab-stu-results .tab-btn').forEach(b => b.classList.remove('active'));
                 if(btn) btn.classList.add('active');
                 document.getElementById('stu-res-list').childNodes.forEach(e => {
-                    e.style.display = e.dataset.type === mode ? 'block' : 'none';
+                    if (e.dataset && e.dataset.type) {
+                        e.style.display = e.dataset.type === mode ? 'block' : 'none';
+                    }
                 });
             },
             loadStuRes: async () => {
-                const c = document.getElementById('stu-res-list'); c.innerHTML="Loading...";
+                const c = document.getElementById('stu-res-list'); c.innerHTML="<p>Loading...</p>";
                 const s = await getDocs(query(collection(db,"results"), where("uid","==",user.uid)));
                 const data = s.docs.map(d=>{return{id:d.id, ...d.data()}}).sort((a,b)=>b.date-a.date);
                 c.innerHTML="";
@@ -748,7 +753,8 @@
                     const type = show ? 'pub' : 'pen';
                     const css = show ? 'status-ok' : 'status-wait';
                     const st = show ? `<b style="color:var(--success)">${r.score}</b>` : `<span style="color:var(--warning)">Pending</span>`;
-                    c.innerHTML += `<div class="card" data-type="${type}"><div><b>${r.examTitle}</b></div><div style="display:flex; justify-content:space-between; margin-top:5px;"><span>${new Date(r.date.seconds*1000).toLocaleDateString()}</span>${st}</div></div>`;
+                    const rev = (show && r.details) ? `<button class="btn-secondary btn-sm" onclick="app.rev('${r.id}')" style="margin-top:10px;">Review</button>` : '';
+                    c.innerHTML += `<div class="card" data-type="${type}"><div><b>${r.examTitle}</b></div><div style="display:flex; justify-content:space-between; margin-top:5px;"><span>${new Date(r.date.seconds*1000).toLocaleDateString()}</span>${st}</div>${rev}</div>`;
                 }
                 app.resFilter('pub', document.querySelector('#tab-stu-results .tab-btn')); 
             },
@@ -824,6 +830,24 @@
                     date:new Date(), isReleased:false, details:dets
                 });
                 alert("Submitted!"); location.reload();
+            },
+            rev: async(rid) => {
+                const r = (await getDoc(doc(db,"results",rid))).data();
+                document.getElementById('view-student').classList.add('hidden');
+                document.getElementById('view-paper').classList.remove('hidden');
+                document.getElementById('q-title').innerText="REVIEW: "+r.examTitle;
+                document.getElementById('q-timer').innerText=r.score;
+                document.querySelector('button[onclick="app.submit()"]').innerText="CLOSE";
+                document.querySelector('button[onclick="app.submit()"]').onclick=()=>location.reload();
+                
+                const c = document.getElementById('q-area'); c.innerHTML="";
+                r.details.forEach((q,i)=>{
+                    c.innerHTML += `<div class="card"><p><b>${i+1}.</b> ${q.q}</p><div class="grid-2">${q.opts.map((o,x)=>{
+                        let st=""; if(x===q.correct) st="opt-right";
+                        else if(x===q.selected) st="opt-wrong";
+                        return `<div class="option-label ${st}">${o}</div>`;
+                    }).join('')}</div></div>`;
+                });
             }
         };
 
@@ -854,7 +878,7 @@
                     const avg = cnt>0 ? (tot/cnt).toFixed(0) : 0;
                     document.getElementById('quick-avg').innerText = avg+"%";
                     
-                    app.nav('stu-home', document.querySelector('.dock-item'));
+                    app.stuNav('home', document.querySelector('.dock-item'));
                 } else {
                     document.getElementById('pend-msg').innerText = "Waiting for Admin Approval.";
                     document.getElementById('view-pending').classList.remove('hidden');

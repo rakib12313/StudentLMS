@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LMS - Master</title>
+    <title>LMS - Final</title>
     
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -11,7 +11,7 @@
 
     <style>
         :root {
-            /* macOS Dark Theme (CSS Only - No Image) */
+            /* macOS Dark Theme (CSS Only) */
             --bg-body: #000000;
             --bg-gradient: radial-gradient(circle at 50% 0%, #1c1c1e 0%, #000000 100%);
             --bg-card: rgba(28, 28, 30, 0.75);
@@ -131,14 +131,6 @@
         .option-label:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.3); }
         input[type="radio"]:checked + span { color: var(--primary); font-weight: bold; }
         
-        /* Switch */
-        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.2); transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--success); }
-        input:checked + .slider:before { transform: translateX(20px); }
-        
         /* Formatting */
         .fmt-bar { display: flex; gap: 5px; margin-bottom: 8px; }
         .fmt-btn { background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; color: #ccc; font-size: 12px; cursor: pointer; }
@@ -156,14 +148,31 @@
     </div>
     <div id="toast-box"></div>
 
+    <!-- === EDIT STUDENT MODAL (ADMIN) === -->
+    <div id="modal-edit" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(5px); z-index:2000; display:flex; justify-content:center; align-items:center;">
+        <div class="card" style="width:90%; max-width:400px;">
+            <h3>Edit Student</h3>
+            <input type="hidden" id="edt-uid">
+            <input type="text" id="edt-name" placeholder="Full Name">
+            <input type="tel" id="edt-phone" placeholder="Phone Number">
+            <div class="grid-2">
+                <select id="edt-class"><option value="8">Class 8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
+                <select id="edt-div"><option value="A">Div A</option><option value="B">B</option><option value="C">C</option></select>
+            </div>
+            <textarea id="edt-msg" placeholder="Send Personal Message..." rows="2"></textarea>
+            <div class="grid-2">
+                <button class="btn-secondary" onclick="document.getElementById('modal-edit').classList.add('hidden')">Cancel</button>
+                <button class="btn-primary" onclick="app.saveStudent()">Save</button>
+            </div>
+        </div>
+    </div>
+
     <!-- === AUTH SCREEN === -->
     <div id="view-auth" class="container flex-center hidden">
         <div class="card" style="width:100%; max-width:380px; text-align:center;">
-            <div style="width:70px; height:70px; background:linear-gradient(135deg, #0A84FF, #5E5CE6); border-radius:18px; margin:0 auto 20px; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 25px rgba(10,132,255,0.4);">
-                <i class="fas fa-graduation-cap" style="font-size:30px; color:white;"></i>
-            </div>
+            <i class="fas fa-graduation-cap" style="font-size:50px; color:var(--primary); margin-bottom:20px;"></i>
             <h2>LMS Portal</h2>
-            <p>Access Control</p>
+            <p>Sign in to continue</p>
             <div id="login-form">
                 <input type="email" id="email" placeholder="Email Address">
                 <input type="password" id="password" placeholder="Password">
@@ -176,7 +185,7 @@
                 <input type="tel" id="reg-phone" placeholder="Phone Number">
                 <div class="grid-2">
                     <select id="reg-class"><option disabled selected>Class</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
-                    <select id="reg-div"><option value="A">A</option><option value="B">B</option></select>
+                    <select id="reg-div"><option value="A">Section A</option><option value="B">B</option></select>
                 </div>
                 <input type="email" id="reg-email" placeholder="Real Email Address">
                 <input type="password" id="reg-pass" placeholder="Create Password">
@@ -225,14 +234,6 @@
             </div>
 
             <div class="card">
-                <h3>Settings</h3>
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>Public Leaderboard</span>
-                    <label class="switch"><input type="checkbox" id="admin-lb-toggle" onchange="app.toggleLeaderboard()"><span class="slider"></span></label>
-                </div>
-            </div>
-
-            <div class="card">
                 <h3>Broadcast</h3>
                 <div style="display:flex; gap:10px;">
                     <input type="text" id="ann-input" placeholder="Post announcement..." style="margin:0;">
@@ -252,7 +253,7 @@
                 </div>
                 <div class="grid-2">
                     <input type="number" id="ex-time" placeholder="Mins">
-                    <input type="number" id="ex-neg" placeholder="Neg Mark (0.25)" step="0.25">
+                    <input type="number" id="ex-neg" placeholder="Neg Mark" step="0.25">
                 </div>
                 <input type="text" id="ex-pin" placeholder="Access PIN (Optional)">
                 <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px; margin-bottom:10px;">
@@ -264,6 +265,7 @@
                     <input type="checkbox" id="ex-shuffle" style="width:auto; margin:0;"> Shuffle Questions
                 </label>
 
+                <!-- Builder Tabs -->
                 <div class="tabs">
                     <button class="tab-btn active" onclick="app.setBuilder('manual')">Manual</button>
                     <button class="tab-btn" onclick="app.setBuilder('json')">JSON</button>
@@ -324,6 +326,7 @@
 
     <!-- === STUDENT VIEW === -->
     <div id="view-student" class="container hidden">
+        <!-- Student Dock -->
         <div class="dock">
             <div class="dock-item active" onclick="app.stuNav('home', this)"><i class="fas fa-compass"></i>Home</div>
             <div class="dock-item" onclick="app.stuNav('exams', this)"><i class="fas fa-book"></i>Exams</div>
@@ -399,31 +402,12 @@
         </div>
     </div>
 
-    <!-- === ADMIN EDIT STUDENT MODAL === -->
-    <div id="modal-edit-student" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:4000; display:flex; justify-content:center; align-items:center;">
-        <div class="card" style="width:90%; max-width:400px;">
-            <h3>Edit Student</h3>
-            <input type="hidden" id="edt-uid">
-            <input type="text" id="edt-name" placeholder="Name">
-            <input type="tel" id="edt-phone" placeholder="Phone">
-            <div class="grid-2">
-                <select id="edt-class"><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
-                <select id="edt-div"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
-            </div>
-            <textarea id="edt-msg" rows="2" placeholder="Send Message..."></textarea>
-            <div class="grid-2" style="margin-top:10px;">
-                <button class="btn-primary" onclick="app.saveStudentEdit()">Save</button>
-                <button class="btn-secondary" onclick="document.getElementById('modal-edit-student').classList.add('hidden')">Cancel</button>
-            </div>
-        </div>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, deleteDoc, updateDoc, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // CONFIGURATION
+        // CONFIGURATION - PRE-FILLED
         const firebaseConfig = {
             apiKey: "AIzaSyBEMPS8vEJztGpoBPJjJIzKKInyt4IY9rQ",
             authDomain: "studentlms-79722.firebaseapp.com",
@@ -446,7 +430,7 @@
             toast: (m, t='success') => {
                 const d=document.createElement('div'); d.className='toast'; 
                 d.style.borderLeftColor = t==='error'?'var(--danger)':'var(--success)';
-                d.innerHTML=m; document.getElementById('toast-box').appendChild(d);
+                d.innerText=m; document.getElementById('toast-box').appendChild(d);
                 setTimeout(()=>d.remove(),3000);
             },
             
@@ -518,18 +502,11 @@
                 const now = new Date();
                 s.forEach(d => {
                     tot++;
-                    if(d.data().lastActive && (now - d.data().lastActive.toDate()) < 300000) on++; // 5 min
+                    if(d.data().lastActive && (now - d.data().lastActive.toDate()) < 300000) on++; // 5 min activity
                 });
                 document.getElementById('stat-total').innerText = tot;
                 document.getElementById('stat-online').innerText = on;
                 document.getElementById('stat-offline').innerText = tot - on;
-                
-                const cfg = await getDoc(doc(db,"system","config"));
-                if(cfg.exists()) document.getElementById('admin-lb-toggle').checked = cfg.data().leaderboardVisible;
-            },
-            toggleLeaderboard: async () => {
-                const status = document.getElementById('admin-lb-toggle').checked;
-                await setDoc(doc(db, "system", "config"), { leaderboardVisible: status }, {merge: true});
             },
             postAnnounce: async () => {
                 const t = document.getElementById('ann-input').value;
@@ -599,7 +576,7 @@
                 document.getElementById('ex-title').value="";
             },
             loadExams: async () => {
-                const c = document.getElementById('admin-exam-list'); c.innerHTML="<p>Loading...</p>";
+                const c = document.getElementById('admin-exam-list'); c.innerHTML="Loading...";
                 const s = await getDocs(collection(db,"exams"));
                 c.innerHTML="";
                 s.forEach(d=>{
@@ -621,7 +598,7 @@
 
             // RESULTS
             loadResGroup: async () => {
-                const c = document.getElementById('results-list'); c.innerHTML="<p>Loading...</p>";
+                const c = document.getElementById('results-list'); c.innerHTML="Loading...";
                 const s = await getDocs(collection(db,"exams"));
                 c.innerHTML="";
                 s.forEach(d=>{
@@ -669,7 +646,7 @@
 
             // ADMIN STUDENTS
             loadAllStu: async () => {
-                const c = document.getElementById('stu-rows'); c.innerHTML="<p>Loading...</p>";
+                const c = document.getElementById('stu-rows'); c.innerHTML="Loading...";
                 const s = await getDocs(query(collection(db,"users"), where("role","==","student")));
                 c.innerHTML="";
                 s.forEach(d=>{
@@ -683,7 +660,7 @@
                 const u = (await getDoc(doc(db,"users",id))).data();
                 document.getElementById('edt-uid').value=id; document.getElementById('edt-name').value=u.displayName;
                 document.getElementById('edt-phone').value=u.phone; document.getElementById('edt-class').value=u.class;
-                document.getElementById('edt-div').value=u.division; document.getElementById('modal-edit-student').classList.remove('hidden');
+                document.getElementById('edt-div').value=u.division; document.getElementById('modal-edit').classList.remove('hidden');
             },
             saveStudentEdit: async()=>{
                 const id = document.getElementById('edt-uid').value;
@@ -693,7 +670,7 @@
                     class:document.getElementById('edt-class').value, division:document.getElementById('edt-div').value
                 });
                 if(m) await addDoc(collection(db,`users/${id}/messages`),{text:m, date:new Date()});
-                document.getElementById('modal-edit-student').classList.add('hidden'); app.loadAllStu(); app.toast("Saved");
+                document.getElementById('modal-edit').classList.add('hidden'); app.loadAllStu(); app.toast("Saved");
             },
 
             // STUDENT NAVIGATION

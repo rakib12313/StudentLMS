@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NeonLMS - Stability Patch</title>
+    <title>NeonLMS - Final</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -40,7 +40,7 @@
             background: linear-gradient(to bottom, var(--neon-blue), var(--neon-purple));
         }
 
-        /* STATS CARD (ADMIN HOME) */
+        /* STATS CARD */
         .stat-card {
             background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
             border-radius: 10px; padding: 15px; text-align: center;
@@ -86,13 +86,14 @@
         .text-neon { color: var(--neon-blue); }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         
+        /* EXAM & RESULT STYLES */
+        .exam-card { border-left: 3px solid var(--warning); }
+        .res-card-pub { border-left: 3px solid var(--success); }
+        .res-card-pen { border-left: 3px solid var(--warning); opacity: 0.7; }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         #toast-box { position: fixed; top: 20px; right: 20px; z-index: 9999; }
         .toast { background: #1e1e24; border-left: 4px solid var(--primary); padding: 15px; margin-bottom: 10px; color: white; animation: fadeIn 0.3s; }
-        
-        #global-loader { position: fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:99999; display:flex; justify-content:center; align-items:center; flex-direction: column;}
-        .spinner { width: 50px; height: 50px; border: 3px solid transparent; border-top-color: var(--neon-blue); border-right-color: var(--neon-purple); border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
         
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -101,27 +102,9 @@
         input:checked + .slider { background-color: var(--neon-blue); }
         input:checked + .slider:before { transform: translateX(20px); }
     </style>
-    
-    <!-- Error Handler Script -->
-    <script>
-        window.onerror = function(msg, url, line) {
-            document.getElementById('global-loader').innerHTML = `
-                <div style="color:red; text-align:center; padding:20px;">
-                    <h3>SYSTEM ERROR</h3>
-                    <p>${msg}</p>
-                    <button onclick="location.reload()" class="btn-secondary">REBOOT</button>
-                </div>`;
-            return true;
-        };
-    </script>
 </head>
 <body>
 
-    <div id="global-loader">
-        <div class="spinner"></div>
-        <h3 style="margin-top:20px; color:var(--neon-blue);">SYSTEM INITIALIZING...</h3>
-        <p style="color:#666; font-size:12px;">(If stuck > 10s, check internet)</p>
-    </div>
     <div id="toast-box"></div>
 
     <!-- AUTH VIEW -->
@@ -381,9 +364,9 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, deleteDoc, updateDoc, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, sendEmailVerification } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, deleteDoc, updateDoc, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
         // CONFIGURATION
         const firebaseConfig = {
@@ -407,7 +390,8 @@
         window.app = {
             toast: (m, t='success') => {
                 const d=document.createElement('div'); d.className='toast'; 
-                d.style.borderLeftColor = t==='error'?var(--danger):var(--success);
+                // FIXED THE SYNTAX ERROR HERE
+                d.style.borderLeftColor = t==='error'?'var(--danger)':'var(--success)';
                 d.innerText=m; document.getElementById('toast-box').appendChild(d);
                 setTimeout(()=>d.remove(),3000);
             },
@@ -474,12 +458,13 @@
                 const now = new Date();
                 s.forEach(d => {
                     tot++;
-                    if(d.data().lastActive && (now - d.data().lastActive.toDate()) < 300000) on++; // 5 min
+                    if(d.data().lastActive && (now - d.data().lastActive.toDate()) < 300000) on++; // 5 min activity
                 });
                 document.getElementById('stat-total').innerText = tot;
                 document.getElementById('stat-online').innerText = on;
                 document.getElementById('stat-offline').innerText = tot - on;
                 
+                // Config
                 const cfg = await getDoc(doc(db,"system","config"));
                 if(cfg.exists()) document.getElementById('admin-lb-toggle').checked = cfg.data().leaderboardVisible;
             },
@@ -791,16 +776,7 @@
             }
         };
 
-        // SAFETY TIMEOUT
-        setTimeout(() => {
-            if(document.getElementById('global-loader').style.display !== 'none') {
-                document.getElementById('global-loader').style.display = 'none';
-                document.getElementById('view-auth').classList.remove('hidden');
-            }
-        }, 8000);
-
         onAuthStateChanged(auth, async (u) => {
-            document.getElementById('global-loader').style.display='none';
             if(u) {
                 user = {uid:u.uid, ...(await getDoc(doc(db,"users",u.uid))).data()};
                 document.getElementById('view-auth').classList.add('hidden');
@@ -818,6 +794,7 @@
                     document.getElementById('stu-name').innerText=user.displayName;
                     document.getElementById('stu-class').innerText=user.class;
                     
+                    // Calc Stats
                     const s = await getDocs(query(collection(db,"results"), where("uid","==",user.uid)));
                     let cnt=0, tot=0;
                     s.forEach(d=>{ cnt++; tot+=(d.data().score/d.data().total)*100; });

@@ -1,957 +1,1619 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LMS - macOS Edition</title>
-    
-    <!-- Using System Fonts + Icons -->
+    <title>LMS Student App</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         :root {
-            /* macOS Dark Palette */
-            --bg-body: #000000;
-            --bg-card: rgba(30, 30, 30, 0.75);
-            --bg-glass: rgba(45, 45, 45, 0.85);
-            --border: rgba(255, 255, 255, 0.12);
-            --primary: #0A84FF; /* Apple Blue */
-            --danger: #FF453A;  /* Apple Red */
-            --success: #30D158; /* Apple Green */
-            --warning: #FFD60A; /* Apple Yellow */
-            --text-main: #FFFFFF;
-            --text-sub: #8E8E93;
-            --radius: 22px;
-            --dock-radius: 30px;
+            /* Colorful Palette */
+            --bg-body: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            --bg-card: rgba(255, 255, 255, 0.08);
+            --bg-card-solid: #16161d;
+            --primary: #4FACFE;
+            --primary-grad: linear-gradient(to right, #4FACFE, #00F2FE);
+            --danger: #FF416C;
+            --danger-grad: linear-gradient(to right, #FF416C, #FF4B2B);
+            --success: #00b09b;
+            --success-grad: linear-gradient(to right, #00b09b, #96c93d);
+            --text: #FFFFFF;
+            --text-sub: #cfcfcf;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
 
         body {
             margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: radial-gradient(circle at 0% 0%, #1a2a6c, #000000);
-            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-body);
+            background-attachment: fixed;
+            color: var(--text);
+            padding-bottom: 100px;
             min-height: 100vh;
-            padding-bottom: 100px; /* Space for Dock */
-            overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            /* Security */
         }
 
-        .container { max-width: 850px; margin: 0 auto; padding: 20px; animation: fadeIn 0.4s ease; }
-        .hidden { display: none !important; }
-        .flex-center { display: flex; justify-content: center; align-items: center; min-height: 90vh; }
+        .hidden {
+            display: none !important;
+        }
 
-        /* macOS Glass Card */
+        .container {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fade 0.4s ease;
+        }
+
+        /* Glass Cards */
         .card {
             background: var(--bg-card);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
-            transition: transform 0.2s;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 18px;
+            padding: 15px;
+            /* Reduced from 20 */
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
-        h1, h2, h3 { margin: 0 0 10px 0; font-weight: 600; letter-spacing: -0.5px; }
-        p, small { color: var(--text-sub); }
-
-        /* iOS Style Inputs */
-        input, select, textarea {
-            width: 100%; padding: 14px; margin-bottom: 12px;
-            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
-            border-radius: 12px; color: white; font-size: 16px;
+        /* Inputs & Buttons */
+        input,
+        button {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 15px;
+            border: none;
+            font-size: 16px;
             transition: 0.2s;
         }
-        input:focus, select:focus, textarea:focus { border-color: var(--primary); background: rgba(0,0,0,0.5); }
-        option { background: #1c1c1e; }
 
-        /* Apple Style Buttons */
+        input {
+            background: rgba(0, 0, 0, 0.4);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            background: rgba(0, 0, 0, 0.6);
+        }
+
         button {
-            width: 100%; padding: 14px; border: none; border-radius: 14px;
-            font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.2s;
-            display: flex; justify-content: center; align-items: center; gap: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
-        button:active { transform: scale(0.97); }
-        
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-secondary { background: rgba(255,255,255,0.1); color: white; }
-        .btn-danger { background: rgba(255, 69, 58, 0.2); color: var(--danger); }
-        .btn-success { background: rgba(48, 209, 88, 0.2); color: var(--success); }
-        .btn-sm { padding: 8px 16px; width: auto; font-size: 13px; border-radius: 20px; }
 
-        /* Floating Dock (Bottom Nav) */
+        button:active {
+            transform: scale(0.97);
+        }
+
+        .btn-primary {
+            background: var(--primary-grad);
+        }
+
+        .btn-danger {
+            background: var(--danger-grad);
+        }
+
+        .btn-success {
+            background: var(--success-grad);
+        }
+
+        .btn-ghost {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Custom Modal System */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-box {
+            background: #1e1e24;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 30px;
+            width: 85%;
+            max-width: 350px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .modal-title {
+            margin: 0 0 10px 0;
+            color: white;
+            font-size: 20px;
+        }
+
+        .modal-desc {
+            color: var(--text-sub);
+            margin-bottom: 25px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .modal-btns {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .modal-btns button {
+            padding: 12px 20px;
+            width: auto;
+            flex: 1;
+            margin: 0;
+        }
+
+        /* Profile & Badges */
+        .profile-pic-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 15px;
+        }
+
+        .profile-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid var(--primary);
+        }
+
+        .cam-icon {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--primary);
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .badge-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .badge-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            opacity: 0.4;
+            filter: grayscale(1);
+            transition: 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .badge-unlocked {
+            opacity: 1;
+            filter: grayscale(0);
+            background: rgba(255, 215, 0, 0.15);
+            border: 1px solid gold;
+            transform: scale(1.05);
+        }
+
+        /* Exam & Library */
+        .opt-box {
+            padding: 12px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            margin-bottom: 8px;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+        }
+
+        .opt-box input {
+            width: auto;
+            margin: 0 10px 0 0;
+        }
+
+        .opt-correct {
+            border-color: #00b09b;
+            background: rgba(0, 176, 155, 0.2);
+        }
+
+        .opt-wrong {
+            border-color: #FF416C;
+            background: rgba(255, 65, 108, 0.2);
+        }
+
+        .lib-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .lib-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .lib-thumb {
+            height: 70px;
+            background: #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: var(--text-sub);
+        }
+
+        .lib-info {
+            padding: 10px;
+        }
+
+        /* Fixed Header for Exam */
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #1a1a20;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 500;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Warning Pulse Animation */
+        .pulse-warn {
+            animation: pulse-red 1s infinite alternate;
+            border-color: var(--danger);
+            box-shadow: 0 0 30px rgba(255, 65, 108, 0.3);
+        }
+
+        /* Protected Content */
+        .protected-view {
+            width: 100%;
+            pointer-events: none;
+            -webkit-touch-callout: none;
+        }
+
+        .watermark {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+            z-index: 5000;
+            opacity: 0.08;
+            font-size: 24px;
+            color: white;
+            transform: rotate(-45deg);
+        }
+
+        /* Bottom Nav */
         .dock {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 450px;
-            background: rgba(28, 28, 30, 0.85);
-            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: var(--dock-radius);
-            display: flex; justify-content: space-around;
-            padding: 14px 0; z-index: 1000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .dock-item {
-            display: flex; flex-direction: column; align-items: center;
-            color: #636366; font-size: 10px; cursor: pointer; transition: 0.3s;
-            width: 20%;
-        }
-        .dock-item i { font-size: 20px; margin-bottom: 4px; }
-        .dock-item.active { color: var(--primary); }
-        .dock-item.active i { transform: translateY(-3px); }
-
-        /* Tables & Lists */
-        .list-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .list-item:last-child { border-bottom: none; }
-        
-        /* Badges & Stats */
-        .badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
-        .status-ok { background: rgba(48, 209, 88, 0.2); color: var(--success); }
-        .status-wait { background: rgba(255, 214, 10, 0.2); color: var(--warning); }
-        
-        .stat-card { background:rgba(255,255,255,0.05); padding:15px; border-radius:16px; text-align:center; }
-        .stat-num { font-size: 24px; font-weight: 700; display: block; margin-bottom: 5px; }
-
-        /* Utilities */
-        .profile-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        
-        /* Exam Card Styling */
-        .exam-card-stu {
-            border-left: 4px solid var(--primary);
-            display: flex; justify-content: space-between; align-items: center;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 95%;
+            max-width: 450px;
+            background: rgba(20, 20, 30, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            z-index: 1000;
         }
 
-        /* Loading & Toasts */
-        #loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; }
-        .spinner { width: 30px; height: 30px; border: 3px solid #333; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
-        #toast-box { position: fixed; top: 20px; right: 20px; z-index: 9999; }
-        .toast { background: #1c1c1e; border-left: 4px solid var(--primary); padding: 15px; margin-bottom: 10px; border-radius: 10px; font-size: 14px; animation: slideIn 0.3s; }
-        
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        .dock .d-item {
+            padding: 5px 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .dock i {
+            font-size: 20px;
+            color: var(--text-sub);
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .dock small {
+            font-size: 10px;
+            color: var(--text-sub);
+        }
+
+        .active i {
+            color: #00F2FE;
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.6);
+            transform: translateY(-3px);
+        }
+
+        .active small {
+            color: #fff;
+        }
+
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse-red {
+            from {
+                box-shadow: 0 0 20px rgba(255, 65, 108, 0.2);
+            }
+
+            to {
+                box-shadow: 0 0 40px rgba(255, 65, 108, 0.6);
+            }
+        }
+
+        /* ========== RESPONSIVE DESIGN ========== */
+
+        /* Tablets */
+        @media (max-width: 1024px) {
+            .container {
+                max-width: 100%;
+            }
+        }
+
+        /* Mobile phones */
+        @media (max-width: 768px) {
+            body {
+                padding-bottom: 90px;
+                font-size: 14px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .card {
+                padding: 15px;
+                margin-bottom: 12px;
+            }
+
+            /* Touch-friendly */
+            input,
+            button,
+            textarea {
+                font-size: 16px;
+                padding: 12px;
+                min-height: 44px;
+            }
+
+            .opt-box {
+                padding: 12px;
+            }
+
+            /* Library grid - Single column */
+            .lib-grid {
+                grid-template-columns: 1fr;
+            }
+
+            /* Badge grid */
+            .badge-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+
+            /* Profile */
+            .profile-pic-container {
+                width: 80px;
+                height: 80px;
+            }
+
+            /* Modal */
+            .modal-box {
+                width: 95%;
+                padding: 20px;
+            }
+
+            .modal-btns {
+                flex-direction: column;
+            }
+
+            .modal-btns button {
+                width: 100% !important;
+            }
+
+            /* Bottom nav */
+            .dock {
+                width: 98%;
+                padding: 10px 0;
+                bottom: 10px;
+            }
+
+            .dock i {
+                font-size: 18px;
+            }
+
+            .dock small {
+                font-size: 9px;
+            }
+
+            /* Exam header */
+            .sticky-header {
+                padding: 12px 15px;
+                font-size: 14px;
+            }
+        }
+
+        /* Small phones */
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            .card {
+                padding: 12px;
+            }
+
+            /* Stack library in single column */
+            .lib-grid {
+                grid-template-columns: 1fr;
+            }
+
+            /* Smaller profile */
+            .profile-pic-container {
+                width: 70px;
+                height: 70px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            h2 {
+                font-size: 18px;
+            }
+
+            h3 {
+                font-size: 16px;
+            }
+        }
+
+        /* Landscape */
+        @media (max-width: 896px) and (orientation: landscape) {
+            body {
+                padding-bottom: 70px;
+            }
+
+            .dock {
+                padding: 6px 0;
+            }
+
+            .dock i {
+                font-size: 16px;
+            }
+        }
+
+        /* Reduce motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* === UI ENHANCEMENTS === */
+        /* Smooth Fade In for Lists */
+        .card,
+        .lib-item,
+        .item-card,
+        .not-item {
+            animation: fade 0.5s ease-out backwards;
+        }
+
+        .card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        /* Interactive Cards */
+        .card:hover,
+        .item-card:hover,
+        .lib-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        /* Nav Active Glow */
+        .active i {
+            color: #4FACFE;
+            text-shadow: 0 0 15px rgba(79, 172, 254, 0.8);
+            transform: translateY(-5px) scale(1.1);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Modern Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
     </style>
 </head>
-<body>
 
-    <div id="loader"><div class="spinner"></div></div>
-    <div id="toast-box"></div>
+<body oncontextmenu="return false;">
 
-    <!-- === EDIT STUDENT MODAL === -->
-    <div id="modal-edit" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); z-index:2000; display:flex; justify-content:center; align-items:center;">
-        <div class="card" style="width:90%; max-width:400px;">
-            <h3>Edit Student</h3>
-            <input type="hidden" id="edt-uid">
-            <input type="text" id="edt-name" placeholder="Full Name">
-            <input type="tel" id="edt-phone" placeholder="Phone Number">
-            <div class="grid-2">
-                <select id="edt-class"><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
-                <select id="edt-div"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
-            </div>
-            <textarea id="edt-msg" placeholder="Send Personal Message..." rows="2"></textarea>
-            <div class="grid-2">
-                <button class="btn-secondary" onclick="document.getElementById('modal-edit').classList.add('hidden')">Cancel</button>
-                <button class="btn-primary" onclick="app.saveStudent()">Save</button>
+    <!-- GLOBAL CUSTOM MODAL -->
+    <div id="ui-modal" class="modal-overlay hidden">
+        <div class="modal-box" id="ui-modal-box">
+            <i id="ui-icon" class="fas fa-info-circle modal-icon"></i>
+            <h3 id="ui-title" class="modal-title">Title</h3>
+            <p id="ui-msg" class="modal-desc">Message goes here.</p>
+            <div id="ui-btns" class="modal-btns">
+                <!-- Buttons injected via JS -->
             </div>
         </div>
     </div>
 
-    <!-- === AUTH === -->
-    <div id="view-auth" class="container flex-center hidden">
-        <div class="card" style="width:100%; max-width:380px; text-align:center;">
-            <i class="fas fa-graduation-cap" style="font-size:40px; color:var(--primary); margin-bottom:15px;"></i>
-            <h2>LMS Portal</h2>
-            <div id="login-form">
-                <input type="email" id="email" placeholder="Apple ID (Email)">
-                <input type="password" id="password" placeholder="Password">
-                <button class="btn-primary" onclick="app.login()">Sign In</button>
-                <button class="btn-secondary" onclick="app.loginGoogle()" style="margin-top:10px;"><i class="fab fa-google"></i> Sign in with Google</button>
-                <p style="margin-top:20px; font-size:13px; cursor:pointer;" onclick="app.toggleAuth('reg')">Create Apple ID</p>
+    <!-- LOGIN SCREEN -->
+    <div id="view-auth" class="container"
+        style="height:100vh; display:flex; flex-direction:column; justify-content:center;">
+        <div class="card" style="text-align:center; padding: 40px 30px; max-width: 420px; margin: 0 auto;">
+            <!-- Logo -->
+            <div
+                style="width: 80px; height: 80px; background: linear-gradient(135deg, #4FACFE, #00F2FE); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 8px 20px rgba(79, 172, 254, 0.3);">
+                <i class="fas fa-graduation-cap" style="font-size: 40px; color: white;"></i>
             </div>
-            <div id="reg-form" class="hidden">
-                <input type="text" id="reg-name" placeholder="Full Name">
-                <input type="tel" id="reg-phone" placeholder="Phone">
-                <div class="grid-2">
-                    <select id="reg-class"><option disabled selected>Class</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
-                    <select id="reg-div"><option value="A">A</option><option value="B">B</option></select>
+
+            <h1 style="margin: 10px 0 5px 0; font-size: 28px;">Student Portal</h1>
+            <p style="color:var(--text-sub); margin-bottom:30px; font-size: 14px;">Access your world of learning</p>
+
+            <!-- Google Login (Placeholder) -->
+            <button class="btn-ghost"
+                style="display: flex; align-items: center; justify-content: center; gap: 10px; background: white; color: #333; font-weight: 500; margin-bottom: 20px;"
+                onclick="app.showAlert('Google Sign-In requires OAuth setup', 'info')">
+                <svg width="20" height="20" viewBox="0 0 20 20">
+                    <path fill="#4285F4"
+                        d="M19.6 10.23c0-.82-.1-1.42-.25-2.05H10v3.72h5.5c-.15.96-.74 2.31-2.04 3.22v2.45h3.16c1.89-1.73 2.98-4.3 2.98-7.34z" />
+                    <path fill="#34A853"
+                        d="M13.46 15.13c-.83.59-1.96 1-3.46 1-2.64 0-4.88-1.74-5.68-4.15H1.07v2.52C2.72 17.75 6.09 20 10 20c2.7 0 4.96-.89 6.62-2.42l-3.16-2.45z" />
+                    <path fill="#FBBC05"
+                        d="M3.99 10c0-.69.12-1.35.32-1.97V5.51H1.07A9.973 9.973 0 000 10c0 1.61.39 3.14 1.07 4.49l3.24-2.52c-.2-.62-.32-1.28-.32-1.97z" />
+                    <path fill="#EA4335"
+                        d="M10 3.88c1.88 0 3.13.81 3.85 1.48l2.84-2.76C14.96.99 12.7 0 10 0 6.09 0 2.72 2.25 1.07 5.51l3.24 2.52C5.12 5.62 7.36 3.88 10 3.88z" />
+                </svg>
+                Continue with Google
+            </button>
+
+            <div
+                style="display: flex; align-items: center; gap: 15px; margin: 25px 0; color: var(--text-sub); font-size: 12px;">
+                <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
+                <span>OR USE EMAIL</span>
+                <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
+            </div>
+
+            <!-- Sign In Form -->
+            <div id="signin-form">
+                <div style="text-align: left; margin-bottom: 8px;">
+                    <label
+                        style="font-size: 12px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px;">Email</label>
                 </div>
-                <input type="email" id="reg-email" placeholder="Email">
-                <input type="password" id="reg-pass" placeholder="Password">
-                <button class="btn-primary" onclick="app.register()">Create Account</button>
-                <p style="margin-top:20px; font-size:13px; cursor:pointer;" onclick="app.toggleAuth('login')">Back to Sign In</p>
+                <input type="email" id="student-email" placeholder="student@example.com" style="margin-bottom: 15px;">
+
+                <div style="text-align: left; margin-bottom: 8px;">
+                    <label
+                        style="font-size: 12px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px;">Password</label>
+                </div>
+                <input type="password" id="student-password" placeholder="••••••••">
+
+                <button class="btn-primary" onclick="app.signIn()" style="margin-top: 20px;">
+                    Sign In <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+                </button>
+
+                <p style="margin-top: 20px; font-size: 14px; color: var(--text-sub);">
+                    Don't have an account? <a href="#" onclick="app.showSignUp(); return false;"
+                        style="color: var(--primary); text-decoration: none; font-weight: 600;">Sign Up</a>
+                </p>
+            </div>
+
+            <!-- Sign Up Form -->
+            <div id="signup-form" class="hidden">
+                <div style="text-align: left; margin-bottom: 8px;">
+                    <label
+                        style="font-size: 12px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px;">Full
+                        Name</label>
+                </div>
+                <input type="text" id="signup-name" placeholder="John Doe" style="margin-bottom: 15px;">
+
+                <div style="text-align: left; margin-bottom: 8px;">
+                    <label
+                        style="font-size: 12px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px;">Email</label>
+                </div>
+                <input type="email" id="signup-email" placeholder="student@example.com" style="margin-bottom: 15px;">
+
+                <div style="text-align: left; margin-bottom: 8px;">
+                    <label
+                        style="font-size: 12px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px;">Password</label>
+                </div>
+                <input type="password" id="signup-password" placeholder="••••••••" style="margin-bottom: 15px;">
+
+                <div style="text-align: left; margin-bottom: 8px;">
+                    <label
+                        style="font-size: 12px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px;">Confirm
+                        Password</label>
+                </div>
+                <input type="password" id="signup-confirm" placeholder="••••••••">
+
+                <button class="btn-success" onclick="app.signUp()" style="margin-top: 20px;">
+                    Create Account <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+                </button>
+
+                <p style="margin-top: 20px; font-size: 14px; color: var(--text-sub);">
+                    Already have an account? <a href="#" onclick="app.showSignIn(); return false;"
+                        style="color: var(--primary); text-decoration: none; font-weight: 600;">Sign In</a>
+                </p>
             </div>
         </div>
     </div>
 
-    <!-- === PENDING === -->
-    <div id="view-pending" class="container flex-center hidden">
-        <div class="card" style="text-align:center;">
-            <i class="fas fa-lock" style="font-size:40px; color:var(--warning); margin-bottom:15px;"></i>
-            <h3>Account Locked</h3>
-            <p>Administrator approval required.</p>
-            <button class="btn-secondary" onclick="app.logout()" style="margin-top:20px;">Sign Out</button>
-        </div>
-    </div>
+    <!-- STUDENT DASHBOARD -->
+    <div id="view-app" class="hidden">
 
-    <!-- === ADMIN PANEL === -->
-    <div id="view-admin" class="container hidden">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="margin:0;">Control Center</h2>
-            <button class="btn-danger btn-sm" onclick="app.logout()">Log Out</button>
-        </div>
-
-        <!-- Admin: Home (Dashboard) -->
-        <div id="tab-admin-home">
-            <div class="grid-2" style="margin-bottom:15px;">
-                <div class="card stat-card">
-                    <span class="stat-num" id="adm-tot-stu" style="color:var(--text-main)">0</span>
-                    <small>Total Students</small>
+        <!-- Tab: Home -->
+        <div id="tab-home" class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div>
+                    <h2 style="margin:0;">Hi, <span id="u-name" style="color:#00F2FE;">User</span></h2>
+                    <small style="color:var(--text-sub);">Ready to learn?</small>
                 </div>
-                <div class="card stat-card">
-                    <span class="stat-num" id="adm-live" style="color:var(--success)">0</span>
-                    <small>Live Now</small>
-                </div>
+                <img id="head-img" src="https://via.placeholder.com/50"
+                    style="width:40px; height:40px; border-radius:50%; border:2px solid #fff;">
             </div>
-            <div class="grid-2" style="margin-bottom:15px;">
-                <div class="card stat-card">
-                     <span class="stat-num" id="adm-pending" style="color:var(--warning)">0</span>
-                     <small>Pending Approval</small>
-                </div>
-                <div class="card stat-card">
-                    <span class="stat-num" id="adm-offline" style="color:var(--text-sub)">0</span>
-                    <small>Offline</small>
-               </div>
-            </div>
-            
-            <div class="card">
-                <h3>Quick Actions</h3>
-                <div class="grid-2">
-                    <button class="btn-secondary" onclick="app.nav('admin-exams', document.querySelector('.dock-item:nth-child(2)'))"><i class="fas fa-plus"></i> Create Exam</button>
-                    <button class="btn-secondary" onclick="app.nav('admin-students', document.querySelector('.dock-item:nth-child(4)'))"><i class="fas fa-check"></i> Approvals</button>
-                </div>
-            </div>
-        </div>
 
-        <!-- Admin: Exams -->
-        <div id="tab-admin-exams" class="hidden">
-            <div class="card" id="exam-editor">
-                <h3>New Exam</h3>
-                <input type="hidden" id="ex-id">
-                <div class="grid-2">
-                    <input type="text" id="ex-title" placeholder="Title">
-                    <select id="ex-class"><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
-                </div>
-                <div class="grid-2">
-                    <input type="number" id="ex-time" placeholder="Mins">
-                    <input type="number" id="ex-neg" placeholder="Neg Mark" step="0.25">
-                </div>
-                <input type="text" id="ex-pin" placeholder="Access PIN (Optional)">
-                <label style="display:flex; align-items:center; gap:10px; margin-bottom:10px; font-size:14px;">
-                    <input type="checkbox" id="ex-shuffle" style="width:auto; margin:0;"> Shuffle Questions
-                </label>
-                
-                <input type="file" id="ex-pdf" accept="application/pdf">
-                <input type="hidden" id="ex-pdf-url">
-
-                <div class="grid-2" style="margin-top:10px;">
-                    <button class="btn-secondary" onclick="app.toggleBuilder('manual')">Manual</button>
-                    <button class="btn-secondary" onclick="app.toggleBuilder('json')">JSON</button>
-                </div>
-
-                <div id="build-man">
-                    <div id="q-box"></div>
-                    <button class="btn-secondary" onclick="app.addQ()" style="margin-top:10px;">+ Question</button>
-                </div>
-                <div id="build-json" class="hidden">
-                    <textarea id="json-in" rows="5" placeholder='Paste your JSON here...'></textarea>
-                    <button class="btn-success" onclick="app.parseJSON()">Import</button>
-                </div>
-
-                <div class="grid-2" style="margin-top:20px;">
-                    <button class="btn-primary" onclick="app.saveExam()"><span id="btn-save-text">Publish</span></button>
-                    <button class="btn-secondary" onclick="app.resetForm()">Clear</button>
-                </div>
-            </div>
-            
-            <div id="admin-exam-list"></div>
-        </div>
-
-        <!-- Admin: Results -->
-        <div id="tab-admin-results" class="hidden">
-            <div id="res-main">
-                <h3>Exam Reports</h3>
-                <div id="results-list"></div>
-            </div>
-            <div id="res-det" class="hidden">
-                <button class="btn-secondary btn-sm" onclick="app.closeRes()" style="margin-bottom:10px;">Back</button>
-                <div class="card">
-                    <h3 id="res-h">Exam</h3>
-                    <div class="grid-2" style="margin-bottom:15px;">
-                        <button class="btn-primary btn-sm" onclick="app.pubAll(true)">Publish All</button>
-                        <button class="btn-secondary btn-sm" onclick="app.pubAll(false)">Hide All</button>
+            <div class="card" style="background: var(--primary-grad); border:none;">
+                <h3 style="margin:0;">Your Progress</h3>
+                <div style="display:flex; margin-top:15px; gap:10px;">
+                    <div
+                        style="flex:1; background:rgba(0,0,0,0.3); padding:10px; border-radius:12px; text-align:center;">
+                        <h1 id="stat-exams" style="margin:0;">0</h1><small>Exams</small>
                     </div>
-                    <div id="res-rows"></div>
+                    <div
+                        style="flex:1; background:rgba(0,0,0,0.3); padding:10px; border-radius:12px; text-align:center;">
+                        <h1 id="stat-avg" style="margin:0;">0%</h1><small>Score</small>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Admin: Students -->
-        <div id="tab-admin-students" class="hidden">
+            <h3 style="margin-top:20px;">Notice Board</h3>
             <div class="card">
-                <h3>Student Directory</h3>
-                <input type="text" placeholder="Search..." onkeyup="app.filter('stu-rows', this.value)">
-                <div id="stu-rows"></div>
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                    <i class="fas fa-bullhorn" style="color: #FFD60A;"></i>
+                    <small style="color:var(--primary);">Just Now</small>
+                </div>
+                <p style="margin:0; font-size:14px; line-height:1.4;">Final exams are approaching. Check the Library for
+                    new revision notes.</p>
             </div>
         </div>
 
-        <!-- Admin Dock -->
+        <!-- Tab: Library -->
+        <div id="tab-library" class="container hidden">
+            <h3>Resource Library</h3>
+            <div style="margin-bottom:15px;">
+                <input type="text" id="lib-search" placeholder="Search resources..." onkeyup="app.renderLibrary()"
+                    style="width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);">
+            </div>
+            <p style="font-size:12px; color:var(--text-sub); margin-bottom:15px;">Viewing Only. Protected Content.</p>
+            <div class="lib-grid" id="lib-list"></div>
+        </div>
+
+        <!-- Tab: Exams -->
+        <div id="tab-exams" class="container hidden">
+            <h3>Exam Center</h3>
+            <div style="margin-bottom:15px;">
+                <input type="text" id="exam-search" placeholder="Search exams..." onkeyup="app.renderExams()"
+                    style="width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);">
+            </div>
+            <div id="exam-list"></div>
+        </div>
+
+        <!-- Tab: Results -->
+        <div id="tab-results" class="container hidden">
+            <h3>Performance History</h3>
+            <div id="result-list"></div>
+        </div>
+
+        <!-- Tab: Profile -->
+        <div id="tab-profile" class="container hidden">
+            <div class="card" style="text-align:center; padding-bottom: 30px;">
+
+                <!-- 1. Profile Photo -->
+                <div class="profile-pic-container" style="margin: 0 auto 15px;">
+                    <img id="p-img" src="https://via.placeholder.com/100" class="profile-img">
+                    <label for="file-up" class="cam-icon"><i class="fas fa-camera" style="color:white;"></i></label>
+                    <input type="file" id="file-up" hidden accept="image/*" onchange="app.handlePhoto(this)">
+                </div>
+
+                <!-- 2. Name & Role -->
+                <h2 id="p-name-disp" style="margin: 0 0 5px 0;">User</h2>
+                <span class="badge"
+                    style="background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; font-size: 12px; color: var(--text-sub);">Student</span>
+
+                <!-- 3. Badges Grid -->
+                <div style="margin: 25px 0; text-align: left;">
+                    <h3 style="margin-bottom: 10px; font-size: 16px;">Badges</h3>
+                    <div class="badge-grid" id="badge-list">
+                        <!-- Badges injected here -->
+                    </div>
+                </div>
+
+                <!-- 4. Form Fields -->
+                <div style="text-align: left; margin-bottom: 20px;">
+                    <label style="display: block; color: var(--text-sub); margin-bottom: 5px; font-size: 13px;">Full
+                        Name</label>
+                    <input type="text" id="inp-name" placeholder="Your Name"
+                        style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                </div>
+
+                <div style="text-align: left; margin-bottom: 20px;">
+                    <label style="display: block; color: var(--text-sub); margin-bottom: 5px; font-size: 13px;">Email
+                        Address</label>
+                    <input type="email" id="inp-email" placeholder="email@example.com"
+                        style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                </div>
+
+                <div style="text-align: left; margin-bottom: 25px;">
+                    <label style="display: block; color: var(--text-sub); margin-bottom: 5px; font-size: 13px;">Phone
+                        Number</label>
+                    <input type="tel" id="inp-phone" placeholder="+00 000 0000"
+                        style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                </div>
+
+                <!-- 5. Action Buttons -->
+                <button class="btn-success" onclick="app.saveProfile()"
+                    style="margin-bottom: 15px; font-weight: 600; box-shadow: 0 4px 15px rgba(0, 176, 155, 0.4);">Save
+                    Changes</button>
+                <button class="btn-danger" onclick="app.logout()"
+                    style="background: #FF416C; box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4);">Log Out</button>
+
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
         <div class="dock">
-            <div class="dock-item active" onclick="app.nav('admin-home', this)"><i class="fas fa-home"></i>Home</div>
-            <div class="dock-item" onclick="app.nav('admin-exams', this)"><i class="fas fa-file-alt"></i>Exams</div>
-            <div class="dock-item" onclick="app.nav('admin-results', this)"><i class="fas fa-chart-bar"></i>Results</div>
-            <div class="dock-item" onclick="app.nav('admin-students', this)"><i class="fas fa-users"></i>Students</div>
+            <div class="d-item active" onclick="app.nav('home', this)"><i class="fas fa-home"></i><small>Home</small>
+            </div>
+            <div class="d-item" onclick="app.nav('library', this)"><i class="fas fa-book"></i><small>Library</small>
+            </div>
+            <div class="d-item" onclick="app.nav('exams', this)"><i class="fas fa-file-alt"></i><small>Exams</small>
+            </div>
+            <div class="d-item" onclick="app.nav('results', this)"><i class="fas fa-trophy"></i><small>Results</small>
+            </div>
+            <div class="d-item" onclick="app.nav('profile', this)"><i
+                    class="fas fa-user-circle"></i><small>Profile</small></div>
         </div>
     </div>
 
-    <!-- === STUDENT VIEW === -->
-    <div id="view-student" class="container hidden">
-        
-        <!-- Home -->
-        <div id="tab-stu-home">
-            <div class="card">
-                <h2>Hello, <span id="stu-name">User</span></h2>
-                <p>Class <span id="stu-class">--</span></p>
-                <div class="grid-2" style="margin-top:15px;">
-                    <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; text-align:center;">
-                        <h2 id="st-count" style="margin:0;">0</h2><small>Exams</small>
-                    </div>
-                    <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; text-align:center;">
-                        <h2 id="st-avg" style="margin:0; color:var(--primary);">0%</h2><small>Average</small>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <h3><i class="fas fa-bell" style="color:var(--warning)"></i> Messages</h3>
-                <div id="msg-box"><small>No messages.</small></div>
-            </div>
-
-            <div class="card">
-                <h3><i class="fas fa-bullhorn" style="color:var(--primary)"></i> Announcements</h3>
-                <div id="ann-box"></div>
-            </div>
+    <!-- MATERIAL VIEWER -->
+    <div id="view-material" class="hidden"
+        style="position:fixed; inset:0; background: #000; z-index:3000; overflow-y:auto; display:flex; flex-direction:column;">
+        <div class="sticky-header">
+            <b id="mat-title">Note Viewer</b>
+            <button class="btn-ghost" style="width:auto; padding:5px 15px; margin:0;"
+                onclick="document.getElementById('view-material').classList.add('hidden')">Close</button>
         </div>
-
-        <!-- Exams -->
-        <div id="tab-stu-exams" class="hidden">
-            <h2 style="margin-left:5px;">Available Exams</h2>
-            <div id="stu-exam-list" style="margin-top:15px;"></div>
-        </div>
-
-        <!-- Results -->
-        <div id="tab-stu-results" class="hidden">
-            <h2 style="margin-left:5px;">My Performance</h2>
-            <div class="card" style="padding:10px;">
-                <div class="grid-2">
-                    <button class="btn-secondary btn-sm" onclick="app.resFilter('pub')" id="btn-res-pub" style="background:var(--bg-glass)">Published</button>
-                    <button class="btn-secondary btn-sm" onclick="app.resFilter('pen')" id="btn-res-pen">Pending</button>
-                </div>
-            </div>
-            <div id="stu-res-list"></div>
-        </div>
-
-        <!-- Profile -->
-        <div id="tab-stu-profile" class="hidden">
-            <div class="card" style="text-align:center;">
-                <div style="position:relative; width:80px; height:80px; margin:0 auto;">
-                    <img id="p-img" class="profile-img" src="https://via.placeholder.com/100">
-                    <div style="position:absolute; bottom:0; right:0; background:var(--primary); width:25px; height:25px; border-radius:50%; display:flex; justify-content:center; align-items:center;">
-                         <label for="p-file" style="color:white; cursor:pointer;"><i class="fas fa-camera" style="font-size:12px;"></i></label>
-                    </div>
-                </div>
-                <input type="file" id="p-file" hidden accept="image/*" onchange="app.uplPhoto(this)">
-                
-                <h2 id="p-name" style="margin-top:15px;">Name</h2>
-                <div id="p-badge" style="margin-bottom:15px;"></div>
-                
-                <div style="text-align:left; background:rgba(0,0,0,0.2); padding:15px; border-radius:12px;">
-                    <div class="list-item"><small>Email</small> <span id="p-email">--</span></div>
-                    <div class="list-item"><small>Phone</small> <span id="p-phone">--</span></div>
-                    <div class="list-item"><small>Class</small> <span id="p-class">--</span></div>
-                </div>
-                
-                <button class="btn-danger" style="margin-top:20px;" onclick="app.logout()">Sign Out</button>
-            </div>
-        </div>
-
-        <!-- Student Dock -->
-        <div class="dock">
-            <div class="dock-item active" onclick="app.nav('stu-home', this)"><i class="fas fa-home"></i>Home</div>
-            <div class="dock-item" onclick="app.nav('stu-exams', this)"><i class="fas fa-layer-group"></i>Exams</div>
-            <div class="dock-item" onclick="app.nav('stu-results', this)"><i class="fas fa-chart-pie"></i>Results</div>
-            <div class="dock-item" onclick="app.nav('stu-profile', this)"><i class="fas fa-user-circle"></i>Profile</div>
+        <div class="watermark" id="watermark-text">USER ID</div>
+        <div id="mat-content"
+            style="flex:1; display:flex; flex-direction:column; align-items:center; padding:20px; position:relative;">
         </div>
     </div>
 
-    <!-- === EXAM ENGINE === -->
-    <div id="view-paper" class="hidden" style="position:fixed; inset:0; background:#000; z-index:3000; overflow-y:auto;">
-        <div style="position:sticky; top:0; background:rgba(20,20,20,0.95); padding:15px; display:flex; justify-content:space-between; border-bottom:1px solid #333;">
-            <span id="q-title" style="font-weight:bold;">Exam</span>
-            <span id="q-timer" style="color:var(--danger); font-family:monospace; font-size:18px;">00:00</span>
+    <!-- EXAM PAPER VIEW -->
+    <div id="view-paper" class="hidden"
+        style="position:fixed; inset:0; background: var(--bg-card-solid); z-index:2000; overflow-y:auto;">
+        <!-- Fixed Header prevents overlap -->
+        <div class="sticky-header">
+            <b id="paper-title" style="font-size:16px;">Exam</b>
+            <b id="paper-timer"
+                style="color:var(--danger); font-family:monospace; font-size:18px; background:rgba(255,0,0,0.1); padding:5px 10px; border-radius:8px;">10:00</b>
         </div>
-        <iframe id="pdf-view" class="hidden" style="width:100%; height:300px; border:none;"></iframe>
-        <div id="q-area" style="padding:20px; padding-bottom:80px;"></div>
-        <div style="position:fixed; bottom:20px; width:90%; left:5%; z-index:3001;">
-            <button class="btn-primary" onclick="app.submit()">Submit Exam</button>
+        <div id="paper-body" class="container" style="padding-top:20px;"></div>
+        <div class="container" style="padding-bottom:100px;">
+            <button class="btn-success" onclick="app.trySubmitExam()">Submit Exam</button>
         </div>
     </div>
 
+    <!-- REVIEW MODAL -->
+    <div id="view-review" class="hidden"
+        style="position:fixed; inset:0; background: var(--bg-card-solid); z-index:2000; overflow-y:auto;">
+        <div class="sticky-header">
+            <b>Result Review</b>
+            <button class="btn-ghost" style="width:auto; padding:5px 15px; margin:0;"
+                onclick="app.closeReview()">Close</button>
+        </div>
+        <div id="review-body" class="container" style="padding-bottom:50px; padding-top:20px;"></div>
+    </div>
+
+    <!-- Firebase & Cloudinary Config -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, deleteDoc, updateDoc, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js";
 
-        // CREDENTIALS
         const firebaseConfig = {
-            apiKey: "AIzaSyBEMPS8vEJztGpoBPJjJIzKKInyt4IY9rQ",
-            authDomain: "studentlms-79722.firebaseapp.com",
-            projectId: "studentlms-79722",
-            storageBucket: "studentlms-79722.firebasestorage.app",
-            messagingSenderId: "1029623857004",
-            appId: "1:1029623857004:web:fa07cb3de1270990a87d49"
+            apiKey: "AIzaSyBWsMjj_aCLCop2v8I-ST97D6hVE1aV2Gg",
+            authDomain: "examapp1-59270.firebaseapp.com",
+            projectId: "examapp1-59270",
+            storageBucket: "examapp1-59270.firebasestorage.app",
+            messagingSenderId: "1013120873082",
+            appId: "1:1013120873082:web:b83622611c121a2f92c1c3",
+            measurementId: "G-FF04K5087Z"
         };
-        const CLOUD_URL = "https://api.cloudinary.com/v1_1/dpe74ejhl/auto/upload"; 
-        const CLOUD_PRESET = "lms_upload";
-        const ADMIN_EMAIL = "rakibk155@gmail.com";
 
-        const appInit = initializeApp(firebaseConfig);
-        const auth = getAuth(appInit);
-        const db = getFirestore(appInit);
-        
-        let user, activeExam, timer, warn=0, curExamId;
+        const fbApp = initializeApp(firebaseConfig); // Renamed from app
+        const analytics = getAnalytics(fbApp);
+        window.firebaseApp = fbApp; 
+    </script>
 
-        document.getElementById('loader').style.display = 'none';
+    <script>
+        // Cloudinary Config
+        const CLOUDINARY_CONFIG = {
+            cloudName: "dpe74ejhl",
+            apiKey: "683721536287352",
+            apiSecret: "z7888OfKHaokoDUUFUgQacvZxn8",
+            uploadPreset: "student_lms"
+        };
 
-        // Heartbeat to update last seen
-        const heartbeat = async () => {
-            if(user && user.uid) {
-                try { await updateDoc(doc(db, "users", user.uid), { lastSeen: new Date() }); } catch(e){}
+        async function uploadToCloudinary(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
+            formData.append('cloud_name', CLOUDINARY_CONFIG.cloudName);
+
+            try {
+                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/auto/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.error?.message || 'Upload failed');
+                }
+                const data = await res.json();
+                return data.secure_url;
+            } catch (e) {
+                console.error(e);
+                alert("Cloudinary Upload Failed: " + e.message);
+                return null;
             }
-        };
-        setInterval(heartbeat, 300000); // Every 5 mins
+        }
 
-        window.app = {
-            toast: (m, t='success') => {
-                const d=document.createElement('div'); d.className='toast'; 
-                d.style.borderLeftColor = t==='error'?'var(--danger)':'var(--success)';
-                d.innerText=m; document.getElementById('toast-box').appendChild(d);
-                setTimeout(()=>d.remove(),3000);
-            },
-            
-            toggleAuth: (m) => {
-                document.getElementById('login-form').classList.toggle('hidden', m==='reg');
-                document.getElementById('reg-form').classList.toggle('hidden', m!=='reg');
-            },
-            login: async () => {
-                try { await signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value); }
-                catch(e){ app.toast(e.message, 'error'); }
-            },
-            loginGoogle: async () => {
-                try {
-                    const r = await signInWithPopup(auth, new GoogleAuthProvider());
-                    const ref = doc(db,"users",r.user.uid);
-                    if(!(await getDoc(ref)).exists()) {
-                        await setDoc(ref, {email:r.user.email, displayName:r.user.displayName, phone:'N/A', role:r.user.email===ADMIN_EMAIL?'admin':'student', class:'9', division:'A', isApproved:r.user.email===ADMIN_EMAIL, lastSeen: new Date()});
-                    }
-                } catch(e){ app.toast(e.message,'error'); }
-            },
-            register: async () => {
-                const n=document.getElementById('reg-name').value, c=document.getElementById('reg-class').value;
-                const d=document.getElementById('reg-div').value, e=document.getElementById('reg-email').value, p=document.getElementById('reg-pass').value;
-                if(!n||!c) return app.toast('Fill all fields','error');
-                try {
-                    const r = await createUserWithEmailAndPassword(auth, e, p);
-                    const role = e===ADMIN_EMAIL?'admin':'student';
-                    await setDoc(doc(db,"users",r.user.uid), {email:e, displayName:n, phone:document.getElementById('reg-phone').value, role, class:c, division:d, isApproved:role==='admin', lastSeen: new Date()});
-                    if(role!=='admin') app.toast('Wait for approval.');
-                } catch(e){ app.toast(e.message,'error'); }
-            },
-            logout: () => signOut(auth),
+        // --- 1. SYNC WITH ADMIN DATA ---
+        const getExams = () => JSON.parse(localStorage.getItem('admin_exams') || '[]');
+        const getLibrary = () => JSON.parse(localStorage.getItem('admin_library') || '[]');
+        const getNotices = () => JSON.parse(localStorage.getItem('admin_notices') || '[]');
 
-            // NAV
-            nav: (t, el) => {
-                document.querySelectorAll('.dock-item').forEach(i=>i.classList.remove('active')); el.classList.add('active');
-                heartbeat(); // Update online status on nav
-                if(t.startsWith('admin')) {
-                    ['admin-home','admin-exams','admin-results','admin-students'].forEach(i=>document.getElementById(`tab-${i}`).classList.add('hidden'));
-                    document.getElementById(`tab-${t}`).classList.remove('hidden');
-                    if(t==='admin-home') app.loadAdminHome();
-                    if(t==='admin-students') app.loadAllStu();
-                    if(t==='admin-exams') app.loadExams();
-                    if(t==='admin-results') app.loadResGroup();
+        let activeExam = null;
+        let examTimer = null;
+        let currentStudentId = null;
+
+        // --- 2. APP LOGIC ---
+        const app = {
+            cheatWarnings: 0,
+
+            // --- CUSTOM MODAL SYSTEM ---
+            showAlert: (msg, type = 'info', title = null) => {
+                const modal = document.getElementById('ui-modal');
+                const box = document.getElementById('ui-modal-box');
+                const icon = document.getElementById('ui-icon');
+                const tEl = document.getElementById('ui-title');
+                const mEl = document.getElementById('ui-msg');
+                const bEl = document.getElementById('ui-btns');
+
+                // Reset classes
+                box.classList.remove('pulse-warn');
+
+                // Config
+                if (type === 'error') {
+                    icon.className = 'fas fa-exclamation-circle modal-icon';
+                    icon.style.color = 'var(--danger)';
+                    tEl.innerText = title || "Error";
+                } else if (type === 'success') {
+                    icon.className = 'fas fa-check-circle modal-icon';
+                    icon.style.color = 'var(--success)';
+                    tEl.innerText = title || "Success";
+                } else if (type === 'warn') {
+                    icon.className = 'fas fa-exclamation-triangle modal-icon';
+                    icon.style.color = 'var(--danger)';
+                    tEl.innerText = title || "Warning";
+                    box.classList.add('pulse-warn');
                 } else {
-                    ['stu-home','stu-exams','stu-results','stu-profile'].forEach(i=>document.getElementById(`tab-${i}`).classList.add('hidden'));
-                    document.getElementById(`tab-${t}`).classList.remove('hidden');
-                    if(t==='stu-home') { app.loadAnn(); app.loadMsg(); app.loadStats(); }
-                    if(t==='stu-exams') app.loadStuExams();
-                    if(t==='stu-results') app.loadStuRes();
-                    if(t==='stu-profile') app.loadPro();
+                    icon.className = 'fas fa-info-circle modal-icon';
+                    icon.style.color = 'var(--primary)';
+                    tEl.innerText = title || "Info";
                 }
+
+                mEl.innerHTML = msg; // Support HTML
+
+                // Single Button
+                bEl.innerHTML = `<button class="btn-primary" onclick="document.getElementById('ui-modal').classList.add('hidden')">OK</button>`;
+
+                modal.classList.remove('hidden');
             },
 
-            // ADMIN HOME
-            loadAdminHome: async () => {
-                // Fetch stats
-                const stus = await getDocs(query(collection(db, "users"), where("role", "==", "student")));
-                let total=0, pending=0, live=0;
-                const now = new Date();
-                
-                stus.forEach(d => {
-                    total++;
-                    const u = d.data();
-                    if(!u.isApproved) pending++;
-                    if(u.lastSeen) {
-                        const diff = (now - u.lastSeen.toDate()) / 1000 / 60; // mins
-                        if(diff < 5) live++;
-                    }
-                });
+            showConfirm: (msg, callback, title = "Confirm") => {
+                const modal = document.getElementById('ui-modal');
+                const icon = document.getElementById('ui-icon');
+                const tEl = document.getElementById('ui-title');
+                const mEl = document.getElementById('ui-msg');
+                const bEl = document.getElementById('ui-btns');
 
-                document.getElementById('adm-tot-stu').innerText = total;
-                document.getElementById('adm-pending').innerText = pending;
-                document.getElementById('adm-live').innerText = live;
-                document.getElementById('adm-offline').innerText = total - live;
-            },
+                icon.className = 'fas fa-question-circle modal-icon';
+                icon.style.color = 'var(--primary)';
+                tEl.innerText = title;
+                mEl.innerText = msg;
 
-            // EXAM
-            toggleBuilder: (m) => {
-                document.getElementById('build-man').classList.toggle('hidden', m!=='manual');
-                document.getElementById('build-json').classList.toggle('hidden', m!=='json');
-            },
-            addQ: (d=null) => {
-                const div = document.createElement('div'); div.className='card q-card'; div.style.padding='15px';
-                div.innerHTML = `
-                    <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><small>MCQ</small><i class="fas fa-times" onclick="this.parentElement.parentElement.remove()" style="color:var(--danger)"></i></div>
-                    <textarea class="q-t" placeholder="Question">${d?d.text:''}</textarea>
-                    <div class="grid-2"><input class="o0" placeholder="A" value="${d?d.options[0]:''}"><input class="o1" placeholder="B" value="${d?d.options[1]:''}"><input class="o2" placeholder="C" value="${d?d.options[2]:''}"><input class="o3" placeholder="D" value="${d?d.options[3]:''}"></div>
-                    <select class="q-c"><option value="0">Ans A</option><option value="1">Ans B</option><option value="2">Ans C</option><option value="3">Ans D</option></select>
+                bEl.innerHTML = `
+                    <button class="btn-ghost" onclick="document.getElementById('ui-modal').classList.add('hidden')">Cancel</button>
+                    <button class="btn-primary" id="confirm-btn">Yes</button>
                 `;
-                if(d) div.querySelector('.q-c').value = d.correct;
-                document.getElementById('q-box').appendChild(div);
-            },
-            
-            // --- UPDATED PARSE JSON FUNCTION ---
-            parseJSON: () => {
-                try {
-                    const val = document.getElementById('json-in').value;
-                    if(!val) return;
-                    let data = JSON.parse(val);
-                    
-                    // 1. Handle "questions" wrapper
-                    if(!Array.isArray(data) && data.questions) data = data.questions;
-                    if(!Array.isArray(data)) throw new Error("Not an array");
 
-                    // 2. Map and Add
-                    data.forEach(q => {
-                        // Map 'question' to 'text'
-                        const text = q.text || q.question || "";
-                        
-                        // Options usually match
-                        const opts = q.options || ["","","",""];
-                        
-                        // Map 'answer' string to index
-                        let corr = 0;
-                        if(typeof q.correct !== 'undefined') corr = q.correct;
-                        else if(typeof q.answer !== 'undefined') {
-                            // If answer is string, find index in options
-                            if(typeof q.answer === 'string') {
-                                const idx = opts.indexOf(q.answer);
-                                if(idx !== -1) corr = idx;
-                            } else {
-                                corr = parseInt(q.answer);
-                            }
-                        }
-
-                        app.addQ({ text: text, options: opts, correct: corr });
-                    });
-
-                    app.toggleBuilder('manual');
-                    app.toast(`Imported ${data.length} Qs`);
-                }
-                catch(e){ console.log(e); app.toast("Invalid JSON Format",'error'); }
-            },
-            // ------------------------------------
-
-            saveExam: async () => {
-                const btn=document.getElementById('btn-save-text'); 
-                if(btn) btn.innerText="Saving...";
-                const id = document.getElementById('ex-id').value;
-                const pdf = document.getElementById('ex-pdf').files[0];
-                let pdfUrl = document.getElementById('ex-pdf-url').value;
-                
-                if(pdf) {
-                    const fd = new FormData(); fd.append('file', pdf); fd.append('upload_preset', CLOUD_PRESET);
-                    try { pdfUrl = (await (await fetch(CLOUD_URL,{method:'POST',body:fd})).json()).secure_url; } catch(e){}
-                }
-
-                let qs = [];
-                document.querySelectorAll('.q-card').forEach(c => {
-                    qs.push({
-                        text:c.querySelector('.q-t').value,
-                        options:[c.querySelector('.o0').value,c.querySelector('.o1').value,c.querySelector('.o2').value,c.querySelector('.o3').value],
-                        correct:parseInt(c.querySelector('.q-c').value)
-                    });
-                });
-
-                const data = {
-                    title: document.getElementById('ex-title').value,
-                    targetClass: document.getElementById('ex-class').value,
-                    time: parseInt(document.getElementById('ex-time').value),
-                    negMark: parseFloat(document.getElementById('ex-neg').value)||0,
-                    pin: document.getElementById('ex-pin').value,
-                    shuffle: document.getElementById('ex-shuffle').checked,
-                    pdf: pdfUrl, questions: qs, updatedAt: new Date(), resultsReleased: false
+                document.getElementById('confirm-btn').onclick = () => {
+                    document.getElementById('ui-modal').classList.add('hidden');
+                    callback();
                 };
 
-                if(!data.title || !data.targetClass) { app.toast("Missing Info",'error'); if(btn) btn.innerText="Publish"; return; }
+                modal.classList.remove('hidden');
+            },
 
-                if(id) { delete data.resultsReleased; await updateDoc(doc(db,"exams",id), data); }
-                else { data.createdAt=new Date(); await addDoc(collection(db,"exams"), data); }
-                
-                app.resetForm(); app.loadExams(); app.toast("Published"); if(btn) btn.innerText="Publish";
-            },
-            resetForm: () => {
-                document.getElementById('ex-id').value=""; document.getElementById('q-box').innerHTML="";
-                document.getElementById('ex-title').value="";
-            },
-            loadExams: async () => {
-                const c = document.getElementById('admin-exam-list'); c.innerHTML="Loading...";
-                const s = await getDocs(collection(db,"exams"));
-                c.innerHTML="";
-                s.forEach(d=>{
-                    const e=d.data();
-                    c.innerHTML+=`<div class="card"><div style="display:flex;justify-content:space-between;"><div><b>${e.title}</b> <span class="badge status-ok">${e.targetClass}</span></div><div><i class="fas fa-edit" onclick="app.edtEx('${d.id}')"></i> <i class="fas fa-trash" style="color:var(--danger);margin-left:10px;" onclick="app.delEx('${d.id}')"></i></div></div></div>`;
-                });
-                window.examsCache = s.docs.map(x=>({id:x.id,...x.data()}));
-            },
-            edtEx: (id) => {
-                const e = window.examsCache.find(x=>x.id===id);
-                document.getElementById('ex-id').value=id; document.getElementById('ex-title').value=e.title;
-                document.getElementById('ex-class').value=e.targetClass; document.getElementById('ex-time').value=e.time;
-                document.getElementById('ex-neg').value=e.negMark; document.getElementById('ex-pin').value=e.pin;
-                document.getElementById('ex-pdf-url').value=e.pdf||""; document.getElementById('q-box').innerHTML="";
-                e.questions.forEach(q=>app.addQ(q)); window.scrollTo(0,0);
-            },
-            delEx: async(id)=>{ if(confirm("Delete?")){await deleteDoc(doc(db,"exams",id)); app.loadExams();} },
+            // --- AUTH SYSTEM ---
 
-            // ADMIN RESULTS
-            loadResGroup: async () => {
-                const c = document.getElementById('results-list'); c.innerHTML="Loading...";
-                const s = await getDocs(collection(db,"exams"));
-                c.innerHTML="";
-                s.forEach(d=>{
-                    const e=d.data();
-                    const st = e.resultsReleased ? '<span class="badge status-ok">LIVE</span>' : '<span class="badge status-wait">HIDDEN</span>';
-                    c.innerHTML += `<div class="card list-item"><div><b>${e.title}</b><br>${st}</div><button class="btn-secondary btn-sm" onclick="app.viewRes('${d.id}','${e.title}',${e.resultsReleased})">View</button></div>`;
-                });
+            showSignUp: () => {
+                document.getElementById('signin-form').classList.add('hidden');
+                document.getElementById('signup-form').classList.remove('hidden');
             },
-            viewRes: async (eid, t, rel) => {
-                curExamId = eid;
-                document.getElementById('res-main').classList.add('hidden');
-                document.getElementById('res-det').classList.remove('hidden');
-                document.getElementById('res-h').innerText = t;
-                const c = document.getElementById('res-rows'); c.innerHTML="Loading...";
-                const s = await getDocs(query(collection(db,"results"), where("examId","==",eid)));
-                c.innerHTML="";
-                s.forEach(d=>{
-                    const r=d.data();
-                    const vis = (rel || r.isReleased);
-                    const eye = vis ? 'fa-eye' : 'fa-eye-slash';
-                    const col = vis ? 'var(--success)' : 'var(--warning)';
-                    c.innerHTML += `<div class="list-item"><div><b>${r.studentName}</b><br><small>${r.score}</small></div><div><i class="fas ${eye}" style="color:${col}; margin-right:15px; cursor:pointer;" onclick="app.togRes('${d.id}',${!vis})"></i><i class="fas fa-trash" style="color:var(--danger); cursor:pointer;" onclick="app.delRes('${d.id}')"></i></div></div>`;
-                });
+
+            showSignIn: () => {
+                document.getElementById('signup-form').classList.add('hidden');
+                document.getElementById('signin-form').classList.remove('hidden');
             },
-            closeRes: () => { document.getElementById('res-det').classList.add('hidden'); document.getElementById('res-main').classList.remove('hidden'); app.loadResGroup(); },
-            pubAll: async (s) => {
-                if(confirm(s?"Publish All?":"Hide All?")) {
-                    await updateDoc(doc(db,"exams",curExamId),{resultsReleased:s});
-                    app.viewRes(curExamId, document.getElementById('res-h').innerText, s);
+
+            signUp: () => {
+                const name = document.getElementById('signup-name').value.trim();
+                const email = document.getElementById('signup-email').value.trim();
+                const password = document.getElementById('signup-password').value;
+                const confirm = document.getElementById('signup-confirm').value;
+
+                // Validation
+                if (!name || !email || !password || !confirm) {
+                    return app.showAlert("Please fill all fields!", "error");
+                }
+
+                if (!email.includes('@')) {
+                    return app.showAlert("Please enter a valid email address!", "error");
+                }
+
+                if (password.length < 6) {
+                    return app.showAlert("Password must be at least 6 characters!", "error");
+                }
+
+                if (password !== confirm) {
+                    return app.showAlert("Passwords do not match!", "error");
+                }
+
+                // Check if email already exists
+                const students = JSON.parse(localStorage.getItem('student_accounts') || '[]');
+                if (students.find(s => s.email === email)) {
+                    return app.showAlert("An account with this email already exists!", "error");
+                }
+
+                // Create account
+                currentStudentId = 'student_' + Date.now();
+                const newStudent = {
+                    id: currentStudentId,
+                    name: name,
+                    email: email,
+                    password: password, // In production, hash this!
+                    createdDate: new Date().toISOString(),
+                    banned: false,
+                    lastActive: Date.now(),
+                    registeredDate: new Date().toLocaleDateString()
+                };
+
+                students.push(newStudent);
+                localStorage.setItem('student_accounts', JSON.stringify(students));
+
+                // Also register in admin system
+                let adminStudents = JSON.parse(localStorage.getItem('admin_students') || '[]');
+                adminStudents.push({
+                    id: currentStudentId,
+                    name: name,
+                    banned: false,
+                    lastActive: Date.now(),
+                    registeredDate: new Date().toLocaleDateString()
+                });
+                localStorage.setItem('admin_students', JSON.stringify(adminStudents));
+
+                // Create profile
+                let profile = { name: name, email: email };
+                localStorage.setItem(currentStudentId + '_profile', JSON.stringify(profile));
+
+                // Clear form
+                document.getElementById('signup-name').value = '';
+                document.getElementById('signup-email').value = '';
+                document.getElementById('signup-password').value = '';
+                document.getElementById('signup-confirm').value = '';
+
+                app.showAlert("Account created successfully! You can now sign in.", "success");
+                app.showSignIn();
+            },
+
+            signIn: () => {
+                const email = document.getElementById('student-email').value.trim();
+                const password = document.getElementById('student-password').value;
+
+                if (!email || !password) {
+                    return app.showAlert("Please enter email and password!", "error");
+                }
+
+                // Get accounts
+                const students = JSON.parse(localStorage.getItem('student_accounts') || '[]');
+                const account = students.find(s => s.email === email && s.password === password);
+
+                if (!account) {
+                    return app.showAlert("Invalid email or password!", "error");
+                }
+
+                // Check if banned
+                if (account.banned) {
+                    return app.showAlert("Your account has been suspended. Contact admin.", "error");
+                }
+
+                currentStudentId = account.id;
+
+                // Save session
+                localStorage.setItem('student_session', JSON.stringify({
+                    id: account.id,
+                    email: account.email,
+                    name: account.name,
+                    loginTime: Date.now()
+                }));
+
+                // Load/update profile
+                let profile = JSON.parse(localStorage.getItem(currentStudentId + '_profile') || '{}');
+                profile.name = account.name;
+                profile.email = account.email;
+                localStorage.setItem(currentStudentId + '_profile', JSON.stringify(profile));
+                localStorage.setItem('myProfile', JSON.stringify(profile));
+                localStorage.setItem('currentStudentId', currentStudentId);
+
+                // Update last active
+                let adminStudents = JSON.parse(localStorage.getItem('admin_students') || '[]');
+                let adminStudent = adminStudents.find(s => s.id === currentStudentId);
+                if (adminStudent) {
+                    adminStudent.lastActive = Date.now();
+                    localStorage.setItem('admin_students', JSON.stringify(adminStudents));
+                }
+
+                // Clear form
+                document.getElementById('student-email').value = '';
+                document.getElementById('student-password').value = '';
+
+                // Show app
+                app.initUI();
+            },
+
+            checkSession: () => {
+                const session = JSON.parse(localStorage.getItem('student_session') || 'null');
+                if (session && session.loginTime && (Date.now() - session.loginTime < 24 * 60 * 60 * 1000)) {
+                    currentStudentId = session.id;
+                    localStorage.setItem('currentStudentId', currentStudentId);
+
+                    // Check if still not banned
+                    const students = JSON.parse(localStorage.getItem('student_accounts') || '[]');
+                    const account = students.find(s => s.id === currentStudentId);
+
+                    if (account && !account.banned) {
+                        let profile = JSON.parse(localStorage.getItem(currentStudentId + '_profile') || '{}');
+                        localStorage.setItem('myProfile', JSON.stringify(profile));
+                        app.initUI();
+                    } else {
+                        localStorage.removeItem('student_session');
+                    }
                 }
             },
-            togRes: async (id, s) => {
-                await updateDoc(doc(db,"results",id),{isReleased:s});
-                // Reload current view
-                const e = await getDoc(doc(db,"exams",curExamId));
-                app.viewRes(curExamId, e.data().title, e.data().resultsReleased);
+
+            logout: () => {
+                localStorage.removeItem('student_session');
+                document.getElementById('view-app').classList.add('hidden');
+                document.getElementById('view-auth').classList.remove('hidden');
+                app.showSignIn();
             },
-            delRes: async (id) => {
-                if(confirm("Delete result?")) {
-                    await deleteDoc(doc(db,"results",id));
-                    const e = await getDoc(doc(db,"exams",curExamId));
-                    app.viewRes(curExamId, e.data().title, e.data().resultsReleased);
+
+            // --- CORE LOGIC ---
+
+            logout: () => {
+                app.showConfirm("Are you sure you want to log out?", () => {
+                    location.reload();
+                }, "Log Out");
+            },
+
+            initUI: () => {
+                currentStudentId = localStorage.getItem('currentStudentId');
+                let profile = JSON.parse(localStorage.getItem('myProfile') || "{}");
+                document.getElementById('u-name').innerText = profile.name;
+                document.getElementById('p-name-disp').innerText = profile.name;
+                document.getElementById('watermark-text').innerText = (profile.name || "USER") + " - Protected";
+
+                document.getElementById('inp-name').value = profile.name || "";
+                document.getElementById('inp-email').value = profile.email || "";
+                document.getElementById('inp-phone').value = profile.phone || "";
+
+                const defImg = "https://via.placeholder.com/100";
+                document.getElementById('p-img').src = profile.photo || defImg;
+                document.getElementById('head-img').src = profile.photo || defImg;
+
+                document.getElementById('view-auth').classList.add('hidden');
+                document.getElementById('view-app').classList.remove('hidden');
+                app.loadStats();
+                app.renderBadges();
+                app.loadNotices();
+
+                // Update last active
+                app.updateActivity();
+                setInterval(app.updateActivity, 60000);
+            },
+
+            saveProfile: () => {
+                let profile = JSON.parse(localStorage.getItem('myProfile') || "{}");
+                profile.name = document.getElementById('inp-name').value;
+                profile.email = document.getElementById('inp-email').value;
+                profile.phone = document.getElementById('inp-phone').value;
+                localStorage.setItem('myProfile', JSON.stringify(profile));
+                localStorage.setItem(currentStudentId + '_profile', JSON.stringify(profile));
+                app.showAlert("Profile saved successfully.", "success");
+                app.initUI();
+            },
+
+            updateActivity: () => {
+                if (!currentStudentId) return;
+                const students = JSON.parse(localStorage.getItem('admin_students') || '[]');
+                const student = students.find(s => s.id === currentStudentId);
+                if (student) {
+                    student.lastActive = Date.now();
+                    localStorage.setItem('admin_students', JSON.stringify(students));
                 }
             },
 
-            // ADMIN STUDENTS
-            loadAllStu: async () => {
-                const c = document.getElementById('stu-rows'); c.innerHTML="Loading...";
-                const s = await getDocs(query(collection(db,"users"), where("role","==","student")));
-                c.innerHTML="";
-                s.forEach(d=>{
-                    const u=d.data();
-                    const st = u.isApproved ? '<i class="fas fa-check-circle" style="color:var(--success)"></i>' : '<i class="fas fa-clock" style="color:var(--warning)"></i>';
-                    const btn = u.isApproved ? `<i class="fas fa-ban" style="color:var(--danger); cursor:pointer;" onclick="app.apprStu('${d.id}',false)"></i>` : `<i class="fas fa-check" style="color:var(--success); cursor:pointer;" onclick="app.apprStu('${d.id}',true)"></i>`;
-                    c.innerHTML += `<div class="list-item"><div><b>${u.displayName}</b> ${st}<br><small>Class ${u.class}</small></div><div>${btn} <i class="fas fa-cog" style="margin-left:15px; color:var(--primary); cursor:pointer;" onclick="app.edtStu('${d.id}')"></i></div></div>`;
-                });
-            },
-            apprStu: async(id,s)=>{ await updateDoc(doc(db,"users",id),{isApproved:s}); app.loadAllStu(); },
-            edtStu: async(id)=>{
-                const u = (await getDoc(doc(db,"users",id))).data();
-                document.getElementById('edt-uid').value=id; document.getElementById('edt-name').value=u.displayName;
-                document.getElementById('edt-phone').value=u.phone; document.getElementById('edt-class').value=u.class;
-                document.getElementById('edt-div').value=u.division; document.getElementById('modal-edit').classList.remove('hidden');
-            },
-            saveStudent: async()=>{
-                const id = document.getElementById('edt-uid').value;
-                const m = document.getElementById('edt-msg').value;
-                await updateDoc(doc(db,"users",id), {
-                    displayName:document.getElementById('edt-name').value, phone:document.getElementById('edt-phone').value,
-                    class:document.getElementById('edt-class').value, division:document.getElementById('edt-div').value
-                });
-                if(m) await addDoc(collection(db,`users/${id}/messages`),{text:m, date:new Date()});
-                document.getElementById('modal-edit').classList.add('hidden'); app.loadAllStu(); app.toast("Saved");
-            },
-            filter: (id, v) => {
-                document.getElementById(id).childNodes.forEach(e => e.style.display = e.innerText.toLowerCase().includes(v.toLowerCase())?'flex':'none');
-            },
-
-            // STUDENT
-            loadAnn: async () => {
-                const c = document.getElementById('ann-box'); c.innerHTML="";
-                const s = await getDocs(query(collection(db,"announcements"), orderBy("date","desc"), limit(5)));
-                if(s.empty) c.innerHTML="<small>No news.</small>";
-                s.forEach(d=>c.innerHTML+=`<div style="margin-bottom:10px; padding:10px; background:rgba(255,255,255,0.05); border-radius:10px;"><small style="color:var(--primary)">${new Date(d.data().date.seconds*1000).toLocaleDateString()}</small><br>${d.data().text}</div>`);
-            },
-            loadMsg: async () => {
-                const c = document.getElementById('msg-box'); c.innerHTML="";
-                const s = await getDocs(query(collection(db,`users/${user.uid}/messages`), orderBy("date","desc"), limit(5)));
-                if(s.empty) c.innerHTML="<small>No messages.</small>";
-                s.forEach(d=>c.innerHTML+=`<div style="margin-bottom:5px; color:var(--warning);"><i class="fas fa-envelope"></i> ${d.data().text}</div>`);
-            },
-            loadStats: async () => {
-                const s = await getDocs(query(collection(db,"results"), where("uid","==",user.uid)));
-                let cnt=0, tot=0;
-                s.forEach(d=>{ cnt++; tot+=(d.data().score/d.data().total)*100; });
-                document.getElementById('st-count').innerText=cnt;
-                document.getElementById('st-avg').innerText = cnt>0 ? (tot/cnt).toFixed(0)+"%" : "0%";
-            },
-            loadStuExams: async () => {
-                const c = document.getElementById('stu-exam-list'); c.innerHTML='<div style="text-align:center; padding:20px;"><div class="spinner"></div></div>';
-                const s = await getDocs(query(collection(db,"exams"), where("targetClass","==",user.class)));
-                c.innerHTML="";
-                if(s.empty) c.innerHTML="<p style='text-align:center;'>No active exams for your class.</p>";
-                s.forEach(d=>{
-                    const e=d.data();
-                    // Customize Exam Card
-                    c.innerHTML += `
-                    <div class="card exam-card-stu">
-                        <div>
-                            <h3 style="margin-bottom:5px;">${e.title}</h3>
-                            <div style="display:flex; gap:10px; font-size:12px; color:var(--text-sub);">
-                                <span><i class="fas fa-clock"></i> ${e.time}m</span>
-                                <span><i class="fas fa-list"></i> ${e.questions.length} Qs</span>
-                            </div>
+            loadNotices: () => {
+                const notices = getNotices();
+                const noticeContainer = document.querySelector('#tab-home .card:last-child');
+                if (notices.length > 0) {
+                    const latest = notices[0];
+                    noticeContainer.innerHTML = `
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                            <i class="fas fa-bullhorn" style="color: #FFD60A;"></i>
+                            <small style="color:var(--primary);">${latest.date}</small>
                         </div>
-                        <button class="btn-primary btn-sm" onclick="app.take('${d.id}')">Start <i class="fas fa-chevron-right"></i></button>
+                        <h4 style="margin: 5px 0; color: white;">${latest.title}</h4>
+                        <p style="margin:0; font-size:14px; line-height:1.4;">${latest.message}</p>
+                    `;
+                } else {
+                    noticeContainer.innerHTML = `
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                            <i class="fas fa-info-circle" style="color: var(--primary);"></i>
+                            <small style="color:var(--text-sub);">No notices</small>
+                        </div>
+                        <p style="margin:0; font-size:14px; line-height:1.4; color: var(--text-sub);">No new announcements at this time.</p>
+                    `;
+                }
+            },
+
+            saveProfile: () => {
+                const newName = document.getElementById('inp-name').value.trim();
+                const newEmail = document.getElementById('inp-email').value.trim();
+                const newPhone = document.getElementById('inp-phone').value.trim();
+                const newPhoto = document.getElementById('p-img').src;
+
+                if (!newName || !newEmail) {
+                    return app.showAlert("Name and Email are required!", "error");
+                }
+
+                // 1. Update Profile Data
+                let profile = JSON.parse(localStorage.getItem(currentStudentId + '_profile') || "{}");
+                profile.name = newName;
+                profile.email = newEmail;
+                profile.phone = newPhone;
+                profile.photo = newPhoto;
+
+                localStorage.setItem(currentStudentId + '_profile', JSON.stringify(profile));
+                localStorage.setItem('myProfile', JSON.stringify(profile));
+
+                // 2. Sync with Student Accounts (Login Data)
+                let accounts = JSON.parse(localStorage.getItem('student_accounts') || '[]');
+                let account = accounts.find(a => a.id === currentStudentId);
+                if (account) {
+                    account.name = newName;
+                    account.email = newEmail;
+                    localStorage.setItem('student_accounts', JSON.stringify(accounts));
+                }
+
+                // 3. Sync with Admin Records (Admin View)
+                let adminStudents = JSON.parse(localStorage.getItem('admin_students') || '[]');
+                let adminStudent = adminStudents.find(s => s.id === currentStudentId);
+                if (adminStudent) {
+                    adminStudent.name = newName;
+                    localStorage.setItem('admin_students', JSON.stringify(adminStudents));
+                }
+
+                // 4. Update UI
+                document.getElementById('u-name').innerText = newName;
+                document.getElementById('p-name-disp').innerText = newName;
+                document.getElementById('watermark-text').innerText = newName + " - Protected";
+
+                app.showAlert("Profile saved successfully!", "success");
+            },
+
+            handlePhoto: async (inp) => {
+                const file = inp.files[0];
+                if (!file) return;
+
+                if (file.size > 5 * 1024 * 1024) {
+                    return app.showAlert("Image too large (Max 5MB)", "error");
+                }
+
+                app.showAlert("Uploading profile photo... Please wait.", "info");
+
+                // Use Cloudinary
+                const url = await uploadToCloudinary(file);
+
+                if (url) {
+                    document.getElementById('p-img').src = url;
+                    const headImg = document.getElementById('head-img');
+                    if (headImg) headImg.src = url;
+
+                    // Update Profile in LocalStorage immediately
+                    const profile = JSON.parse(localStorage.getItem(currentStudentId + '_profile') || "{}");
+                    profile.photo = url; // Save URL
+                    localStorage.setItem(currentStudentId + '_profile', JSON.stringify(profile));
+
+                    app.showAlert("Photo updated successfully!", "success");
+                } else {
+                    inp.value = "";
+                }
+            },
+
+            nav: (tab, el) => {
+                document.querySelectorAll('.container').forEach(c => {
+                    if (c.id.startsWith('tab-')) c.classList.add('hidden');
+                });
+                document.getElementById('tab-' + tab).classList.remove('hidden');
+                document.querySelectorAll('.d-item').forEach(i => i.classList.remove('active'));
+                el.classList.add('active');
+
+                if (tab === 'home') app.loadNotices();
+                if (tab === 'exams') app.renderExams();
+                if (tab === 'results') app.renderResults();
+                if (tab === 'profile') app.renderBadges();
+                if (tab === 'library') app.renderLibrary();
+            },
+
+            // --- LIBRARY ---
+            renderLibrary: () => {
+                const library = getLibrary();
+                const list = document.getElementById('lib-list');
+                const query = document.getElementById('lib-search') ? document.getElementById('lib-search').value.toLowerCase() : '';
+
+                list.innerHTML = "";
+
+                const filtered = library.filter(item =>
+                    item.title.toLowerCase().includes(query) ||
+                    item.subject.toLowerCase().includes(query)
+                );
+
+                if (filtered.length === 0) {
+                    list.innerHTML = '<p style="text-align:center; color:var(--text-sub); grid-column: 1/-1;">No materials found.</p>';
+                    return;
+                }
+                filtered.forEach(item => {
+                    const icon = item.type === 'pdf' ? 'fa-file-pdf' : 'fa-image';
+                    list.innerHTML += `
+                    <div class="lib-item" onclick="app.openMaterial(${item.id})">
+                        <div class="lib-thumb"><i class="fas ${icon}"></i></div>
+                        <div class="lib-info"><b style="font-size:14px; display:block;">${item.title}</b><span class="badge" style="background:var(--primary); color:black; font-size:10px;">${item.subject}</span></div>
                     </div>`;
                 });
             },
-            resFilter: (mode) => {
-                document.querySelectorAll('.res-card').forEach(e => {
-                    e.style.display = e.dataset.type === mode ? 'block' : 'none';
-                });
-                // Toggle Button Style
-                document.getElementById('btn-res-pub').style.background = mode==='pub' ? 'var(--bg-glass)' : 'rgba(255,255,255,0.05)';
-                document.getElementById('btn-res-pen').style.background = mode==='pen' ? 'var(--bg-glass)' : 'rgba(255,255,255,0.05)';
-            },
-            loadStuRes: async () => {
-                const c = document.getElementById('stu-res-list'); 
-                c.innerHTML='<div style="text-align:center; padding:20px;"><div class="spinner"></div></div>';
-                
-                try {
-                    const s = await getDocs(query(collection(db,"results"), where("uid","==",user.uid), orderBy("date","desc")));
-                    c.innerHTML="";
-                    if(s.empty) { c.innerHTML="<p style='text-align:center; color:var(--text-sub);'>No results found.</p>"; return; }
 
-                    for(const d of s.docs){
-                        const r=d.data();
-                        let show = r.isReleased;
-                        // Double check if exam was released globally later
-                        if(!show) {
-                            try {
-                                const es = await getDoc(doc(db,"exams",r.examId));
-                                if(es.exists() && es.data().resultsReleased) show=true;
-                            } catch(err) {}
-                        }
-                        
-                        const type = show ? 'pub' : 'pen';
-                        const scoreDisp = show ? `<span style="font-size:18px; font-weight:bold; color:var(--success);">${r.score}</span><small>/${r.total}</small>` : `<span class="badge status-wait">Pending</span>`;
-                        const action = (show && r.details) ? `<button class="btn-secondary btn-sm" onclick="app.rev('${d.id}')" style="width:100%;">Review Key</button>` : '';
-                        
-                        // Custom Result Card
-                        c.innerHTML += `
-                        <div class="card res-card" data-type="${type}" style="border-left:4px solid ${show ? 'var(--success)' : 'var(--warning)'};">
-                            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
-                                <div>
-                                    <h4 style="margin:0;">${r.examTitle}</h4>
-                                    <small>${new Date(r.date.seconds*1000).toLocaleDateString()}</small>
-                                </div>
-                                <div style="text-align:right;">
-                                    ${scoreDisp}
-                                </div>
-                            </div>
-                            ${action}
-                        </div>`;
-                    }
-                    app.resFilter('pub'); // Default
-                } catch(e) {
-                    console.error(e);
-                    c.innerHTML="<p>Error loading results.</p>";
+            openMaterial: (id) => {
+                const library = getLibrary();
+                const item = library.find(i => i.id === id);
+                if (!item) return;
+                document.getElementById('view-material').classList.remove('hidden');
+                document.getElementById('mat-title').innerText = item.title;
+                const cont = document.getElementById('mat-content');
+                cont.innerHTML = "";
+
+                // Content
+                if (item.type === 'pdf' || item.type.includes('pdf')) {
+                    cont.innerHTML = `<embed src="${item.data}" type="application/pdf" style="width:100%; height:80vh;">`;
+                } else {
+                    cont.innerHTML = `<img src="${item.data}" class="protected-view" style="width:100%; max-width:800px; margin-bottom:10px; border:1px solid #333;">`;
                 }
-            },
-            loadPro: () => {
-                document.getElementById('p-name').innerText=user.displayName;
-                document.getElementById('p-email').innerText=user.email;
-                document.getElementById('p-phone').innerText=user.phone;
-                document.getElementById('p-class').innerText=user.class;
-                if(user.photoURL) document.getElementById('p-img').src=user.photoURL;
-                // Reuse stats logic for badge
-                const avg = parseFloat(document.getElementById('st-avg').innerText) || 0;
-                let b = "Recruit", col = "#888";
-                if(avg>80) {b="Elite"; col="var(--success)";}
-                else if(avg>60) {b="Soldier"; col="var(--primary)";}
-                document.getElementById('p-badge').innerHTML=`<span class="badge" style="background:${col}; color:black;">${b}</span>`;
-            },
-            uplPhoto: async (inp) => {
-                const f = inp.files[0]; if(!f) return;
-                const fd=new FormData(); fd.append('file',f); fd.append('upload_preset',CLOUD_PRESET);
-                
-                app.toast("Uploading...");
-                
-                try {
-                    const req = await fetch(CLOUD_URL, {method:'POST', body:fd});
-                    const r = await req.json();
-                    
-                    if(r.error) {
-                        console.error(r.error);
-                        throw new Error(r.error.message);
-                    }
-                    
-                    await updateDoc(doc(db,"users",user.uid),{photoURL:r.secure_url});
-                    document.getElementById('p-img').src=r.secure_url; 
-                    app.toast("Updated");
-                } catch(e){ 
-                    console.error("Upload Error:", e);
-                    app.toast("Upload failed. Check console.",'error'); 
+
+                // Download Button (Conditional)
+                if (item.allowDownload) {
+                    const btn = document.createElement('a');
+                    btn.href = item.data;
+                    btn.download = item.fileName || (item.title + (item.type === 'pdf' ? '.pdf' : '.jpg'));
+                    btn.className = 'btn-primary';
+                    btn.style.display = 'inline-block';
+                    btn.style.marginTop = '15px';
+                    btn.style.textDecoration = 'none';
+                    btn.innerHTML = '<i class="fas fa-download"></i> Download Material';
+                    cont.appendChild(document.createElement('br'));
+                    cont.appendChild(btn);
+                } else {
+                    const msg = document.createElement('p');
+                    msg.innerText = "Download not permitted for this material.";
+                    msg.style.color = "var(--text-sub)";
+                    msg.style.marginTop = "15px";
+                    msg.style.fontSize = "12px";
+                    cont.appendChild(document.createElement('br'));
+                    cont.appendChild(msg);
                 }
             },
 
-            // ENGINE
-            take: (id) => {
-                // Fetch fresh
-                getDoc(doc(db,"exams",id)).then(s=>{
-                    activeExam={id:s.id,...s.data()};
-                    if(activeExam.pin) { if(prompt("PIN")!==activeExam.pin) return app.toast("Wrong PIN",'error'); }
-                    
-                    document.getElementById('view-student').classList.add('hidden');
-                    document.getElementById('view-paper').classList.remove('hidden');
-                    document.getElementById('q-title').innerText=activeExam.title;
-                    if(activeExam.pdf) { document.getElementById('pdf-view').src=activeExam.pdf; document.getElementById('pdf-view').classList.remove('hidden'); }
-                    else document.getElementById('pdf-view').classList.add('hidden');
+            // --- EXAM ENGINE ---
+            renderExams: () => {
+                const exams = getExams();
+                const list = document.getElementById('exam-list');
+                const attempts = JSON.parse(localStorage.getItem(currentStudentId + '_attempts') || "[]");
+                const query = document.getElementById('exam-search') ? document.getElementById('exam-search').value.toLowerCase() : '';
 
-                    let qs = [...activeExam.questions];
-                    if(activeExam.shuffle) qs.sort(()=>Math.random()-0.5);
-                    activeExam._shuffled=qs;
+                list.innerHTML = "";
 
-                    const c = document.getElementById('q-area'); c.innerHTML="";
-                    qs.forEach((q,i)=>{
-                        c.innerHTML += `<div class="card"><p><b>${i+1}.</b> ${q.text}</p><div class="grid-2">${q.options.map((o,x)=>`<label style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;"><input type="radio" name="q${i}" value="${x}"> ${o}</label>`).join('')}</div></div>`;
-                    });
+                const filtered = exams.filter(ex => ex.title.toLowerCase().includes(query));
 
-                    let t=activeExam.time*60;
-                    timer = setInterval(()=>{
-                        let m=Math.floor(t/60), s=t%60;
-                        document.getElementById('q-timer').innerText = `${m}:${s<10?'0'+s:s}`;
-                        if(t-- < 0) app.submit();
-                    },1000);
-                    
-                    warn=0; document.addEventListener("visibilitychange", app.vis);
+                if (filtered.length === 0) {
+                    list.innerHTML = '<p style="text-align:center; color:var(--text-sub);">No exams found.</p>';
+                    return;
+                }
+                filtered.forEach(ex => {
+                    const isTaken = attempts.includes(ex.id);
+                    const btnHtml = isTaken ? `<button class="btn-ghost" style="width:auto; opacity:0.6; cursor:not-allowed;">Completed</button>` : `<button class="btn-primary" style="width:auto; padding:8px 20px;" onclick="app.startExam(${ex.id})">Start</button>`;
+                    list.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center;"><div><h3 style="margin:0 0 5px 0;">${ex.title}</h3><small style="color:var(--text-sub);"><i class="fas fa-clock"></i> ${ex.time} min • ${ex.questions.length} Questions</small></div>${btnHtml}</div>`;
                 });
             },
-            vis: () => {
-                if(document.hidden) { warn++; alert(`Warning ${warn}/3`); if(warn>=3) app.submit(); }
-            },
-            submit: async () => {
-                document.removeEventListener("visibilitychange", app.vis); clearInterval(timer);
-                let score=0, dets=[];
-                activeExam._shuffled.forEach((q,i)=>{
-                    const s = document.querySelector(`input[name="q${i}"]:checked`);
-                    let v = -1;
-                    if(s) { v=parseInt(s.value); if(v===q.correct) score++; else score-=activeExam.negMark||0; }
-                    dets.push({q:q.text, opts:q.options, correct:q.correct, selected:v});
-                });
-                await addDoc(collection(db,"results"), {
-                    uid:user.uid, studentName:user.displayName, studentEmail:user.email,
-                    examId:activeExam.id, examTitle:activeExam.title, score:score.toFixed(2), total:activeExam.questions.length,
-                    date:new Date(), isReleased:false, details:dets
-                });
-                alert("Submitted!"); location.reload();
-            },
-            rev: async(rid) => {
-                const r = (await getDoc(doc(db,"results",rid))).data();
-                document.getElementById('view-student').classList.add('hidden');
+
+            startExam: (id) => {
+                const attempts = JSON.parse(localStorage.getItem(currentStudentId + '_attempts') || "[]");
+                if (attempts.includes(id)) return app.showAlert("You have already taken this exam.", "error");
+                app.cheatWarnings = 0;
+                document.addEventListener("visibilitychange", app.handleVisibility);
+
+                const exams = getExams();
+                activeExam = exams.find(e => e.id === id);
+                if (!activeExam) return app.showAlert("Exam not found!", "error");
+                document.getElementById('view-app').classList.add('hidden');
                 document.getElementById('view-paper').classList.remove('hidden');
-                document.getElementById('q-title').innerText="REVIEW: "+r.examTitle;
-                document.getElementById('q-timer').innerText=r.score;
-                document.querySelector('button[onclick="app.submit()"]').innerText="CLOSE";
-                document.querySelector('button[onclick="app.submit()"]').onclick=()=>location.reload();
-                
-                const c = document.getElementById('q-area'); c.innerHTML="";
-                r.details.forEach((q,i)=>{
-                    c.innerHTML += `<div class="card"><p><b>${i+1}.</b> ${q.q}</p><div class="grid-2">${q.opts.map((o,x)=>{
-                        let st=""; if(x===q.correct) st="border:1px solid lime; color:lime;";
-                        else if(x===q.selected) st="border:1px solid red; color:red;";
-                        return `<div style="padding:10px; border-radius:8px; background:rgba(255,255,255,0.05); ${st}">${o}</div>`;
-                    }).join('')}</div></div>`;
+
+                document.getElementById('paper-title').innerText = activeExam.title;
+                const body = document.getElementById('paper-body');
+                body.innerHTML = "";
+                activeExam.questions.forEach((q, idx) => {
+                    body.innerHTML += `<div class="card"><p style="font-size:18px;"><b>Q${idx + 1}.</b> ${q.t}</p>${q.opts.map((o, i) => `<label class="opt-box" style="display:flex; cursor:pointer;"><input type="radio" name="q${idx}" value="${i}"> <span>${o}</span></label>`).join('')}</div>`;
                 });
+                let time = activeExam.time * 60;
+                examTimer = setInterval(() => {
+                    time--;
+                    let m = Math.floor(time / 60), s = time % 60;
+                    document.getElementById('paper-timer').innerText = `${m}:${s < 10 ? '0' + s : s}`;
+                    if (time <= 0) app.finalizeSubmission(); // Auto submit NO confirm
+                }, 1000);
+            },
+
+            // --- ANTI-CHEAT ---
+            handleVisibility: () => {
+                if (document.hidden) {
+                    app.cheatWarnings++;
+                    // Show Custom Modal for Warning
+                    app.showAlert(`Warning <b>${app.cheatWarnings}/3</b><br>Do not switch tabs or minimize the app!<br>Your exam will be auto-submitted.`, "warn", "Anti-Cheat Alert");
+
+                    if (app.cheatWarnings >= 3) {
+                        // Close modal forcefully and submit
+                        document.getElementById('ui-modal').classList.add('hidden');
+                        app.finalizeSubmission();
+                    }
+                }
+            },
+
+            // --- SUBMISSION FLOW ---
+            trySubmitExam: () => {
+                app.showConfirm("Are you sure you want to finish this exam?", app.finalizeSubmission, "Submit Exam");
+            },
+
+            finalizeSubmission: () => {
+                clearInterval(examTimer);
+                document.removeEventListener("visibilitychange", app.handleVisibility);
+                let score = 0, details = [];
+                activeExam.questions.forEach((q, idx) => {
+                    const sel = document.querySelector(`input[name="q${idx}"]:checked`);
+                    let val = -1;
+                    if (sel) { val = parseInt(sel.value); if (val === q.c) score++; }
+                    details.push({ q: q.t, opts: q.opts, correct: q.c, selected: val });
+                });
+                app.checkBadges(score, activeExam.questions.length);
+                const result = { id: Date.now(), exam: activeExam.title, examId: activeExam.id, score: score, total: activeExam.questions.length, date: new Date().toLocaleDateString(), details: details };
+                let results = JSON.parse(localStorage.getItem(currentStudentId + '_results') || "[]");
+                results.push(result);
+                localStorage.setItem(currentStudentId + '_results', JSON.stringify(results));
+                localStorage.setItem('myResults', JSON.stringify(results));
+                let attempts = JSON.parse(localStorage.getItem(currentStudentId + '_attempts') || "[]");
+                attempts.push(activeExam.id);
+                localStorage.setItem(currentStudentId + '_attempts', JSON.stringify(attempts));
+                localStorage.setItem('myAttempts', JSON.stringify(attempts));
+
+                app.showAlert(`Exam Submitted!<br>Score: <b>${score}/${activeExam.questions.length}</b>`, "success");
+
+                document.getElementById('view-paper').classList.add('hidden');
+                document.getElementById('view-app').classList.remove('hidden');
+                app.nav('results', document.querySelectorAll('.d-item')[3]);
+                app.loadStats();
+            },
+
+            checkBadges: (score, total) => {
+                let badges = JSON.parse(localStorage.getItem(currentStudentId + '_badges') || "[]");
+                let newBadge = false;
+                if (!badges.includes('first_blood')) { badges.push('first_blood'); newBadge = true; }
+                if (score === total && !badges.includes('sniper')) { badges.push('sniper'); newBadge = true; }
+                if ((score / total) > 0.5 && !badges.includes('survivor')) { badges.push('survivor'); newBadge = true; }
+                if (newBadge) setTimeout(() => app.showAlert("🏆 New Badge Unlocked! Check Profile.", "success", "Achievement"), 1000);
+                localStorage.setItem(currentStudentId + '_badges', JSON.stringify(badges));
+                localStorage.setItem('myBadges', JSON.stringify(badges));
+            },
+
+            renderBadges: () => {
+                const myBadges = JSON.parse(localStorage.getItem(currentStudentId + '_badges') || "[]");
+                const container = document.getElementById('badge-list');
+                const allBadges = [
+                    { id: 'first_blood', icon: 'fa-graduation-cap', name: 'Rookie', color: '#4FACFE' },
+                    { id: 'survivor', icon: 'fa-shield-alt', name: 'Survivor', color: '#FFD60A' },
+                    { id: 'sniper', icon: 'fa-crosshairs', name: 'Sniper', color: '#FF416C' }
+                ];
+                container.innerHTML = "";
+                allBadges.forEach(b => {
+                    const isUnlocked = myBadges.includes(b.id);
+                    const cls = isUnlocked ? 'badge-unlocked' : '';
+                    const col = isUnlocked ? b.color : '#666';
+                    container.innerHTML += `<div class="badge-item ${cls}"><i class="fas ${b.icon}" style="font-size:24px; color:${col}; margin-bottom:5px;"></i><br><small style="color:${isUnlocked ? '#fff' : '#888'}">${b.name}</small></div>`;
+                });
+            },
+
+            renderResults: () => {
+                const list = document.getElementById('result-list');
+                const results = JSON.parse(localStorage.getItem(currentStudentId + '_results') || "[]");
+                list.innerHTML = "";
+                if (results.length === 0) return list.innerHTML = "<p style='text-align:center; color:var(--text-sub);'>No exams taken yet.</p>";
+                results.reverse().forEach((r) => {
+                    list.innerHTML += `<div class="card"><div style="display:flex; justify-content:space-between;"><b style="color:var(--primary);">${r.exam}</b><b style="color:${r.score / r.total >= 0.5 ? 'var(--success)' : 'var(--danger)'}">${r.score}/${r.total}</b></div><div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;"><small style="color:var(--text-sub);">${r.date}</small><button class="btn-ghost" style="width:auto; padding:5px 15px; font-size:12px;" onclick="app.viewReview(${r.id})">Review Answers</button></div></div>`;
+                });
+            },
+
+            viewReview: (resId) => {
+                const results = JSON.parse(localStorage.getItem(currentStudentId + '_results') || "[]");
+                const res = results.find(r => r.id === resId);
+                if (!res) return;
+                document.getElementById('view-review').classList.remove('hidden');
+                const box = document.getElementById('review-body');
+                box.innerHTML = `<h2 style="text-align:center; margin-bottom:20px;">Score: ${res.score}/${res.total}</h2>`;
+                res.details.forEach((d, i) => {
+                    let optsHtml = "";
+                    d.opts.forEach((optText, optIdx) => {
+                        let styleClass = "", icon = "";
+                        if (optIdx === d.correct) { styleClass = "opt-correct"; icon = " <i class='fas fa-check' style='float:right'></i>"; }
+                        else if (optIdx === d.selected && d.selected !== d.correct) { styleClass = "opt-wrong"; icon = " <i class='fas fa-times' style='float:right'></i>"; }
+                        optsHtml += `<div class="opt-box ${styleClass}">${optText} ${icon}</div>`;
+                    });
+                    box.innerHTML += `<div class="card"><p><b>Q${i + 1}.</b> ${d.q}</p>${optsHtml}</div>`;
+                });
+            },
+
+            closeReview: () => document.getElementById('view-review').classList.add('hidden'),
+
+            loadStats: () => {
+                const results = JSON.parse(localStorage.getItem(currentStudentId + '_results') || "[]");
+                document.getElementById('stat-exams').innerText = results.length;
+                if (results.length > 0) {
+                    let totalPerc = 0;
+                    results.forEach(r => totalPerc += (r.score / r.total));
+                    let avg = (totalPerc / results.length) * 100;
+                    document.getElementById('stat-avg').innerText = Math.round(avg) + "%";
+                }
             }
         };
 
-        onAuthStateChanged(auth, async (u) => {
-            if(u) {
-                user = {uid:u.uid, ...(await getDoc(doc(db,"users",u.uid))).data()};
-                heartbeat(); // Init heartbeat
-                document.getElementById('view-auth').classList.add('hidden');
-                if(user.role==='admin') {
-                    document.getElementById('view-admin').classList.remove('hidden');
-                    app.nav('admin-home', document.querySelector('.dock-item'));
-                } else if(user.isApproved) {
-                    document.getElementById('view-student').classList.remove('hidden');
-                    document.getElementById('stu-name').innerText=user.displayName;
-                    document.getElementById('stu-class').innerText=user.class;
-                    app.nav('stu-home', document.querySelector('.dock-item'));
-                } else document.getElementById('view-pending').classList.remove('hidden');
-            } else {
-                document.querySelectorAll('.container').forEach(c=>c.classList.add('hidden'));
-                document.getElementById('view-auth').classList.remove('hidden');
-            }
-        });
+        // Check for existing session on page load
+        app.checkSession();
     </script>
 </body>
+
 </html>

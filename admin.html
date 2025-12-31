@@ -1,0 +1,2328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LMS Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-body: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            --bg-card: rgba(255, 255, 255, 0.08);
+            --bg-card-solid: #16161d;
+            --primary: #4FACFE;
+            --primary-grad: linear-gradient(to right, #4FACFE, #00F2FE);
+            --danger: #FF416C;
+            --danger-grad: linear-gradient(to right, #FF416C, #FF4B2B);
+            --success: #00b09b;
+            --success-grad: linear-gradient(to right, #00b09b, #96c93d);
+            --text: #FFFFFF;
+            --text-sub: #cfcfcf;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-body);
+            background-attachment: fixed;
+            color: var(--text);
+            padding-bottom: 100px;
+            min-height: 100vh;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: fade 0.4s ease;
+        }
+
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        input,
+        textarea,
+        select,
+        button {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 15px;
+            border: none;
+            font-size: 16px;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+
+        input,
+        textarea,
+        select {
+            background: rgba(0, 0, 0, 0.4);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: var(--primary);
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: scale(0.97);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4FACFE 0%, #00F2FE 100%);
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%);
+            box-shadow: 0 4px 15px rgba(255, 65, 108, 0.3);
+            font-weight: 600;
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 6px 20px rgba(255, 65, 108, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+            box-shadow: 0 4px 15px rgba(0, 176, 155, 0.3);
+            font-weight: 600;
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 6px 20px rgba(0, 176, 155, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn-ghost {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-ghost:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-box {
+            background: #1e1e24;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 30px;
+            width: 85%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .modal-title {
+            margin: 0 0 10px 0;
+            color: white;
+            font-size: 20px;
+        }
+
+        .modal-desc {
+            color: var(--text-sub);
+            margin-bottom: 25px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .modal-btns {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .modal-btns button {
+            padding: 12px 20px;
+            width: auto;
+            flex: 1;
+            margin: 0;
+        }
+
+        .dock {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 95%;
+            /* Responsive */
+            max-width: 500px;
+            background: rgba(15, 15, 25, 0.85);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border-radius: 40px;
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            padding: 12px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
+
+        .dock .d-item {
+            padding: 5px 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .dock i {
+            font-size: 20px;
+            color: var(--text-sub);
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .dock small {
+            font-size: 10px;
+            color: var(--text-sub);
+        }
+
+        .active i {
+            color: #fff;
+            transform: translateY(-6px) scale(1.1);
+            filter: drop-shadow(0 0 8px #4FACFE);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .active small {
+            color: #fff;
+            font-weight: 600;
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+
+        .dock .d-item:hover i {
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .active small {
+            color: #fff;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-card h1 {
+            margin: 0;
+            font-size: 36px;
+            background: var(--primary-grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-card small {
+            color: var(--text-sub);
+            font-size: 14px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .item-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .item-card h4 {
+            margin: 0 0 10px 0;
+            color: var(--primary);
+        }
+
+        .badge {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            display: inline-block;
+            margin: 2px;
+        }
+
+        .badge-success {
+            background: rgba(0, 176, 155, 0.2);
+            color: #00b09b;
+        }
+
+        .badge-danger {
+            background: rgba(255, 65, 108, 0.2);
+            color: #FF416C;
+        }
+
+        .badge-primary {
+            background: rgba(79, 172, 254, 0.2);
+            color: #4FACFE;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th,
+        table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        table th {
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--primary);
+        }
+
+        .file-upload {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            padding: 40px;
+            text-align: center;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary);
+            background: rgba(79, 172, 254, 0.05);
+        }
+
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .sm-btn {
+            width: auto !important;
+            padding: 8px 15px !important;
+            font-size: 12px !important;
+            margin: 0 5px 0 0 !important;
+            display: inline-block !important;
+        }
+
+        .flex-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* TABLE STYLES */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 10px;
+        }
+
+        th {
+            text-align: left;
+            padding: 15px;
+            color: var(--text-sub);
+            font-weight: 500;
+            font-size: 14px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* ========== RESPONSIVE DESIGN ========== */
+
+        /* Tablets and smaller laptops */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 15px;
+                max-width: 100%;
+            }
+
+            .stat-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .grid-2 {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+
+        /* Mobile phones - Portrait */
+        @media (max-width: 768px) {
+            body {
+                padding-bottom: 90px;
+                font-size: 14px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            .card {
+                padding: 15px;
+                border-radius: 15px;
+                margin-bottom: 10px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            h3 {
+                font-size: 16px;
+            }
+
+            /* Touch-friendly inputs */
+            input,
+            textarea,
+            select,
+            button {
+                padding: 12px;
+                font-size: 16px;
+                /* Prevents zoom on iOS */
+                border-radius: 12px;
+                margin-bottom: 10px;
+            }
+
+            button {
+                min-height: 44px;
+                /* iOS touch target */
+            }
+
+            .sm-btn {
+                padding: 8px 12px !important;
+                font-size: 11px !important;
+                min-height: 36px;
+            }
+
+            /* Stat cards - Stack on mobile */
+            .stat-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 15px 10px;
+            }
+
+            .stat-card h1 {
+                font-size: 28px;
+            }
+
+            .stat-card small {
+                font-size: 11px;
+            }
+
+            /* Library and item grids */
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .item-card {
+                padding: 12px;
+            }
+
+            /* Tables - Responsive */
+            table {
+                font-size: 12px;
+            }
+
+            table th,
+            table td {
+                padding: 8px;
+            }
+
+            /* Make tables scrollable */
+            .card>table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            /* Modal adjustments */
+            .modal-box {
+                width: 95%;
+                max-width: 95%;
+                padding: 20px;
+                border-radius: 20px;
+            }
+
+            .modal-icon {
+                font-size: 40px;
+            }
+
+            .modal-title {
+                font-size: 18px;
+            }
+
+            .modal-desc {
+                font-size: 14px;
+            }
+
+            .modal-btns {
+                flex-direction: column;
+            }
+
+            .modal-btns button {
+                width: 100% !important;
+            }
+
+            /* Bottom navigation - More compact */
+            .dock {
+                bottom: 10px;
+                width: 98%;
+                padding: 8px 0;
+                border-radius: 20px;
+            }
+
+            .dock .d-item {
+                padding: 5px 5px;
+            }
+
+            .dock i {
+                font-size: 18px;
+                margin-bottom: 2px;
+            }
+
+            .dock small {
+                font-size: 9px;
+            }
+
+            /* File upload */
+            .file-upload {
+                padding: 30px 20px;
+            }
+
+            .file-upload i {
+                font-size: 36px !important;
+            }
+
+            /* Flex row on mobile - Stack */
+            .flex-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .flex-row button {
+                width: 100%;
+            }
+        }
+
+        /* Small phones */
+        @media (max-width: 480px) {
+            .container {
+                padding: 8px;
+            }
+
+            .card {
+                padding: 12px;
+            }
+
+            /* Stack all stat cards */
+            .stat-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card h1 {
+                font-size: 24px;
+            }
+
+            /* Smaller text */
+            h2 {
+                font-size: 18px;
+            }
+
+            h3 {
+                font-size: 15px;
+            }
+
+            /* Badge adjustments */
+            .badge {
+                font-size: 10px;
+                padding: 4px 8px;
+            }
+
+            /* Bottom nav - Icons only mode option */
+            .dock small {
+                display: block;
+                /* Keep labels */
+                font-size: 8px;
+            }
+
+            /* Modal even more compact */
+            .modal-box {
+                padding: 15px;
+            }
+        }
+
+        /* Landscape mode optimizations */
+        @media (max-width: 896px) and (orientation: landscape) {
+            body {
+                padding-bottom: 70px;
+            }
+
+            .dock {
+                padding: 6px 0;
+                bottom: 5px;
+            }
+
+            .dock i {
+                font-size: 16px;
+                margin-bottom: 1px;
+            }
+
+            .dock small {
+                font-size: 8px;
+            }
+
+            .stat-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* Accessibility - High contrast for better readability */
+        @media (prefers-contrast: high) {
+            .card {
+                border: 2px solid rgba(255, 255, 255, 0.3);
+            }
+
+            input,
+            textarea,
+            select {
+                border: 2px solid rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        /* Reduce motion for accessibility */
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* === UI ENHANCEMENTS === */
+        /* Smooth Fade In */
+        .card,
+        .item-card,
+        tr {
+            animation: fade 0.4s ease-out backwards;
+        }
+
+        .card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        /* Hover Effects */
+        .item-card:hover,
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.03);
+            transition: 0.3s;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* macOS UI Overrides */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif !important;
+            background: #0d1117 !important;
+            /* Deep dark bg */
+        }
+
+        /* Unified Title Bar */
+        .mac-titlebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 48px;
+            background: rgba(26, 26, 36, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 5000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            user-select: none;
+        }
+
+        .traffic-lights {
+            position: absolute;
+            left: 18px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .mac-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .mac-dot.close {
+            background: #FF5F56;
+            box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.2) inset;
+        }
+
+        .mac-dot.maximize {
+            background: #27C93F;
+            box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.2) inset;
+        }
+
+        .mac-dot.minimize {
+            background: #FFBD2E;
+            box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.2) inset;
+        }
+
+        .window-title {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: -0.1px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .container {
+            padding-top: 90px !important;
+        }
+
+        /* Input Polish */
+        input,
+        select,
+        textarea {
+            border-radius: 10px !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            background: rgba(0, 0, 0, 0.3) !important;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            background: rgba(30, 30, 40, 0.8) !important;
+            box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.4), inset 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+            border-color: #0A84FF !important;
+        }
+
+        /* Card Polish */
+        .card,
+        .modal-box {
+            border-radius: 18px !important;
+            background: rgba(30, 30, 40, 0.6) !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        }
+
+        /* Compact UI Overrides (Global) */
+        .stat-card {
+            padding: 15px !important;
+        }
+
+        .stat-card h1 {
+            font-size: 26px !important;
+            margin-bottom: 0 !important;
+        }
+
+        .stat-card small {
+            font-size: 12px !important;
+        }
+
+        .item-card {
+            padding: 12px !important;
+        }
+
+        .item-card i {
+            font-size: 24px !important;
+            margin-bottom: 5px !important;
+        }
+
+        .file-upload {
+            padding: 20px !important;
+        }
+
+        .file-upload i {
+            font-size: 32px !important;
+        }
+
+        /* Ultra Small Screens (iPhone SE, etc) */
+        @media (max-width: 380px) {
+            .mac-titlebar {
+                height: 40px;
+            }
+
+            .container {
+                padding-top: 60px !important;
+                padding-left: 10px !important;
+                padding-right: 10px !important;
+            }
+
+            .dock {
+                padding: 8px 5px !important;
+                width: 95% !important;
+                bottom: 5px !important;
+            }
+
+            .dock .d-item {
+                padding: 5px 2px !important;
+            }
+
+            .dock i {
+                font-size: 16px !important;
+            }
+
+            .dock small {
+                font-size: 9px !important;
+                transform: scale(0.9);
+            }
+
+            .stat-card h1 {
+                font-size: 22px !important;
+            }
+
+            .window-title {
+                font-size: 11px;
+            }
+
+            .card {
+                padding: 15px 10px !important;
+            }
+
+            /* Force horizontal scroll for tables to fit */
+            table {
+                min-width: 400px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- macOS Title Bar (Global) -->
+    <div class="mac-titlebar">
+        <div class="traffic-lights">
+            <div class="mac-dot close"></div>
+            <div class="mac-dot minimize"></div>
+            <div class="mac-dot maximize"></div>
+        </div>
+        <div class="window-title">Admin Console</div>
+    </div>
+
+    <!-- MODAL -->
+    <div id="ui-modal" class="modal-overlay hidden">
+        <div class="modal-box" id="ui-modal-box">
+            <i id="ui-icon" class="fas fa-info-circle modal-icon"></i>
+            <h3 id="ui-title" class="modal-title">Title</h3>
+            <p id="ui-msg" class="modal-desc">Message</p>
+            <div id="ui-btns" class="modal-btns"></div>
+        </div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="view-auth" class="container"
+        style="height:100vh; display:flex; flex-direction:column; justify-content:center;">
+        <div class="card" style="text-align:center; padding: 40px 30px; max-width: 420px; margin: 0 auto;">
+            <!-- Logo -->
+            <div
+                style="width: 80px; height: 80px; background: linear-gradient(135deg, #FF416C, #FF4B2B); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 8px 20px rgba(255, 65, 108, 0.3);">
+                <i class="fas fa-user-shield" style="font-size: 40px; color: white;"></i>
+            </div>
+
+            <h1 style="margin: 10px 0 5px 0; font-size: 28px;">Admin Portal</h1>
+            <p style="color:var(--text-sub); margin-bottom:30px; font-size: 14px;">Manage your learning platform</p>
+
+            <!-- Google Login (Placeholder) -->
+            <button class="btn-ghost"
+                style="display: flex; align-items: center; justify-content: center; gap: 10px; background: white; color: #333; font-weight: 500; margin-bottom: 20px;"
+                onclick="admin.showAlert('Google Sign-In requires OAuth setup', 'info')">
+                <svg width="20" height="20" viewBox="0 0 20 20">
+                    <path fill="#4285F4"
+                        d="M19.6 10.23c0-.82-.1-1.42-.25-2.05H10v3.72h5.5c-.15.96-.74 2.31-2.04 3.22v2.45h3.16c1.89-1.73 2.98-4.3 2.98-7.34z" />
+                    <path fill="#34A853"
+                        d="M13.46 15.13c-.83.59-1.96 1-3.46 1-2.64 0-4.88-1.74-5.68-4.15H1.07v2.52C2.72 17.75 6.09 20 10 20c2.7 0 4.96-.89 6.62-2.42l-3.16-2.45z" />
+                    <path fill="#FBBC05"
+                        d="M3.99 10c0-.69.12-1.35.32-1.97V5.51H1.07A9.973 9.973 0 000 10c0 1.61.39 3.14 1.07 4.49l3.24-2.52c-.2-.62-.32-1.28-.32-1.97z" />
+                    <path fill="#EA4335"
+                        d="M10 3.88c1.88 0 3.13.81 3.85 1.48l2.84-2.76C14.96.99 12.7 0 10 0 6.09 0 2.72 2.25 1.07 5.51l3.24 2.52C5.12 5.62 7.36 3.88 10 3.88z" />
+                </svg>
+                Continue with Google
+            </button>
+
+            <div
+                style="display: flex; align-items: center; gap: 15px; margin: 25px 0; color: var(--text-sub); font-size: 12px;">
+                <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
+                <span>OR USE EMAIL</span>
+                <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
+            </div>
+
+            <!-- Sign In Form -->
+            <div id="signin-form">
+                <div style="text-align: left; margin-bottom: 8px;">
+                    <label
+                        style="font-size: 12px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px;">Email</label>
+                </div>
+                <input type="email" id="admin-email" placeholder="admin@example.com" style="margin-bottom: 15px;">
+
+                <div style="text-align: left; margin-bottom: 8px;">
+                    <label
+                        style="font-size: 12px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px;">Password</label>
+                </div>
+                <input type="password" id="admin-password" placeholder="••••••••">
+
+                <button class="btn-danger" onclick="admin.signIn()" style="margin-top: 20px;">
+                    Sign In <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+                </button>
+
+                <p style="margin-top: 20px; font-size: 14px; color: var(--text-sub);">
+                    Don't have an account? <a href="#" onclick="admin.showSignUp(); return false;"
+                        style="color: var(--primary); text-decoration: none; font-weight: 600;">Sign Up</a>
+                </p>
+            </div>
+
+            <!-- Sign Up Form -->
+            <div id="signup-form" class="hidden">
+                <div style="text-align: left; margin-bottom: 8px;">
+                    <label
+                        style="font-size: 12px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px;">Full
+                        Name</label>
+                </div>
+                <input type="text" id="signup-name" placeholder="John Doe" style="margin-bottom: 15px;">
+
+                <div style="text-align: left; margin-bottom: 8px;">
+                    <label
+                        style="font-size: 12px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px;">Email</label>
+                </div>
+                <input type="email" id="signup-email" placeholder="admin@example.com" style="margin-bottom: 15px;">
+
+                <div style="text-align: left; margin-bottom: 8px;">
+                    <label
+                        style="font-size: 12px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px;">Password</label>
+                </div>
+                <input type="password" id="signup-password" placeholder="••••••••" style="margin-bottom: 15px;">
+
+                <div style="text-align: left; margin-bottom: 8px;">
+                    <label
+                        style="font-size: 12px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px;">Confirm
+                        Password</label>
+                </div>
+                <input type="password" id="signup-confirm" placeholder="••••••••">
+
+                <button class="btn-success" onclick="admin.signUp()" style="margin-top: 20px;">
+                    Create Account <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+                </button>
+
+                <p style="margin-top: 20px; font-size: 14px; color: var(--text-sub);">
+                    Already have an account? <a href="#" onclick="admin.showSignIn(); return false;"
+                        style="color: var(--primary); text-decoration: none; font-weight: 600;">Sign In</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN DASHBOARD -->
+    <div id="view-admin" class="hidden">
+
+        <!-- Tab: Dashboard -->
+        <div id="tab-dashboard" class="container">
+            <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <h1 id="stat-students">0</h1>
+                    <small>Total Students</small>
+                </div>
+                <div class="stat-card">
+                    <h1 id="stat-online">0</h1>
+                    <small>Online Now</small>
+                </div>
+                <div class="stat-card">
+                    <h1 id="stat-exams">0</h1>
+                    <small>Active Exams</small>
+                </div>
+                <div class="stat-card">
+                    <h1 id="stat-library">0</h1>
+                    <small>Library Items</small>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 20px;">
+                <h3><i class="fas fa-bullhorn"></i> Publish Notice</h3>
+                <input type="text" id="notice-title" placeholder="Notice Title">
+                <textarea id="notice-msg" placeholder="Notice Message"></textarea>
+                <button class="btn-success" onclick="admin.publishNotice()"><i class="fas fa-paper-plane"></i> Publish
+                    to Students</button>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-list"></i> Recent Notices</h3>
+                <div id="notice-list"></div>
+            </div>
+        </div>
+
+        <!-- Tab: Library -->
+        <div id="tab-library" class="container hidden">
+            <h2><i class="fas fa-book"></i> Library Management</h2>
+
+            <div class="card">
+                <h3>Upload Material</h3>
+                <div class="file-upload" onclick="document.getElementById('lib-file').click()">
+                    <i class="fas fa-cloud-upload-alt"
+                        style="font-size: 48px; color: var(--primary); margin-bottom: 10px;"></i>
+                    <p>Click to upload photos or PDFs</p>
+                    <input type="file" id="lib-file" hidden accept="image/*,.pdf"
+                        onchange="admin.handleLibUpload(this)">
+                </div>
+                <input type="text" id="lib-title" placeholder="Material Title">
+                <input type="text" id="lib-subject" placeholder="Subject">
+                <label
+                    style="display: flex; align-items: center; gap: 10px; color: var(--text-sub); margin-bottom: 10px;">
+                    <input type="checkbox" id="lib-download" style="width: auto; margin: 0;">
+                    <span>Allow Download</span>
+                </label>
+                <button class="btn-primary" onclick="admin.addLibraryItem()"><i class="fas fa-plus"></i> Add to
+                    Library</button>
+            </div>
+
+            <div class="card">
+                <div class="flex-row">
+                    <h3>Library Items</h3>
+                    <input type="text" id="lib-search" placeholder="Search..." onkeyup="admin.loadLibrary()"
+                        style="width: 200px; padding: 8px; font-size: 13px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                </div>
+                <div id="library-list" class="grid-2" style="margin-top:15px;"></div>
+            </div>
+        </div>
+
+        <!-- Tab: Exams -->
+        <div id="tab-exams" class="container hidden">
+            <h2><i class="fas fa-file-alt"></i> Exam Management</h2>
+
+            <div class="card">
+                <h3>Create New Exam</h3>
+                <input type="text" id="exam-title" placeholder="Exam Title">
+                <input type="number" id="exam-time" placeholder="Time Limit (minutes)" min="1" value="10">
+
+                <h4 style="margin-top: 20px;">Add Questions Manually</h4>
+                <div id="question-builder">
+                    <input type="text" id="q-text" placeholder="Question Text">
+                    <input type="text" id="q-opt1" placeholder="Option A">
+                    <input type="text" id="q-opt2" placeholder="Option B">
+                    <input type="text" id="q-opt3" placeholder="Option C">
+                    <input type="text" id="q-opt4" placeholder="Option D">
+                    <select id="q-correct">
+                        <option value="0">Correct Answer: A</option>
+                        <option value="1">Correct Answer: B</option>
+                        <option value="2">Correct Answer: C</option>
+                        <option value="3">Correct Answer: D</option>
+                    </select>
+                    <button class="btn-ghost" onclick="admin.addQuestion()"><i class="fas fa-plus"></i> Add
+                        Question</button>
+                </div>
+
+                <div id="questions-preview"></div>
+
+                <h4 style="margin-top: 20px;">Or Import from JSON</h4>
+                <textarea id="json-input" placeholder='Paste JSON here or click "Upload JSON File"'></textarea>
+                <input type="file" id="json-file" hidden accept=".json" onchange="admin.handleJsonFile(this)">
+                <button class="btn-ghost" onclick="document.getElementById('json-file').click()"><i
+                        class="fas fa-file-upload"></i> Upload JSON File</button>
+                <button class="btn-primary" onclick="admin.importJson()"><i class="fas fa-file-import"></i> Import
+                    Questions from JSON</button>
+
+                <button class="btn-success" onclick="admin.publishExam()" style="margin-top: 20px;"><i
+                        class="fas fa-check"></i> Publish Exam</button>
+            </div>
+
+            <div class="card">
+                <div class="flex-row">
+                    <h3>Published Exams</h3>
+                    <input type="text" id="exam-search" placeholder="Search..." onkeyup="admin.loadExams()"
+                        style="width: 200px; padding: 8px; font-size: 13px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                </div>
+                <div id="exams-list" style="margin-top:15px;"></div>
+            </div>
+        </div>
+
+        <!-- Tab: Results -->
+        <div id="tab-results" class="container hidden">
+            <h2><i class="fas fa-trophy"></i> Result Management</h2>
+
+            <!-- Filters -->
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="flex-row" style="flex-wrap: wrap; gap: 10px;">
+                    <select id="res-filter-exam" onchange="admin.loadResults()"
+                        style="flex:1; min-width: 150px; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px;">
+                        <option value="" style="background:#1e1e24;">All Exams</option>
+                    </select>
+                    <select id="res-filter-student" onchange="admin.loadResults()"
+                        style="flex:1; min-width: 150px; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px;">
+                        <option value="" style="background:#1e1e24;">All Students</option>
+                    </select>
+                    <button class="btn-ghost" onclick="admin.loadResults(true)"><i class="fas fa-sync"></i>
+                        Refresh</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="flex-row" style="margin-bottom: 15px;">
+                    <h3>Exam Results</h3>
+                    <div id="res-stats" style="font-size: 14px; color: var(--text-sub);"></div>
+                </div>
+                <div id="results-list" style="overflow-x: auto;"></div>
+            </div>
+        </div>
+
+        <!-- Tab: Students -->
+        <div id="tab-students" class="container hidden">
+            <h2><i class="fas fa-users"></i> Student Management</h2>
+
+            <div class="card">
+                <div class="flex-row" style="margin-bottom:15px;">
+                    <h3>Registered Students</h3>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" id="student-search" placeholder="Search students..."
+                            onkeyup="admin.loadStudents()"
+                            style="width: 200px; padding: 8px; font-size: 13px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                        <button class="btn-primary sm-btn" onclick="admin.exportStudentCSV()"><i
+                                class="fas fa-file-csv"></i> Export</button>
+                    </div>
+                </div>
+                <div id="students-list"></div>
+            </div>
+        </div>
+
+        <!-- Bottom Nav -->
+        <div class="dock">
+            <div class="d-item active" onclick="admin.nav('dashboard', this)"><i
+                    class="fas fa-tachometer-alt"></i><small>Dashboard</small></div>
+            <div class="d-item" onclick="admin.nav('library', this)"><i class="fas fa-book"></i><small>Library</small>
+            </div>
+            <div class="d-item" onclick="admin.nav('exams', this)"><i class="fas fa-file-alt"></i><small>Exams</small>
+            </div>
+            <div class="d-item" onclick="admin.nav('results', this)"><i class="fas fa-trophy"></i><small>Results</small>
+            </div>
+            <div class="d-item" onclick="admin.nav('students', this)"><i
+                    class="fas fa-users"></i><small>Students</small></div>
+        </div>
+    </div>
+
+    <!-- Firebase & Cloudinary Config -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBWsMjj_aCLCop2v8I-ST97D6hVE1aV2Gg",
+            authDomain: "examapp1-59270.firebaseapp.com",
+            projectId: "examapp1-59270",
+            storageBucket: "examapp1-59270.firebasestorage.app",
+            messagingSenderId: "1013120873082",
+            appId: "1:1013120873082:web:b83622611c121a2f92c1c3",
+            measurementId: "G-FF04K5087Z"
+        };
+
+        const fbApp = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(fbApp);
+        window.firebaseApp = fbApp;
+        console.log("Firebase Initialized");
+    </script>
+
+    <script>
+        // Cloudinary Config
+        const CLOUDINARY_CONFIG = {
+            cloudName: "dpe74ejhl",
+            apiKey: "683721536287352",
+            apiSecret: "z7888OfKHaokoDUUFUgQacvZxn8",
+            uploadPreset: "student_lms"
+        };
+
+        async function uploadToCloudinary(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
+            formData.append('cloud_name', CLOUDINARY_CONFIG.cloudName);
+
+            try {
+                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/auto/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.error?.message || 'Upload failed');
+                }
+                const data = await res.json();
+                return data.secure_url;
+            } catch (e) {
+                console.error(e);
+                alert("Cloudinary Upload Failed: " + e.message);
+                return null;
+            }
+        }
+
+        const admin = {
+            currentExamQuestions: [],
+            currentLibFile: null,
+
+            // MODAL
+            showAlert: (msg, type = 'info', title = null) => {
+                const modal = document.getElementById('ui-modal');
+                const icon = document.getElementById('ui-icon');
+                const tEl = document.getElementById('ui-title');
+                const mEl = document.getElementById('ui-msg');
+                const bEl = document.getElementById('ui-btns');
+
+                if (type === 'error') {
+                    icon.className = 'fas fa-exclamation-circle modal-icon';
+                    icon.style.color = 'var(--danger)';
+                    tEl.innerText = title || "Error";
+                } else if (type === 'success') {
+                    icon.className = 'fas fa-check-circle modal-icon';
+                    icon.style.color = 'var(--success)';
+                    tEl.innerText = title || "Success";
+                } else {
+                    icon.className = 'fas fa-info-circle modal-icon';
+                    icon.style.color = 'var(--primary)';
+                    tEl.innerText = title || "Info";
+                }
+
+                mEl.innerHTML = msg;
+                bEl.innerHTML = `<button class="btn-primary" onclick="document.getElementById('ui-modal').classList.add('hidden')">OK</button>`;
+                modal.classList.remove('hidden');
+            },
+
+            showConfirm: (msg, callback, title = "Confirm") => {
+                const modal = document.getElementById('ui-modal');
+                const icon = document.getElementById('ui-icon');
+                const tEl = document.getElementById('ui-title');
+                const mEl = document.getElementById('ui-msg');
+                const bEl = document.getElementById('ui-btns');
+
+                icon.className = 'fas fa-question-circle modal-icon';
+                icon.style.color = 'var(--primary)';
+                tEl.innerText = title;
+                mEl.innerText = msg;
+
+                bEl.innerHTML = `
+                    <button class="btn-ghost" onclick="document.getElementById('ui-modal').classList.add('hidden')">Cancel</button>
+                    <button class="btn-primary" id="confirm-btn">Yes</button>
+                `;
+
+                document.getElementById('confirm-btn').onclick = () => {
+                    document.getElementById('ui-modal').classList.add('hidden');
+                    callback();
+                };
+
+                modal.classList.remove('hidden');
+            },
+
+            // AUTH SYSTEM
+            showSignUp: () => {
+                document.getElementById('signin-form').classList.add('hidden');
+                document.getElementById('signup-form').classList.remove('hidden');
+            },
+
+            showSignIn: () => {
+                document.getElementById('signup-form').classList.add('hidden');
+                document.getElementById('signin-form').classList.remove('hidden');
+            },
+
+            signUp: () => {
+                const name = document.getElementById('signup-name').value.trim();
+                const email = document.getElementById('signup-email').value.trim();
+                const password = document.getElementById('signup-password').value;
+                const confirm = document.getElementById('signup-confirm').value;
+
+                // Validation
+                if (!name || !email || !password || !confirm) {
+                    return admin.showAlert("Please fill all fields!", "error");
+                }
+
+                if (!email.includes('@')) {
+                    return admin.showAlert("Please enter a valid email address!", "error");
+                }
+
+                if (password.length < 6) {
+                    return admin.showAlert("Password must be at least 6 characters!", "error");
+                }
+
+                if (password !== confirm) {
+                    return admin.showAlert("Passwords do not match!", "error");
+                }
+
+                // Check if email already exists
+                const admins = JSON.parse(localStorage.getItem('admin_accounts') || '[]');
+                if (admins.find(a => a.email === email)) {
+                    return admin.showAlert("An account with this email already exists!", "error");
+                }
+
+                // Create account
+                const newAdmin = {
+                    id: 'admin_' + Date.now(),
+                    name: name,
+                    email: email,
+                    password: password, // In production, hash this!
+                    createdDate: new Date().toISOString()
+                };
+
+                admins.push(newAdmin);
+                localStorage.setItem('admin_accounts', JSON.stringify(admins));
+
+                // Clear form
+                document.getElementById('signup-name').value = '';
+                document.getElementById('signup-email').value = '';
+                document.getElementById('signup-password').value = '';
+                document.getElementById('signup-confirm').value = '';
+
+                admin.showAlert("Account created successfully! You can now sign in.", "success");
+                admin.showSignIn();
+            },
+
+            signIn: () => {
+                const email = document.getElementById('admin-email').value.trim();
+                const password = document.getElementById('admin-password').value;
+
+                if (!email || !password) {
+                    return admin.showAlert("Please enter email and password!", "error");
+                }
+
+                // Get accounts
+                const admins = JSON.parse(localStorage.getItem('admin_accounts') || '[]');
+                const account = admins.find(a => a.email === email && a.password === password);
+
+                if (!account) {
+                    return admin.showAlert("Invalid email or password!", "error");
+                }
+
+                // Save session
+                localStorage.setItem('admin_session', JSON.stringify({
+                    id: account.id,
+                    email: account.email,
+                    name: account.name,
+                    loginTime: Date.now()
+                }));
+
+                // Clear form
+                document.getElementById('admin-email').value = '';
+                document.getElementById('admin-password').value = '';
+
+                // Show dashboard
+                document.getElementById('view-auth').classList.add('hidden');
+                document.getElementById('view-admin').classList.remove('hidden');
+                admin.loadDashboard();
+            },
+
+            logout: () => {
+                localStorage.removeItem('admin_session');
+                document.getElementById('view-admin').classList.add('hidden');
+                document.getElementById('view-auth').classList.remove('hidden');
+                admin.showSignIn();
+            },
+
+            checkSession: () => {
+                const session = JSON.parse(localStorage.getItem('admin_session') || 'null');
+                if (session && session.loginTime && (Date.now() - session.loginTime < 24 * 60 * 60 * 1000)) {
+                    document.getElementById('view-auth').classList.add('hidden');
+                    document.getElementById('view-admin').classList.remove('hidden');
+                    admin.loadDashboard();
+                }
+            },
+
+            // NAVIGATION
+            nav: (tab, el) => {
+                document.querySelectorAll('.container').forEach(c => {
+                    if (c.id.startsWith('tab-')) c.classList.add('hidden');
+                });
+                document.getElementById('tab-' + tab).classList.remove('hidden');
+                document.querySelectorAll('.d-item').forEach(i => i.classList.remove('active'));
+                el.classList.add('active');
+
+                if (tab === 'dashboard') admin.loadDashboard();
+                if (tab === 'library') admin.loadLibrary();
+                if (tab === 'exams') admin.loadExams();
+                if (tab === 'results') admin.loadResults();
+                if (tab === 'students') admin.loadStudents();
+            },
+
+            // DASHBOARD
+            // DASHBOARD
+            loadDashboard: () => {
+                const students = JSON.parse(localStorage.getItem('admin_students') || '[]');
+                const exams = JSON.parse(localStorage.getItem('admin_exams') || '[]');
+                const library = JSON.parse(localStorage.getItem('admin_library') || '[]');
+                const results = []; // We need to aggregate results if not stored globally in one list
+                // Aggregating results from all students would be slow, but let's check if we have a global results list?
+                // The sync logic usually stores results in [studentId]_results. 
+                // Admin dashboard originally didn't show total results count except maybe dynamically.
+                // Let's count totals.
+                let totalResults = 0;
+                let recentActivity = [];
+
+                students.forEach(s => {
+                    const sResults = JSON.parse(localStorage.getItem(s.id + '_results') || '[]');
+                    totalResults += sResults.length;
+                    sResults.forEach(r => {
+                        recentActivity.push({
+                            type: 'exam',
+                            student: s.name,
+                            detail: `Completed ${r.exam}`,
+                            time: r.date // String date, might need parsing for sort, but mostly recent
+                        });
+                    });
+                    if (s.registeredDate) {
+                        recentActivity.push({
+                            type: 'user',
+                            student: s.name,
+                            detail: 'Joined the platform',
+                            time: s.registeredDate
+                        });
+                    }
+                });
+
+                // Add exams creation to activity if we stored dates (we didn't store creation date for exams explicitly in previous code, but let's assume)
+                // Using dummy sort for now or just take last few
+
+                // Update Stats
+                document.getElementById('stat-students').innerText = students.length;
+                document.getElementById('stat-online').innerText = students.filter(s => !s.banned && s.lastActive && (Date.now() - s.lastActive < 300000)).length;
+                document.getElementById('stat-exams').innerText = exams.length;
+                document.getElementById('stat-library').innerText = library.length;
+
+                // Render Dashboard Content (Injecting HTML into a container if it exists, or we need to modify the HTML structure of tab-dashboard)
+                // The original HTML structure for tab-dashboard is static.
+                // We need to make it "informative".
+                // I will inject the "Recent Activity" list into a new container in the dashboard tab.
+                // First, let's verify if there is a container for this.
+                // The current HTML (from what I recall) has 4 stat cards.
+                // I will add a "Recent Activity" section dynamically if it doesn't exist.
+
+                const dashContainer = document.getElementById('tab-dashboard');
+                // Check if we already added the activity section
+                let activitySection = document.getElementById('dash-activity-section');
+                if (!activitySection) {
+                    const div = document.createElement('div');
+                    div.id = 'dash-activity-section';
+                    div.style.marginTop = '30px';
+                    div.innerHTML = `
+                        <div class="flex-row" style="margin-bottom:15px;">
+                            <h3><i class="fas fa-history"></i> Recent Activity</h3>
+                            <button class="btn-ghost sm-btn" onclick="admin.loadDashboard()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                        </div>
+                        <div class="card">
+                            <ul id="activity-list" style="list-style:none; padding:0; margin:0;"></ul>
+                        </div>
+                    `;
+                    dashContainer.appendChild(div);
+                }
+
+                const actList = document.getElementById('activity-list');
+                actList.innerHTML = '';
+
+                if (recentActivity.length === 0) {
+                    actList.innerHTML = '<li style="color:var(--text-sub); text-align:center;">No recent activity</li>';
+                } else {
+                    // Sort roughly (dates are strings "12/31/2025", so strict sort is hard without parsing, 
+                    // but let's just show the last 5 items found which are likely recent additions)
+                    // Better: reverse the list (assuming latest added last)
+                    recentActivity.reverse().slice(0, 5).forEach(act => {
+                        let icon = act.type === 'user' ? '<i class="fas fa-user-plus" style="color:var(--success)"></i>' : '<i class="fas fa-check-circle" style="color:var(--primary)"></i>';
+                        actList.innerHTML += `
+                            <li style="display:flex; align-items:center; gap:15px; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                                <div style="width:36px; height:36px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                    ${icon}
+                                </div>
+                                <div style="flex:1;">
+                                    <div style="font-weight:500;">${act.student}</div>
+                                    <div style="font-size:12px; color:var(--text-sub);">${act.detail}</div>
+                                </div>
+                                <div style="font-size:12px; color:var(--text-sub);">${act.time}</div>
+                            </li>
+                        `;
+                    });
+                }
+
+                admin.loadNotices();
+            },
+
+            publishNotice: () => {
+                const title = document.getElementById('notice-title').value;
+                const msg = document.getElementById('notice-msg').value;
+                if (!title || !msg) return admin.showAlert("Please fill all fields!", "error");
+
+                const notices = JSON.parse(localStorage.getItem('admin_notices') || '[]');
+                const notice = {
+                    id: Date.now(),
+                    title: title,
+                    message: msg,
+                    date: new Date().toLocaleString(),
+                    published: true
+                };
+                notices.unshift(notice);
+                localStorage.setItem('admin_notices', JSON.stringify(notices));
+
+                document.getElementById('notice-title').value = '';
+                document.getElementById('notice-msg').value = '';
+                admin.showAlert("Notice published successfully!", "success");
+                admin.loadNotices();
+            },
+
+            loadNotices: () => {
+                const notices = JSON.parse(localStorage.getItem('admin_notices') || '[]');
+                const list = document.getElementById('notice-list');
+                if (notices.length === 0) {
+                    list.innerHTML = '<p style="color: var(--text-sub); text-align: center;">No notices published yet.</p>';
+                    return;
+                }
+                list.innerHTML = '';
+                notices.slice(0, 5).forEach(n => {
+                    list.innerHTML += `
+                        <div style="border-bottom: 1px solid rgba(255,255,255,0.1); padding: 10px 0;">
+                            <div class="flex-row">
+                                <div>
+                                    <b style="color: var(--primary);">${n.title}</b>
+                                    <p style="margin: 5px 0; font-size: 14px;">${n.message}</p>
+                                    <small style="color: var(--text-sub);">${n.date}</small>
+                                </div>
+                                <button class="btn-danger sm-btn" onclick="admin.deleteNotice(${n.id})"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+            },
+
+            deleteNotice: (id) => {
+                admin.showConfirm("Delete this notice?", () => {
+                    let notices = JSON.parse(localStorage.getItem('admin_notices') || '[]');
+                    notices = notices.filter(n => n.id !== id);
+                    localStorage.setItem('admin_notices', JSON.stringify(notices));
+                    admin.loadNotices();
+                });
+            },
+
+            // LIBRARY
+            handleLibUpload: async (input) => {
+                const file = input.files[0];
+                if (!file) return;
+
+                admin.showAlert("Uploading to Cloud Storage... Please wait.", "info");
+
+                const url = await uploadToCloudinary(file);
+                if (url) {
+                    admin.currentLibFile = {
+                        name: file.name,
+                        type: file.type,
+                        data: url
+                    };
+                    admin.showAlert("Upload Successful! Cloud URL generated.", "success");
+                } else {
+                    input.value = "";
+                    // Alert handled in helper
+                }
+            },
+
+            addLibraryItem: () => {
+                if (!admin.currentLibFile) return admin.showAlert("Please upload a file first!", "error");
+                const title = document.getElementById('lib-title').value;
+                const subject = document.getElementById('lib-subject').value;
+                const allowDownload = document.getElementById('lib-download').checked;
+
+                if (!title || !subject) return admin.showAlert("Please fill all fields!", "error");
+
+                const library = JSON.parse(localStorage.getItem('admin_library') || '[]');
+                const item = {
+                    id: Date.now(),
+                    title: title,
+                    subject: subject,
+                    type: admin.currentLibFile.type.includes('pdf') ? 'pdf' : 'image',
+                    fileName: admin.currentLibFile.name,
+                    data: admin.currentLibFile.data,
+                    allowDownload: allowDownload,
+                    uploadDate: new Date().toLocaleDateString()
+                };
+                library.push(item);
+                localStorage.setItem('admin_library', JSON.stringify(library));
+
+                document.getElementById('lib-title').value = '';
+                document.getElementById('lib-subject').value = '';
+                document.getElementById('lib-download').checked = false;
+                admin.currentLibFile = null;
+                admin.showAlert("Material added successfully!", "success");
+                admin.loadLibrary();
+            },
+
+            loadLibrary: () => {
+                const library = JSON.parse(localStorage.getItem('admin_library') || '[]');
+                const list = document.getElementById('library-list');
+                const query = document.getElementById('lib-search') ? document.getElementById('lib-search').value.toLowerCase() : '';
+
+                list.innerHTML = '';
+
+                const filtered = library.filter(i => i.title.toLowerCase().includes(query) || i.subject.toLowerCase().includes(query));
+
+                if (filtered.length === 0) {
+                    list.innerHTML = '<p style="color: var(--text-sub); text-align: center; grid-column: 1/-1;">No library items found.</p>';
+                    return;
+                }
+
+                filtered.forEach(item => {
+                    const icon = item.type === 'pdf' ? 'fa-file-pdf' : 'fa-image';
+                    const downloadStatus = item.allowDownload ?
+                        `<i class="fas fa-download" style="color:var(--success);"></i>` :
+                        `<i class="fas fa-ban" style="color:var(--danger);"></i>`;
+
+                    list.innerHTML += `
+                        <div class="item-card" style="text-align: center;">
+                            <i class="fas ${icon}" style="font-size: 32px; color: var(--primary); margin-bottom: 10px;"></i>
+                            <h4 style="font-size: 14px; margin-bottom: 5px;">${item.title}</h4>
+                            <span class="badge" style="font-size: 10px; background: rgba(255,255,255,0.1); color: var(--text-sub);">${item.subject}</span>
+                            <p style="font-size: 11px; color: var(--text-sub); margin-top: 8px;">Uploaded: ${item.uploadDate || 'N/A'}</p>
+                            
+                            <div class="flex-row" style="justify-content: center; margin-top: 15px; gap:8px;">
+                                <button class="btn-success sm-btn" onclick="admin.toggleDownload(${item.id})" title="Toggle Download Permission"><i class="fas ${item.allowDownload ? 'fa-download' : 'fa-ban'}"></i></button>
+                                <button class="btn-ghost sm-btn" style="background:rgba(255,255,255,0.1);" onclick="admin.editLibraryItem(${item.id})" title="Edit"><i class="fas fa-edit"></i></button>
+                                <button class="btn-danger sm-btn" onclick="admin.deleteLibraryItem(${item.id})" title="Delete"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+            },
+
+            toggleDownload: (id) => {
+                const library = JSON.parse(localStorage.getItem('admin_library') || '[]');
+                const item = library.find(i => i.id === id);
+                if (item) {
+                    item.allowDownload = !item.allowDownload;
+                    localStorage.setItem('admin_library', JSON.stringify(library));
+                    admin.loadLibrary();
+                }
+            },
+
+            editLibraryItem: (id) => {
+                const library = JSON.parse(localStorage.getItem('admin_library') || '[]');
+                const item = library.find(i => i.id === id);
+                if (!item) return;
+
+                const newTitle = prompt("Enter new title:", item.title);
+                if (newTitle) item.title = newTitle;
+
+                const newSubject = prompt("Enter new subject:", item.subject);
+                if (newSubject) item.subject = newSubject;
+
+                localStorage.setItem('admin_library', JSON.stringify(library));
+                admin.loadLibrary();
+            },
+
+            deleteLibraryItem: (id) => {
+                admin.showConfirm("Delete this library item?", () => {
+                    let library = JSON.parse(localStorage.getItem('admin_library') || '[]');
+                    library = library.filter(i => i.id !== id);
+                    localStorage.setItem('admin_library', JSON.stringify(library));
+                    admin.loadLibrary();
+                });
+            },
+
+            // EXAMS
+            addQuestion: () => {
+                const text = document.getElementById('q-text').value;
+                const opts = [
+                    document.getElementById('q-opt1').value,
+                    document.getElementById('q-opt2').value,
+                    document.getElementById('q-opt3').value,
+                    document.getElementById('q-opt4').value
+                ];
+                const correct = parseInt(document.getElementById('q-correct').value);
+
+                if (!text || opts.some(o => !o)) return admin.showAlert("Please fill all question fields!", "error");
+
+                admin.currentExamQuestions.push({ t: text, opts: opts, c: correct });
+
+                document.getElementById('q-text').value = '';
+                document.getElementById('q-opt1').value = '';
+                document.getElementById('q-opt2').value = '';
+                document.getElementById('q-opt3').value = '';
+                document.getElementById('q-opt4').value = '';
+
+                admin.updateQuestionsPreview();
+            },
+
+            updateQuestionsPreview: () => {
+                const preview = document.getElementById('questions-preview');
+                if (admin.currentExamQuestions.length === 0) {
+                    preview.innerHTML = '';
+                    return;
+                }
+                preview.innerHTML = `<h4 style="margin-top: 20px;">Questions (${admin.currentExamQuestions.length})</h4>`;
+                admin.currentExamQuestions.forEach((q, idx) => {
+                    preview.innerHTML += `
+                        <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px; margin-bottom: 8px;">
+                            <b>Q${idx + 1}:</b> ${q.t}
+                            <button class="btn-danger sm-btn" onclick="admin.removeQuestion(${idx})" style="float: right;"><i class="fas fa-times"></i></button>
+                        </div>
+                    `;
+                });
+            },
+
+            removeQuestion: (idx) => {
+                admin.currentExamQuestions.splice(idx, 1);
+                admin.updateQuestionsPreview();
+            },
+
+            handleJsonFile: (input) => {
+                const file = input.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('json-input').value = e.target.result;
+                };
+                reader.readAsText(file);
+            },
+
+            importJson: () => {
+                const jsonText = document.getElementById('json-input').value;
+                if (!jsonText) return admin.showAlert("Please paste or upload JSON!", "error");
+
+                try {
+                    const data = JSON.parse(jsonText);
+                    const questions = admin.parseJsonQuestions(data);
+
+                    if (questions.length === 0) {
+                        return admin.showAlert("No valid questions found in JSON!", "error");
+                    }
+
+                    admin.currentExamQuestions = admin.currentExamQuestions.concat(questions);
+                    document.getElementById('json-input').value = '';
+                    admin.updateQuestionsPreview();
+                    admin.showAlert(`Imported ${questions.length} questions!`, "success");
+                } catch (e) {
+                    admin.showAlert("Invalid JSON format: " + e.message, "error");
+                }
+            },
+
+            parseJsonQuestions: (data) => {
+                const questions = [];
+
+                // Format 1: User's custom format
+                if (data.exam_name && data.questions && Array.isArray(data.questions)) {
+                    if (data.exam_name) document.getElementById('exam-title').value = data.exam_name;
+
+                    data.questions.forEach(q => {
+                        if (q.question && q.options && q.answer) {
+                            const correctIdx = q.options.indexOf(q.answer);
+                            questions.push({
+                                t: q.question,
+                                opts: q.options,
+                                c: correctIdx >= 0 ? correctIdx : 0
+                            });
+                        }
+                    });
+                    return questions;
+                }
+
+                // Format 2: Direct questions array
+                if (Array.isArray(data)) {
+                    data.forEach(q => {
+                        // Check for standard format
+                        if (q.t && q.opts && q.c !== undefined) {
+                            questions.push(q);
+                        }
+                        // Check for custom format
+                        else if (q.question && q.options && q.answer) {
+                            const correctIdx = q.options.indexOf(q.answer);
+                            questions.push({
+                                t: q.question,
+                                opts: q.options,
+                                c: correctIdx >= 0 ? correctIdx : 0
+                            });
+                        }
+                    });
+                    return questions;
+                }
+
+                // Format 3: Has questions property
+                if (data.questions && Array.isArray(data.questions)) {
+                    if (data.title) document.getElementById('exam-title').value = data.title;
+                    return admin.parseJsonQuestions(data.questions);
+                }
+
+                // Format 4: Has quiz property (New)
+                if (data.quiz && Array.isArray(data.quiz)) {
+                    return admin.parseJsonQuestions(data.quiz);
+                }
+
+                return questions;
+            },
+
+            publishExam: () => {
+                const title = document.getElementById('exam-title').value;
+                const time = parseInt(document.getElementById('exam-time').value);
+
+                if (!title) return admin.showAlert("Please enter exam title!", "error");
+                if (admin.currentExamQuestions.length === 0) return admin.showAlert("Please add questions!", "error");
+
+                const exams = JSON.parse(localStorage.getItem('admin_exams') || '[]');
+                const exam = {
+                    id: Date.now(),
+                    title: title,
+                    time: time,
+                    questions: admin.currentExamQuestions,
+                    createdDate: new Date().toLocaleDateString(),
+                    attempts: 0
+                };
+                exams.push(exam);
+                localStorage.setItem('admin_exams', JSON.stringify(exams));
+
+                document.getElementById('exam-title').value = '';
+                document.getElementById('exam-time').value = '10';
+                admin.currentExamQuestions = [];
+                admin.updateQuestionsPreview();
+
+                admin.showAlert("Exam published successfully!", "success");
+                admin.loadExams();
+            },
+
+            loadExams: () => {
+                const exams = JSON.parse(localStorage.getItem('admin_exams') || '[]');
+                const list = document.getElementById('exams-list');
+                const query = document.getElementById('exam-search') ? document.getElementById('exam-search').value.toLowerCase() : '';
+
+                list.innerHTML = '';
+
+                const filtered = exams.filter(e => e.title.toLowerCase().includes(query));
+
+                if (filtered.length === 0) {
+                    list.innerHTML = '<p style="color: var(--text-sub); text-align: center;">No exams found.</p>';
+                    return;
+                }
+
+                filtered.forEach(exam => {
+                    list.innerHTML += `
+                        <div class="item-card">
+                            <div class="flex-row">
+                                <div>
+                                    <h4>${exam.title}</h4>
+                                    <p style="font-size: 12px; color: var(--text-sub);">
+                                        <i class="fas fa-clock"></i> ${exam.time} min • 
+                                        <i class="fas fa-question-circle"></i> ${exam.questions.length} questions
+                                    </p>
+                                    <p style="font-size: 11px; color: var(--text-sub);">Created: ${exam.createdDate}</p>
+                                </div>
+                                <button class="btn-danger sm-btn" onclick="admin.deleteExam(${exam.id})"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+            },
+
+            deleteExam: (id) => {
+                admin.showConfirm("Delete this exam? This will also remove student results.", () => {
+                    let exams = JSON.parse(localStorage.getItem('admin_exams') || '[]');
+                    exams = exams.filter(e => e.id !== id);
+                    localStorage.setItem('admin_exams', JSON.stringify(exams));
+                    admin.loadExams();
+                });
+            },
+
+            // RESULTS
+            // RESULTS
+            loadResults: (refresh = false) => {
+                const students = JSON.parse(localStorage.getItem('admin_students') || '[]');
+                const exams = JSON.parse(localStorage.getItem('admin_exams') || '[]');
+
+                // 1. Populate Filters (if empty or refresh)
+                const examSelect = document.getElementById('res-filter-exam');
+                const studentSelect = document.getElementById('res-filter-student');
+
+                if (refresh || examSelect.options.length <= 1) {
+                    const currentExam = examSelect.value;
+                    examSelect.innerHTML = '<option value="" style="background:#1e1e24;">All Exams</option>';
+                    exams.forEach(e => {
+                        examSelect.innerHTML += `<option value="${e.title}" style="background:#1e1e24;">${e.title}</option>`;
+                    });
+                    examSelect.value = currentExam; // Restore selection
+                }
+
+                if (refresh || studentSelect.options.length <= 1) {
+                    const currentStudent = studentSelect.value;
+                    studentSelect.innerHTML = '<option value="" style="background:#1e1e24;">All Students</option>';
+                    students.forEach(s => {
+                        studentSelect.innerHTML += `<option value="${s.id}" style="background:#1e1e24;">${s.name}</option>`;
+                    });
+                    studentSelect.value = currentStudent; // Restore selection
+                }
+
+                // 2. Aggregate & Filter Data
+                const filterExam = examSelect.value;
+                const filterStudentId = studentSelect.value;
+
+                let allResults = [];
+                students.forEach(student => {
+                    // Filter by Student ID first if selected
+                    if (filterStudentId && student.id !== filterStudentId) return;
+
+                    const results = JSON.parse(localStorage.getItem(student.id + '_results') || '[]');
+                    results.forEach(r => {
+                        // Filter by Exam Title
+                        if (filterExam && r.exam !== filterExam) return;
+
+                        allResults.push({
+                            studentId: student.id,
+                            studentName: student.name,
+                            resultId: r.id,
+                            exam: r.exam,
+                            score: r.score,
+                            total: r.total,
+                            date: r.date,
+                            percentage: Math.round((r.score / r.total) * 100)
+                        });
+                    });
+                });
+
+                // 3. Sort by Date (Recent first)
+                // Date format is "M/D/YYYY", string. Simple reverse might work if order preserved, but better sort.
+                // For now, reverse is "good enough" assuming pushed sequentially.
+                allResults.reverse();
+
+                // 4. Render Table
+                const list = document.getElementById('results-list');
+                const stats = document.getElementById('res-stats');
+
+                if (allResults.length === 0) {
+                    list.innerHTML = '<p style="color: var(--text-sub); text-align: center; padding: 20px;">No results found matching filters.</p>';
+                    stats.innerText = '';
+                    return;
+                }
+
+                // Calc Stats
+                const avg = Math.round(allResults.reduce((acc, r) => acc + r.percentage, 0) / allResults.length);
+                stats.innerText = `Showing ${allResults.length} results • Average Score: ${avg}%`;
+
+                let html = `
+                    <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
+                        <thead>
+                            <tr style="background: rgba(255,255,255,0.05);">
+                                <th style="padding: 12px; text-align: left; border-radius: 8px 0 0 8px;">Student</th>
+                                <th style="padding: 12px; text-align: left;">Exam</th>
+                                <th style="padding: 12px; text-align: left;">Score</th>
+                                <th style="padding: 12px; text-align: left;">Date</th>
+                                <th style="padding: 12px; text-align: left; border-radius: 0 8px 8px 0;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                allResults.forEach(r => {
+                    const gradeColor = r.percentage >= 50 ? 'var(--success)' : 'var(--danger)';
+                    const badge = `<span class="badge" style="background:${gradeColor}; color:black; font-weight:bold; font-size:11px; padding:3px 8px; border-radius:10px;">${r.percentage}%</span>`;
+
+                    html += `
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 12px;"><b>${r.studentName}</b></td>
+                            <td style="padding: 12px;">${r.exam}</td>
+                            <td style="padding: 12px;">
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    ${r.score}/${r.total} ${badge}
+                                </div>
+                            </td>
+                            <td style="padding: 12px; font-size:13px; color:var(--text-sub);">${r.date}</td>
+                            <td style="padding: 12px;">
+                                <button class="btn-primary sm-btn" style="font-size:11px; padding:5px 10px;" onclick="admin.allowRetake('${r.studentId}', ${r.resultId})">Retake</button>
+                                <button class="btn-danger sm-btn" style="font-size:11px; padding:5px 10px;" onclick="admin.deleteResult('${r.studentId}', ${r.resultId})"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table>';
+                list.innerHTML = html;
+            },
+
+            clearResultFilters: () => {
+                document.getElementById('res-filter-exam').value = "";
+                document.getElementById('res-filter-student').value = "";
+                admin.loadResults();
+            },
+
+            exportResults: () => {
+                const students = JSON.parse(localStorage.getItem('admin_students') || '[]');
+                const filterExam = document.getElementById('res-filter-exam').value;
+                const filterStudentId = document.getElementById('res-filter-student').value;
+
+                let allResults = [];
+                students.forEach(student => {
+                    if (filterStudentId && student.id !== filterStudentId) return;
+                    const results = JSON.parse(localStorage.getItem(student.id + '_results') || '[]');
+                    results.forEach(r => {
+                        if (filterExam && r.exam !== filterExam) return;
+                        allResults.push({
+                            student: student.name,
+                            email: JSON.parse(localStorage.getItem(student.id + '_profile') || '{}').email || 'N/A',
+                            exam: r.exam,
+                            score: r.score,
+                            total: r.total,
+                            percentage: Math.round((r.score / r.total) * 100),
+                            date: r.date
+                        });
+                    });
+                });
+
+                if (allResults.length === 0) return admin.showAlert("No results to export!", "error");
+
+                // CSV Generation
+                let csv = 'Student Name,Email,Exam Title,Score,Total,Percentage,Date\n';
+                allResults.forEach(r => {
+                    csv += `"${r.student}","${r.email}","${r.exam}",${r.score},${r.total},${r.percentage}%,"${r.date}"\n`;
+                });
+
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `exam_results_${new Date().toISOString().slice(0, 10)}.csv`;
+                a.click();
+            },
+
+            allowRetake: (studentId, resultId) => {
+                admin.showConfirm("Allow this student to retake the exam?", () => {
+                    const results = JSON.parse(localStorage.getItem(studentId + '_results') || '[]');
+                    const result = results.find(r => r.id === resultId);
+                    if (!result) return;
+
+                    // Find exam ID from title
+                    const exams = JSON.parse(localStorage.getItem('admin_exams') || '[]');
+                    const exam = exams.find(e => e.title === result.exam);
+                    if (!exam) return;
+
+                    // Remove from attempts
+                    let attempts = JSON.parse(localStorage.getItem(studentId + '_attempts') || '[]');
+                    attempts = attempts.filter(a => a !== exam.id);
+                    localStorage.setItem(studentId + '_attempts', JSON.stringify(attempts));
+
+                    admin.showAlert("Retake allowed! Student can now retake this exam.", "success");
+                });
+            },
+
+            deleteResult: (studentId, resultId) => {
+                admin.showConfirm("Delete this result?", () => {
+                    let results = JSON.parse(localStorage.getItem(studentId + '_results') || '[]');
+                    results = results.filter(r => r.id !== resultId);
+                    localStorage.setItem(studentId + '_results', JSON.stringify(results));
+                    admin.loadResults();
+                });
+            },
+
+            // STUDENTS
+            // STUDENTS
+            loadStudents: () => {
+                const students = JSON.parse(localStorage.getItem('admin_students') || '[]');
+                const list = document.getElementById('students-list');
+                const query = document.getElementById('student-search') ? document.getElementById('student-search').value.toLowerCase() : '';
+
+                list.innerHTML = '';
+
+                const filtered = students.filter(s =>
+                    s.name.toLowerCase().includes(query) ||
+                    (JSON.parse(localStorage.getItem(s.id + '_profile') || '{}').email || '').toLowerCase().includes(query)
+                );
+
+                if (filtered.length === 0) {
+                    list.innerHTML = '<p style="color: var(--text-sub); text-align: center;">No registered students found.</p>';
+                    return;
+                }
+
+                let html = `
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
+                            <thead>
+                                <tr style="background: rgba(255,255,255,0.05); text-align: left;">
+                                    <th style="padding: 15px; border-radius: 10px 0 0 10px;">Name</th>
+                                    <th style="padding: 15px;">Email</th>
+                                    <th style="padding: 15px;">Status</th>
+                                    <th style="padding: 15px; border-radius: 0 10px 10px 0;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                // sort by most recent
+                filtered.reverse().forEach(student => {
+                    const profile = JSON.parse(localStorage.getItem(student.id + '_profile') || '{}');
+
+                    const status = student.banned ?
+                        '<span class="badge" style="background: var(--danger-grad); padding: 4px 10px; border-radius: 12px; font-size: 12px;">Banned</span>' :
+                        '<span class="badge" style="background: var(--success); padding: 4px 10px; border-radius: 12px; font-size: 12px;">Active</span>';
+
+                    const banBtn = student.banned ?
+                        `<button class="btn-success sm-btn" onclick="admin.unbanStudent('${student.id}')" style="font-size: 12px; padding: 5px 10px;">Unban</button>` :
+                        `<button class="btn-danger sm-btn" onclick="admin.banStudent('${student.id}')" style="font-size: 12px; padding: 5px 10px;">Ban</button>`;
+
+                    const email = profile.email || "N/A";
+
+                    html += `
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 15px;">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <div style="width:30px; height:30px; background:rgba(255,255,255,0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px;">
+                                        ${student.name.charAt(0).toUpperCase()}
+                                    </div>
+                                    <b>${student.name}</b>
+                                </div>
+                            </td>
+                            <td style="padding: 15px; color: var(--text-sub);">${email}</td>
+                            <td style="padding: 15px;">${status}</td>
+                            <td style="padding: 15px;">
+                                <div style="display:flex; gap: 5px;">
+                                    ${banBtn}
+                                    <button class="btn-primary sm-btn" onclick="admin.viewStudent('${student.id}')" style="font-size: 12px; padding: 5px 10px;">View</button>
+                                    <button class="btn-ghost sm-btn" onclick="admin.deleteStudent('${student.id}')" style="font-size: 12px; padding: 5px 10px;">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table></div>';
+                list.innerHTML = html;
+            },
+
+            exportStudentCSV: () => {
+                const students = JSON.parse(localStorage.getItem('admin_students') || '[]');
+                if (students.length === 0) return admin.showAlert("No students to export!", "error");
+
+                let csv = 'Student ID,Name,Email,Phone,Joined Date,Activities,Status\n';
+                students.forEach(s => {
+                    const p = JSON.parse(localStorage.getItem(s.id + '_profile') || '{}');
+                    const results = JSON.parse(localStorage.getItem(s.id + '_results') || '[]');
+                    csv += `"${s.id}","${s.name}","${p.email || 'N/A'}","${p.phone || 'N/A'}","${new Date(s.id).toLocaleDateString()}",${results.length},"${s.banned ? 'Banned' : 'Active'}"\n`;
+                });
+
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `students_list_${new Date().toISOString().slice(0, 10)}.csv`;
+                a.click();
+            },
+
+            banStudent: (studentId) => {
+                admin.showConfirm("Ban this student?", () => {
+                    const students = JSON.parse(localStorage.getItem('admin_students') || '[]');
+                    const student = students.find(s => s.id === studentId);
+                    if (student) {
+                        student.banned = true;
+                        localStorage.setItem('admin_students', JSON.stringify(students));
+                        admin.loadStudents();
+                    }
+                });
+            },
+
+            unbanStudent: (studentId) => {
+                const students = JSON.parse(localStorage.getItem('admin_students') || '[]');
+                const student = students.find(s => s.id === studentId);
+                if (student) {
+                    student.banned = false;
+                    localStorage.setItem('admin_students', JSON.stringify(students));
+                    admin.loadStudents();
+                }
+            },
+
+            viewStudent: (studentId) => {
+                const students = JSON.parse(localStorage.getItem('admin_students') || '[]');
+                const student = students.find(s => s.id === studentId);
+                const profile = JSON.parse(localStorage.getItem(studentId + '_profile') || '{}');
+                const results = JSON.parse(localStorage.getItem(studentId + '_results') || '[]');
+                const badges = JSON.parse(localStorage.getItem(studentId + '_badges') || '[]');
+
+                const info = `
+                    <div style="text-align: left;">
+                        ${profile.photo ? `<img src="${profile.photo}" style="width: 100px; height: 100px; border-radius: 50%; display: block; margin: 0 auto 15px;">` : ''}
+                        <p><b>Name:</b> ${student.name}</p>
+                        <p><b>Email:</b> ${profile.email || 'Not set'}</p>
+                        <p><b>Phone:</b> ${profile.phone || 'Not set'}</p>
+                        <p><b>Total Exams:</b> ${results.length}</p>
+                        <p><b>Badges Earned:</b> ${badges.length}</p>
+                        <p><b>Status:</b> ${student.banned ? 'Banned' : 'Active'}</p>
+                    </div>
+                `;
+
+                document.getElementById('ui-msg').innerHTML = info;
+                document.getElementById('ui-title').innerText = "Student Profile";
+                document.getElementById('ui-icon').className = 'fas fa-user modal-icon';
+                document.getElementById('ui-icon').style.color = 'var(--primary)';
+                document.getElementById('ui-btns').innerHTML = `<button class="btn-primary" onclick="document.getElementById('ui-modal').classList.add('hidden')">Close</button>`;
+                document.getElementById('ui-modal').classList.remove('hidden');
+            },
+
+            deleteStudent: (studentId) => {
+                admin.showConfirm("Delete this student and all their data?", () => {
+                    let students = JSON.parse(localStorage.getItem('admin_students') || '[]');
+                    students = students.filter(s => s.id !== studentId);
+                    localStorage.setItem('admin_students', JSON.stringify(students));
+
+                    // Clean up student data
+                    localStorage.removeItem(studentId + '_profile');
+                    localStorage.removeItem(studentId + '_results');
+                    localStorage.removeItem(studentId + '_attempts');
+                    localStorage.removeItem(studentId + '_badges');
+
+                    admin.loadStudents();
+                });
+            }
+        };
+
+        // Auto-refresh dashboard every 30 seconds
+        setInterval(() => {
+            if (!document.getElementById('tab-dashboard').classList.contains('hidden')) {
+                admin.loadDashboard();
+            }
+        }, 30000);
+
+        // Check for existing session on page load
+        admin.checkSession();
+    </script>
+</body>
+
+</html>
